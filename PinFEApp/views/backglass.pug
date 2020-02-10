@@ -1,0 +1,54 @@
+﻿extends layout
+
+
+block content
+  h1= Backglass
+   
+
+  div(style='width:100%;height:100%')
+    div(style:'float:left')
+        h2.status(style='color:green;position:absolute;top:15px;right:15px;z-index:11')
+        h2.tableName(style='display:inline-block;height:25px;margin:0px')
+    img.backglass(src=image style="position:absolute;left:0px;top:0px;width:100%;height:100%")
+    //div.swiper-pagination
+  script.
+
+    /*var tables = !{JSON.stringify(tables)}*/
+    
+
+      if (!!window.EventSource) {
+        var source = new EventSource('/status')
+
+        source.addEventListener('message', function(e) {
+            var status= JSON.parse(e.data);
+            if($(".status").val()!=status.state)
+                $(".status").text(status.state);
+
+            if($(".backglass").attr("src")!="tables"+status.table+".bg.jpg")
+                $(".backglass").attr("src","tables"+status.table+".bg.jpg");
+            //console.log("message:"+status.data);
+        }, false)
+
+        source.addEventListener('open', function(e) {
+            //console.log("Connected:"+e.data);
+            $(".status").text("Connected");
+        }, false)
+
+        source.addEventListener('error', function(e) {
+          const id_state = document.getElementById('state')
+          if (e.eventPhase == EventSource.CLOSED)
+            source.close()
+          if (e.target.readyState == EventSource.CLOSED) {
+            //console.log("Disconnected:");
+            $(".status").text("Connected");
+            //id_state.innerHTML = "Disconnected"
+          }
+          else if (e.target.readyState == EventSource.CONNECTING) {
+            //console.log("Connecting...:");
+            $(".status").text("Connecting...");
+            //id_state.innerHTML = "Connecting..."
+          }
+        }, false)
+      } else {
+        console.log("Your browser doesn't support SSE")
+      }

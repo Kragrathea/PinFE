@@ -1,0 +1,394 @@
+﻿extends layout
+
+
+block content
+  h1= Pinball
+  //p Welcome to #{title}
+    
+  .stars
+  .twinkling
+  .clouds
+
+
+
+  div.swiper-container(id='table-list' style='width:100%;z-index:10;-webkit-box-reflect: below -100px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, transparent), to(rgba(255,255,255,0.2)));')
+    h2.status(style='color:green;position:absolute;top:15px;right:15px;z-index:11')
+    div(style:'z-index:10;float:left')
+      //input.search(type="text")
+      ul.pagination
+      div(style='text-align:center;')
+        h2.filter(style='display:inline-block;height:25px;margin:0px')
+        h2.ratio(style='display:block;margin:0px')="1/"+tables.length
+    ul.swiper-wrapper.list
+  div(style='text-align:center;')
+    h2.masterName(style='display:inline-block;height:25px;width:100%;margin:0px')
+    h2.tableName(style='display:inline-block;height:25px;margin:0px')
+
+    //div.swiper-pagination
+  script.
+
+    var tables = !{JSON.stringify(tables)}
+    var filteredTables=tables;
+
+    var filterString="";
+
+    $(".search").on("input",function(){
+        setFilter($(".search").val());
+    });
+    
+    //var tsv is the TSV file with headers
+      function tsvJSON(tsv){
+        var lines=tsv.split("\n");
+        var result = [];
+
+        //table headers are on line 1
+        var headers=lines[1].split("\t");
+
+        //override headers to shorter javascript friendly.
+        var headers=["name","comment","type","version","author"];
+        for(var i=2;i<lines.length;i++){
+          var obj = {};
+          var currentline=lines[i].split("\t");
+ 
+          for(var j=0;j<headers.length;j++){
+            obj[headers[j]] = currentline[j];
+          }
+        result.push(obj);
+      }
+	
+      return result; //JavaScript object
+      //return JSON.stringify(result); //JSON
+    }
+
+    var masterTableList=[];
+    var masterTableIndex;
+    function loadMasterTableList()
+    {
+        $.get( "/data/MasterTableList.tsv", function( data ) {
+            //console.log( "Data Loaded: " + data );
+            masterTableList=tsvJSON(data);
+            var options = {
+                shouldSort: true,
+                threshold: 0.3,
+                //includeScore:true,
+                location: 0,
+                distance: 100,
+                maxPatternLength: 32,
+                minMatchCharLength: 3,
+                tokenize: true,
+                keys: [
+                    "name",
+                    //"author",
+                    //"comment",
+                    ]
+                };
+            masterTableIndex = new Fuse(masterTableList, options);
+              
+            //sortTablesIntoMaster();
+        });
+
+    }
+    loadMasterTableList();
+
+    function sortTablesIntoMaster()
+    {
+        tables.forEach(function(t){
+            var matches= masterTableIndex.search(t.tableFolder.split("[")[0]);
+            if(matches.length)
+                console.log(t.tableFolder+"->"+matches[0].item.name);
+        });
+    }
+
+
+    function findTableInMaster(table)
+    {
+
+        //first attempt to split at date         
+        var re = /.+?\(.+?(19|20)\d{2}/;
+        var tableCleaned=re.exec(table.tableFolder);
+        if(!tableCleaned)
+        {
+            //second attempt to split at date
+            var re2 = /.+?(19|20)\d{2}/;
+            tableCleaned=re2.exec(table.tableFolder);
+            if(!tableCleaned){
+                //ok at least spit any garbage off if possible. 
+                tableCleaned=[table.tableFolder.split("[")[0]];
+                }
+        }
+
+        var matches= masterTableIndex.search(tableCleaned[0]);
+        return(matches)
+    }
+
+    function setFilter(filter){
+        
+        console.log("Search:"+filter);
+
+        if(filter=="")
+            filteredTables = tables;
+        else
+        {
+            filterString=filter.toLowerCase();
+
+            console.log("Searching:"+filterString);
+            //filteredTables = tables.filter(x=>x.tableName.toLowerCase().indexOf(filterString)>-1);
+            filteredTables = tables.filter(x=>x.table.toLowerCase().indexOf(filterString)>-1);
+
+        }
+        console.log("Found:"+filteredTables.length);
+        initTableList();
+        swiper.update();
+        swiper.slideTo(0);
+        updateRatio();
+
+    };
+
+    function createTableItem(index){
+        var e = filteredTables[index];
+        var item=$("<li class='swiper-slide'></li>");
+        item.attr("style",'width:250px;text-align:center;padding-right:100px;');
+        item.attr("data-index",index);
+
+        if(e.bgSmallPic){
+            var img=$("<img/>");
+            img.attr("src","tables"+e.table+".bg-small.jpg");
+            img.attr("style",'width:100%;margin-bottom:-0px;')
+            item.append(img);
+        }
+        if(e.dtSmallPic){
+            var img=$("<img/>");
+            img.attr("src","tables"+e.table+".dt-small.jpg");
+            img.attr("style",'width:100%;margin-bottom:-40px;')
+            item.append(img);
+        }
+
+        if(e.fsSmallPic){
+            var img=$("<img/>");
+            img.attr("src","tables"+e.table+".fs-small.jpg");
+            img.attr("style",'max-height:400px;transform:rotateX(45deg);margin-bottom:-40px;')
+            item.append(img);
+        }
+        
+        if(e.wheelPic){
+            var img=$("<img/>");
+            img.attr("src","tables"+e.table+".wheel.png");
+            img.attr("style",'max-height:120px;max-width:90%;transform:translate3d(10px,-30px,30px);filter: drop-shadow(22px 22px 22px rgba(0,0,0,1.0));')
+            item.append(img);
+        }
+        var text =$("<h2></h2>");
+        text.attr("name",e.tableName);
+        if(!e.wheelPic)
+            text.append(e.tableName);
+
+        item.append(text);
+        return(item);
+    }
+    function updateRatio()
+    {
+        var curIndex = parseInt($(swiper.slides[swiper.activeIndex]).attr("data-index"));
+        if(curIndex!=undefined && !isNaN(curIndex))
+            $(".ratio").text((curIndex+1) +"/" + filteredTables.length);
+        else
+            $(".ratio").text(0 +"/" + filteredTables.length);
+    }
+    function initTableList()
+    {
+        $(".list").empty();
+        filteredTables.slice(0,30).forEach(function(e,i){
+            var item = createTableItem(i);
+            $(".list").append(item);
+        });
+    }
+    initTableList();
+
+
+
+    //$('.flipster').flipster();
+
+    var swiper = new Swiper('.swiper-container', {
+      effect: 'coverflow',
+      grabCursor: true,
+      centeredSlides: true,
+      slidesPerView: "auto",
+      preloadImages: true,
+      lazy: {
+        loadPrevNext: true,
+      	loadPrevNextAmount: 5,
+      },
+      keyboard: {
+        enabled: true,
+      },
+      coverflowEffect: {
+        rotate: 20,
+        stretch: 10,
+        depth: 100,
+        modifier: 1,
+        slideShadows : false,
+      },
+    });
+
+    updateRatio();
+
+    var curSlide=0;
+    
+    function updateSlides(){
+        console.log("slideChange index:"+swiper.realIndex+" of "+swiper.slides.length);
+        if(swiper.activeIndex>swiper.slides.length-10){
+            console.log("slideChange Near end:"+swiper.activeIndex);
+            var lastIndex = parseInt($(swiper.slides[swiper.slides.length-1]).attr("data-index"));
+            console.log("lastIndex:"+lastIndex);
+
+            while(lastIndex+1<filteredTables.length && swiper.activeIndex>swiper.slides.length-10)
+            {
+                lastIndex++;//=lastIndex+1;
+                var item = createTableItem(lastIndex+1);
+                swiper.appendSlide(item[0])
+                swiper.removeSlide(0);
+
+                console.log("addSlide:"+(lastIndex+1));
+            }
+            swiper.update();
+
+        }
+        if(swiper.activeIndex<10){
+            console.log("slideChange Near start:"+swiper.activeIndex);
+            var lastIndex = parseInt($(swiper.slides[0]).attr("data-index"));
+            console.log("lastIndex:"+lastIndex);
+      
+            while(lastIndex-1>=0 && swiper.activeIndex<10)
+            {
+                lastIndex--;
+                var item = createTableItem(lastIndex-1);
+                swiper.prependSlide(item[0])
+                swiper.removeSlide(swiper.slides.length-1);
+
+                console.log("addSlide:"+(lastIndex-1));
+            }
+            swiper.update();
+        }
+        curSlide=swiper.realIndex;
+
+        updateRatio();
+
+    }
+
+    swiper.on("slideChangeTransitionEnd",updateSlides);
+    swiper.on("slideChange",function(){
+        updateRatio();
+        console.log("slideChange Near end:"+swiper.activeIndex);
+        var dataIndex = parseInt($(swiper.slides[swiper.activeIndex]).attr("data-index"));
+
+        $(".tableName").text(filteredTables[dataIndex].table);
+
+        var matches = findTableInMaster(filteredTables[dataIndex])
+        $(".masterName").text(matches[0].name);
+
+        $.ajax({
+            url: '/select', 
+            type: 'POST', 
+            contentType: 'application/json', 
+            data: JSON.stringify({table:filteredTables[dataIndex].table})}
+        )
+        });
+          
+
+    //swiper.on("reachBeginning",updateSlides);
+    //swiper.on("reachEnd",updateSlides);
+        
+
+    var curFilter=""
+    var buildingFilter=false;
+    document.onkeydown = checkKey;
+    function checkKey(e) {
+        e = e || window.event;
+        console.log(e.keyCode);      
+
+        switch(e.keyCode)
+        {
+            case 38:
+                // up arrow
+                break;
+            case 40:
+                // down arrow
+                break;
+            case 37:
+                // left arrow
+                buildingFilter=false;
+                break;
+            case 39:
+                // right arrow
+                buildingFilter=false;
+                break;
+            case 13:
+                var dataIndex = parseInt($(swiper.slides[swiper.activeIndex]).attr("data-index"));
+                var table = filteredTables[dataIndex].table;
+                $.ajax({
+                    url: '/play', 
+                    type: 'POST', 
+                    contentType: 'application/json', 
+                    data: JSON.stringify({table:table})}
+                )
+                break;
+            case 8:
+                curFilter=curFilter.slice(0, -1);
+                setFilter(curFilter);
+                break;
+            default:
+                if (e.key.length==1 /*&& e.key.match(/^[0-9a-z]+$/)*/)
+                {
+                    if(!buildingFilter){
+                        curFilter=""
+                        buildingFilter=true;
+                        }
+                    curFilter=curFilter+e.key;
+                    setFilter(curFilter);
+                }
+                break;
+        }
+        console.log(curFilter);
+        $(".filter").text(curFilter);
+    }
+
+    
+    swiper.on("xxreachBeginning",function(){
+        swiper.slideTo(19);
+        $('.pagination').find('.active').previous().trigger("click");
+        swiper.update();
+        console.log("next");
+    });
+
+
+      if (!!window.EventSource) {
+        var source = new EventSource('/status')
+
+        source.addEventListener('message', function(e) {
+            var status= JSON.parse(e.data);
+            if($(".status").val()!=status.state)
+                $(".status").text(status.state);
+
+        }, false)
+
+        source.addEventListener('open', function(e) {
+            //console.log("Connected:"+e.data);
+            $(".status").text("Connected");
+        }, false)
+
+        source.addEventListener('error', function(e) {
+          const id_state = document.getElementById('state')
+          if (e.eventPhase == EventSource.CLOSED)
+            source.close()
+          if (e.target.readyState == EventSource.CLOSED) {
+            //console.log("Disconnected:");
+            $(".status").text("Connected");
+            //id_state.innerHTML = "Disconnected"
+          }
+          else if (e.target.readyState == EventSource.CONNECTING) {
+            //console.log("Connecting...:");
+            $(".status").text("Connecting...");
+            //id_state.innerHTML = "Connecting..."
+          }
+        }, false)
+      } else {
+        console.log("Your browser doesn't support SSE")
+      }
