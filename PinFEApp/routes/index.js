@@ -12,6 +12,10 @@ var imageDir = '/Games/VPTables/_index/FS/Gif/';
 
 var tableDir = '/Games/VPTables/Sorted/VPXCollection/';
 
+var masterDir = '/Games/VPTables/TableLists/Master';
+
+
+tableDir = masterDir;
 
 function findInDir(dir, filter, fileList = []) {
     const files = fs.readdirSync(tableDir + dir);
@@ -118,6 +122,8 @@ router.get('/status', function (req, res) {
     sendStatus(res)
 })
 
+
+
 function runPlayer(command, args, callback) {
     console.log("Starting Process.");
     if (playerActive)
@@ -152,6 +158,21 @@ function runPlayer(command, args, callback) {
         //callback(scriptOutput, code);
     });
 }
+
+
+var wheelsDir = '/Games/VPTables/Wheels';
+var wheelFiles;
+router.get('/search', function (req, res) {
+    var query = url.parse(req.url, true).query;
+    var term = (query.term);
+    res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive'
+    })
+    res.flushHeaders();
+    sendStatus(res)
+})
 
 /* GET home page. */
 router.get('/', function (req, res) {

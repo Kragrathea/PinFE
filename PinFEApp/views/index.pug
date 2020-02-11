@@ -114,7 +114,7 @@ block content
             if(!tableCleaned){
                 //ok at least spit any garbage off if possible. 
                 tableCleaned=[table.tableFolder.split("[")[0]];
-                }
+            }
         }
 
         var matches= masterTableIndex.search(tableCleaned[0]);
@@ -170,16 +170,24 @@ block content
             item.append(img);
         }
         
-        if(e.wheelPic){
+        if(true /*e.wheelPic*/){
+            var div =$("<div></div>");
             var img=$("<img/>");
-            img.attr("src","tables"+e.table+".wheel.png");
-            img.attr("style",'max-height:120px;max-width:90%;transform:translate3d(10px,-30px,30px);filter: drop-shadow(22px 22px 22px rgba(0,0,0,1.0));')
-            item.append(img);
+            img.attr("src","master"+e.table+".wheel.png");
+            
+            if(!e.wheelPic)
+                img.attr("src","images/"+"3D Search.png");
+
+            img.attr("style",'display:block;width:100%;height:auto;transform:translate3d(10px,-30px,30px);filter: drop-shadow(22px 22px 22px rgba(0,0,0,1.0));')
+            //max-height:120px;max-width:90%;
+            div.append(img)
+            item.append(div);
         }
         var text =$("<h2></h2>");
         text.attr("name",e.tableName);
-        if(!e.wheelPic)
-            text.append(e.tableName);
+        
+        //if(!e.wheelPic)
+            text.append( e.table.split("\\")[1] );
 
         item.append(text);
         return(item);

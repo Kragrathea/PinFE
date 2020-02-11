@@ -30,6 +30,8 @@ app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist/'));
 app.use('/scripts', express.static(__dirname + '/node_modules/'));
 
 app.use('/tables', express.static('C:/Games/VPTables/Sorted/VPXCollection/'));
+app.use('/master', express.static('C:/Games/VPTables/TableLists/Master'));
+app.use('/wheels', express.static('C:/Games/VPTables/Wheels'));
 
 app.use('/', routes);
 app.use('/users', users);
