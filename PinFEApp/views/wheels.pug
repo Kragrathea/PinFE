@@ -1,0 +1,17 @@
+﻿extends layout
+
+
+block content
+  h1= Wheels
+
+  div(style='width:100%;height:100%')
+    div(style:'float:left')
+    each wheel in wheels
+      div(style='width:128px;height:128px;float:left')
+        img(src="/wheels/?image="+wheel.file, alt=wheel.name style="display:block;width:100%;height:auto;")
+    //img.backglass(src=image style="position:absolute;left:0px;top:0px;width:100%;height:100%")
+    //div.swiper-pagination
+  script.
+
+    /*var tables = !{JSON.stringify(tables)}*/
+    

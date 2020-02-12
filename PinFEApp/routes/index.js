@@ -12,7 +12,7 @@ var imageDir = '/Games/VPTables/_index/FS/Gif/';
 
 var tableDir = '/Games/VPTables/Sorted/VPXCollection/';
 
-var masterDir = "/Projects/PinFE/PinFE/PinFEApp/public/Master";
+var masterDir = "./public/Master";
 
 
 tableDir = masterDir;

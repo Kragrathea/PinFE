@@ -12,6 +12,8 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var master = require('./routes/master');
+var wheels = require('./routes/wheels');
 
 var app = express();
 
@@ -31,10 +33,12 @@ app.use('/scripts', express.static(__dirname + '/node_modules/'));
 
 app.use('/tables', express.static('C:/Games/VPTables/Sorted/VPXCollection/'));
 //app.use('/master', express.static(path.join(__dirname, 'master')));
-app.use('/wheels', express.static('C:/Games/VPTables/Wheels'));
+//app.use('/wheels', express.static('C:/Games/VPTables/Wheels'));
 
 app.use('/', routes);
 app.use('/users', users);
+app.use('/master', master);
+app.use('/wheels', wheels);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
