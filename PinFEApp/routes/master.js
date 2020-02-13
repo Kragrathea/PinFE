@@ -7,19 +7,15 @@ var fs = require('fs'),
     path = require('path'),
     querystring = require('querystring');
 var url = require('url');
-var tableDir = '/Games/VPTables/Sorted/VPXCollection/';
 
 var masterDir = "./public/data";
 
-
-tableDir = masterDir;
-
 function findInDir(dir, filter, fileList = []) {
-    const files = fs.readdirSync(tableDir + dir);
+    const files = fs.readdirSync(masterDir + dir);
 
     files.forEach((file) => {
         const filePath = path.join(dir, file);
-        const fileStat = fs.lstatSync(tableDir + filePath);
+        const fileStat = fs.lstatSync(masterDir + filePath);
 
         if (fileStat.isDirectory()) {
             findInDir(filePath, filter, fileList);
@@ -45,7 +41,7 @@ function loadMasterTableList() {
         var headers = lines[1].split("\t");
 
         //override headers to shorter javascript friendly.
-        var headers = ["name", "comment", "type", "version", "author"];
+        var headers = ["name", "comment", "type", "version", "author", "tver", "tdate", "rom"]; //,"check","notes"];
         for (var i = 2; i < lines.length; i++) {
             var obj = {};
             var currentline = lines[i].split("\t");
@@ -91,12 +87,49 @@ router.get('/search', function (req, res) {
 
 router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
-    var pic = (query.image);
+    var qry = (query.search);
+    var image = (query.image);
+    var json = (query.json);
+    var imageIndex = (query.imageIndex);
 
-    res.json({
-        masterList: masterTableList,
-    });
-    //res.end();
+
+    var results = masterTableList
+    if (qry !== undefined) {
+        results = masterTableIndex.search(qry);
+    }
+
+    //if (imageIndex !== undefined) {
+    //    image = results[imageIndex].file;
+    //}
+
+    if (json !== undefined) {
+        res.json({
+            results: results,
+        });
+    }
+    else if (image !== undefined) {
+
+        //fs.readFile(wheelsDir + image, function (err, content) {
+        //    if (err) {
+        //        var size = (wheelsDir + image).length;
+        //        res.writeHead(400, { 'Content-type': 'text/html' })
+        //        console.log(err);
+        //        res.end("No such image");
+        //    } else {
+        //        //specify the content type in the response will be an image
+        //        res.writeHead(200, { 'Content-type': 'image/jpg' });
+        //        res.end(content);
+        //    }
+        //});
+
+    } else {
+        var page = (query.page);
+        if (page === undefined)
+            page = 0;
+        page = parseInt(page);
+        res.render('master', { title: 'PinFE', items: results.slice(page * 60, (page + 1) * 60) });
+    }
+
 });
 
 module.exports = router;

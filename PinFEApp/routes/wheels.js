@@ -80,28 +80,68 @@ router.get('/grid', function (req, res) {
     var qry = (query.search);
     var results = wheelList
     if (qry !== undefined) {
-        var results = wheelListIndex.search(qry);
+        results = wheelListIndex.search(qry);
     }
     res.render('wheels', { title: 'PinFE Wheels', wheels: results.slice(0,100) });
 });
+
+//router.get('/', function (req, res) {
+//    var query = url.parse(req.url, true).query;
+//    var qry = (query.search);
+//    var image = (query.image);
+
+//    var results = wheelList
+//    if (qry !== undefined) {
+//        var results = wheelListIndex.search(qry);
+//    }
+
+//    if (image === undefined) {
+//        res.json({
+//            results: wheelList,
+//        });
+//    } else {
+//        fs.readFile(wheelsDir + image, function (err, content) {
+//            if (err) {
+//                res.writeHead(400, { 'Content-type': 'text/html' })
+//                console.log(err);
+//                res.end("No such image");
+//            } else {
+//                //specify the content type in the response will be an image
+//                res.writeHead(200, { 'Content-type': 'image/jpg' });
+//                res.end(content);
+//            }
+//        });
+//    }
+
+//});
 
 router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
     var qry = (query.search);
     var image = (query.image);
+    var json = (query.json);
+    var imageIndex = (query.imageIndex);
+
 
     var results = wheelList
     if (qry !== undefined) {
-        var results = wheelListIndex.search(qry);
+        results = wheelListIndex.search(qry);
     }
 
-    if (image === undefined) {
+    if (imageIndex !== undefined) {
+        image = results[imageIndex].file;
+    }
+
+    if (json !== undefined) {
         res.json({
-            results: wheelList,
+            results: results,
         });
-    } else {
+    }
+    else if (image !== undefined) {
+
         fs.readFile(wheelsDir + image, function (err, content) {
             if (err) {
+                var size = (wheelsDir + image).length;
                 res.writeHead(400, { 'Content-type': 'text/html' })
                 console.log(err);
                 res.end("No such image");
@@ -111,6 +151,13 @@ router.get('/', function (req, res) {
                 res.end(content);
             }
         });
+
+    } else {
+        var page = (query.page);
+        if (page === undefined)
+            page = 0;
+        page = parseInt(page);
+        res.render('wheels', { title: 'PinFE', items: results.slice(page * 60, (page + 1) * 60) });
     }
 
 });

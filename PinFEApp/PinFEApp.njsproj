@@ -32,16 +32,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="app.js" />
+    <Compile Include="routes\tables.js" />
     <Compile Include="routes\index.js" />
     <Compile Include="routes\master.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="routes\backglasses.js" />
     <Compile Include="routes\wheels.js" />
     <Compile Include="routes\users.js" />
     <Content Include="package.json" />
     <Content Include="public\data\MasterTableList.tsv" />
     <Content Include="public\stylesheets\main.css" />
     <Content Include="README.md" />
+    <Content Include="views\master.pug" />
+    <Content Include="views\tables.pug" />
+    <Content Include="views\backglasses.pug" />
     <Content Include="views\wheels.pug" />
     <Content Include="views\backglass.pug" />
     <Content Include="views\index.pug" />

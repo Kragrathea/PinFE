@@ -15,7 +15,7 @@ var tableDir = '/Games/VPTables/Sorted/VPXCollection/';
 var masterDir = "./public/Master";
 
 
-tableDir = masterDir;
+//tableDir = masterDir;
 
 function findInDir(dir, filter, fileList = []) {
     const files = fs.readdirSync(tableDir + dir);

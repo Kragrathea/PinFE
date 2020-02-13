@@ -14,6 +14,8 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var master = require('./routes/master');
 var wheels = require('./routes/wheels');
+var backglasses = require('./routes/backglasses');
+var tables = require('./routes/tables');
 
 var app = express();
 
@@ -31,7 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist/'));
 app.use('/scripts', express.static(__dirname + '/node_modules/'));
 
-app.use('/tables', express.static('C:/Games/VPTables/Sorted/VPXCollection/'));
+//app.use('/tables', express.static('C:/Games/VPTables/Sorted/VPXCollection/'));
 //app.use('/master', express.static(path.join(__dirname, 'master')));
 //app.use('/wheels', express.static('C:/Games/VPTables/Wheels'));
 
@@ -39,6 +41,8 @@ app.use('/', routes);
 app.use('/users', users);
 app.use('/master', master);
 app.use('/wheels', wheels);
+app.use('/backglasses', backglasses);
+app.use('/tables', tables);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
