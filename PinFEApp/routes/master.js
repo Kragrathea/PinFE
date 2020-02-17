@@ -8,71 +8,8 @@ var fs = require('fs'),
     querystring = require('querystring');
 var url = require('url');
 
-var masterDir = "./public/data";
 
-function findInDir(dir, filter, fileList = []) {
-    const files = fs.readdirSync(masterDir + dir);
 
-    files.forEach((file) => {
-        const filePath = path.join(dir, file);
-        const fileStat = fs.lstatSync(masterDir + filePath);
-
-        if (fileStat.isDirectory()) {
-            findInDir(filePath, filter, fileList);
-        } else if (filter.test(filePath)) {
-            fileList.push(filePath);
-        }
-    });
-
-    return fileList;
-}
-
-var masterTableList = [];
-var masterTableIndex;
-function loadMasterTableList() {
-
-    fs.readFile(masterDir+'/MasterTableList.tsv', function (err, data) {
-        if (err) throw err;
-        var lines = data.toString().split("\n");
-
-        masterTableList = []
-
-        //table headers are on line 1
-        var headers = lines[1].split("\t");
-
-        //override headers to shorter javascript friendly.
-        var headers = ["name", "comment", "type", "version", "author", "tver", "tdate", "rom"]; //,"check","notes"];
-        for (var i = 2; i < lines.length; i++) {
-            var obj = {};
-            var currentline = lines[i].split("\t");
-
-            for (var j = 0; j < headers.length; j++) {
-                obj[headers[j]] = currentline[j];
-            }
-            masterTableList.push(obj);
-        }
-        console.log("Loaded masterTableList. Length:" + masterTableList.length);
-
-        var options = {
-            shouldSort: true,
-            threshold: 0.3,
-            //includeScore:true,
-            location: 0,
-            distance: 100,
-            maxPatternLength: 32,
-            minMatchCharLength: 3,
-            tokenize: true,
-            keys: [
-                "name",
-                //"author",
-                //"comment",
-            ]
-        };
-        masterTableIndex = new Fuse(masterTableList, options);
-    });
-}
-
-loadMasterTableList();
 
 router.get('/search', function (req, res) {
     var query = url.parse(req.url, true).query;
@@ -93,9 +30,9 @@ router.get('/', function (req, res) {
     var imageIndex = (query.imageIndex);
 
 
-    var results = masterTableList
+    var results = res.app.locals.masterTableList
     if (qry !== undefined) {
-        results = masterTableIndex.search(qry);
+        results = res.app.locals.masterTableIndex.search(qry);
     }
 
     //if (imageIndex !== undefined) {
@@ -103,9 +40,7 @@ router.get('/', function (req, res) {
     //}
 
     if (json !== undefined) {
-        res.json({
-            results: results,
-        });
+        res.json( results );
     }
     else if (image !== undefined) {
 
@@ -127,7 +62,7 @@ router.get('/', function (req, res) {
         if (page === undefined)
             page = 0;
         page = parseInt(page);
-        res.render('master', { title: 'PinFE', items: results.slice(page * 60, (page + 1) * 60) });
+        res.render('master', { title: 'PinFE', items: results.slice(page * 100, (page + 1) * 100) });
     }
 
 });

@@ -201,13 +201,23 @@ router.get('/', function (req, res) {
 });
 
 router.get('/backglass', function (req, res) {
-    //var query = url.parse(req.url, true).query;
-    //var pic = (query.image);
+    var query = url.parse(req.url, true).query;
+    var pic = (query.image);
     //figure out backglass image name
-    var bgImage = "tables" + curSelectedTable + ".bg.jpg";
-    res.render('backglass', { title: 'PinFE Backglass', table: curSelectedTable,image:bgImage});
+    var bgImage = "tables/?image=" + curSelectedTable + ".bg.jpg";
+    res.render('backglass', { title: 'PinFE Backglass', table: curSelectedTable, image: encodeURIComponent(bgImage) });
+});
+router.get('/wheel', function (req, res) {
+    var query = url.parse(req.url, true).query;
+    var pic = (query.image);
+    //figure out backglass image name
+    var bgImage = "tables/?image=" + curSelectedTable + ".wheel.jpg";
+    res.render('wheel', { title: 'PinFE', table: curSelectedTable, image: encodeURIComponent(bgImage) });
 
 
 });
+
+
+
 
 module.exports = router;

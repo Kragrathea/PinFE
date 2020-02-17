@@ -10,14 +10,84 @@ var bodyParser = require('body-parser');
 //var jQuery = require('jquery');
 //var flipster = require('jquery.flipster');
 
+var app = express();
+
+var Fuse = require('fuse.js');
+
+var fs = require('fs');
+
+app.locals.masterTableList = [];
+function loadMasterTableList() {
+
+    var masterDir = "./public/data";
+
+    function findInDir(dir, filter, fileList = []) {
+        const files = fs.readdirSync(masterDir + dir);
+
+        files.forEach((file) => {
+            const filePath = path.join(dir, file);
+            const fileStat = fs.lstatSync(masterDir + filePath);
+
+            if (fileStat.isDirectory()) {
+                findInDir(filePath, filter, fileList);
+            } else if (filter.test(filePath)) {
+                fileList.push(filePath);
+            }
+        });
+
+        return fileList;
+    }
+
+    fs.readFile(masterDir + '/MasterTableList.tsv', function (err, data) {
+        if (err) throw err;
+        var lines = data.toString().split("\n");
+
+        app.locals.masterTableList = []
+
+        //table headers are on line 1
+        var headers = lines[1].split("\t");
+
+        //override headers to shorter javascript friendly.
+        var headers = ["name", "comment", "type", "vpver", "author", "version", "date", "rom"]; //,"check","notes"];
+        for (var i = 2; i < lines.length; i++) { //NOTE 2. Bypassheaders.
+            var obj = {id:i-2}; //NOTE -2
+            var currentline = lines[i].split("\t");
+            for (var j = 0; j < headers.length; j++) {
+                obj[headers[j]] = currentline[j];
+            }
+            app.locals.masterTableList.push(obj);
+        }
+        console.log("Loaded masterTableList. Length:" + app.locals. masterTableList.length);
+
+        var options = {
+            shouldSort: true,
+            threshold: 0.3,
+            //includeScore:true,
+            location: 0,
+            distance: 100,
+            maxPatternLength: 32,
+            minMatchCharLength: 3,
+            tokenize: true,
+            keys: [
+                "name",
+                //"author",
+                //"comment",
+            ]
+        };
+        app.locals.masterTableIndex = new Fuse(app.locals.masterTableList, options);
+    });
+}
+loadMasterTableList();
+
+
+
+var master = require('./routes/master');
 var routes = require('./routes/index');
 var users = require('./routes/users');
-var master = require('./routes/master');
 var wheels = require('./routes/wheels');
 var backglasses = require('./routes/backglasses');
 var tables = require('./routes/tables');
 
-var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -50,6 +120,7 @@ app.use(function (req, res, next) {
     err.status = 404;
     next(err);
 });
+
 
 
 

@@ -28,23 +28,45 @@ function findInDir(baseDir,dir, filter, fileList = []) {
     return fileList;
 }
 
-var tablesList = [];
+var tablesList;
 var tablesListIndex;
 function loadTablesList() {
 
-    var files = findInDir(tablesDir,".", /\.vpx$/);
+    function findBackglass() {
+
+    }
+
+    var files = findInDir(tablesDir, ".", /\.vpx$/);
     var results = [];
+    var count = 0;
     files.forEach((file) => {
+        //if db file exists load
+        //else default info 
         results.push({
-            name: path.basename(file),
-            file: encodeURIComponent(file),
+            id: count++,
+            tableName: path.basename(file),
+            tableFolder: path.basename(path.dirname(file)),
+            table: file,
+            master: '/master/?search=' + encodeURIComponent(path.basename(path.dirname(file))) + "&json=1",
+            //master: app.locals.masterTableIndex.search(path.basename(path.dirname(file)))[0],
+            backglass: fs.existsSync(tablesDir + file + ".directb2s") || fs.existsSync(tablesDir + file.replace(".vpx", "") + ".directb2s"),
+            fsPic: fs.existsSync(tablesDir + file + ".fs.jpg"),
+            bgPic: fs.existsSync(tablesDir + file + ".bg.jpg"),
+            dtPic: fs.existsSync(tablesDir + file + ".dt.jpg"),
+            fsSmallPic: fs.existsSync(tablesDir + file + ".fs-small.jpg"),
+            bgSmallPic: fs.existsSync(tablesDir + file + ".bg-small.jpg"),
+            dtSmallPic: fs.existsSync(tablesDir + file + ".dt-small.jpg"),
+            wheelPic: fs.existsSync(tablesDir + file + ".wheel.png"),
+            wheelSmallPic: fs.existsSync(tablesDir + file + ".wheel-small.png"),
         })
     });
 
     tablesList = results;
 
     console.log("Loaded tablesList. Length:" + tablesList.length);
-
+}
+function createTablesIndex() {
+    
     var options = {
         shouldSort: true,
         threshold: 0.3,
@@ -62,44 +84,27 @@ function loadTablesList() {
     };
     tablesListIndex = new Fuse(tablesList, options);
 }
-loadTablesList();
 
-router.get('/search', function (req, res) {
-    var query = url.parse(req.url, true).query;
-    var qry = (query.query);
-
-    var matches = tablesList.search(qry);
-    res.json({
-        matches: matches,
-    });
-    //res.end();
-});
-
-router.get('/display', function (req, res) {
-    var query = url.parse(req.url, true).query;
-    var qry = (query.search);
-    var results = tablesList
-    if (qry !== undefined) {
-        results = tablesListIndex.search(qry);
-    }
-    res.render('tables', { title: 'PinFE', tables: results.slice(0,20) });
-});
 
 router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
     var qry = (query.search);
     var image = (query.image);
     var json = (query.json);
-    
+
+    if (!tablesList)
+        loadTablesList(); 
+
     var results = tablesList
     if (qry !== undefined) {
+        if (!tablesListIndex)
+            createTablesIndex(); 
+
         results = tablesListIndex.search(qry);
     }
 
     if (json !== undefined) {
-        res.json({
-            results: results,
-        });
+        res.json(tablesList);
     }
     else if (image !== undefined) {
         fs.readFile(tablesDir + image, function (err, content) {

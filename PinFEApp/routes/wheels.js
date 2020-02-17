@@ -157,7 +157,7 @@ router.get('/', function (req, res) {
         if (page === undefined)
             page = 0;
         page = parseInt(page);
-        res.render('wheels', { title: 'PinFE', items: results.slice(page * 60, (page + 1) * 60) });
+        res.render('wheels', { title: 'PinFE', items: results.slice(page * 100, (page + 1) * 100) });
     }
 
 });

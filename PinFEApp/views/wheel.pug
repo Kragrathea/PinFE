@@ -2,26 +2,16 @@
 
 
 block content
-  h1= Backglass
-   
-
   div(style='width:100%;height:100%')
     div(style:'float:left')
         h2.status(style='color:green;position:absolute;top:15px;right:15px;z-index:11')
         h2.tableName(style='display:inline-block;height:25px;margin:0px')
     img.backglass(src=image style="position:absolute;left:0px;top:0px;width:100%;height:100%")
-    div.dmd(style="position:absolute;left:0px;top:0px;width:1024px;height:200px;z-index:12")
-        iframe(src='http://localhost:9090' style="width:100%;height:100%" )
-        div.cover(style="position:absolute;left:0px;top:0px;width:100%;height:100%")
     //div.swiper-pagination
   script.
 
     /*var tables = !{JSON.stringify(tables)}*/
     
-
-    $(".dmd").draggable({
-        iframeFix: true
-        }).resizable();
 
       if (!!window.EventSource) {
         var source = new EventSource('/status')
@@ -29,15 +19,10 @@ block content
         source.addEventListener('message', function(e) {
             var status= JSON.parse(e.data);
             if($(".status").val()!=status.state)
-                {
                 $(".status").text(status.state);
-                if(status.state.startsWith("Playing"))
-                    $(".dmd").show();
-                else
-                    $(".dmd").hide();
-                }
-            if($(".backglass").attr("src")!="tables?image="+encodeURIComponent(status.table)+".bg.jpg")
-                $(".backglass").attr("src","tables?image="+encodeURIComponent(status.table)+".bg.jpg");
+
+            if($(".backglass").attr("src")!="tables?image="+encodeURIComponent(status.table)+".wheel.png")
+                $(".backglass").attr("src","tables?image="+encodeURIComponent(status.table)+".wheel.png");
             //console.log("message:"+status.data);
         }, false)
 

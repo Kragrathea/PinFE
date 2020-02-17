@@ -4,14 +4,38 @@
 block content
   h1= Master
 
-  div(style='width:100%;height:100%')
-    div(style:'float:left')
-    each item in items
-      div(style='width:10%;height:100px;float:left;display:inline-block')
-        img(src="/wheels/?search="+item.name+"&imageIndex=0", alt=item.name style="display:block;width:100%;height:auto;")
-        h2=item.name
+  div(style='position:absolute;left:10px;right:10px;bottom:10px;top:10px')
+    div.master-table
+
+  //div(style='width:100%;height:100%')
+  //  div(style:'float:left')
+  //  each item in items
+  //    div(style='width:10%;height:100px;float:left;display:inline-block')
+  //      img(src="/backglasses/?search="+item.name+"&imageIndex=0", alt=item.name style="display:block;width:100%;height:auto;")
+  //      h2=item.name
+
 
   script.
 
+    var table = new Tabulator(".master-table", 
+        {
+        height:"100%", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+        layout:"fitDataStretch",
+        //pagination:"local",
+        //paginationSize:30,
+        //paginationSizeSelector:[30, 60, 80, 100],
+        columns:[ //Define Table Columns
+            {title:"Id", field:"id"},
+            {title:"Name", field:"name"},
+            {title:"Type", field:"type"},
+            {title:"Date", field:"date", sorter:"date", align:"center"},
+            {title:"Version", field:"version"},
+            {title:"Comment", field:"comment", align:"left",width:"100"},
+            {title:"Author", field:"author"},
+        ]
+        });
+        ["name", "comment", "type", "version", "author", "tver", "tdate", "rom"];
 
+    table.setData('/master/?json=1');
+    //$("#example-table").tabulator("setData", !{JSON.stringify(items)});
     

@@ -44,6 +44,7 @@
     <Content Include="public\data\MasterTableList.tsv" />
     <Content Include="public\stylesheets\main.css" />
     <Content Include="README.md" />
+    <Content Include="views\wheel.pug" />
     <Content Include="views\master.pug" />
     <Content Include="views\tables.pug" />
     <Content Include="views\backglasses.pug" />
@@ -58,6 +59,7 @@
     <Folder Include="public\images\" />
     <Folder Include="public\javascripts\" />
     <Folder Include="public\data\" />
+    <Folder Include="public\sounds\" />
     <Folder Include="public\stylesheets\" />
     <Folder Include="routes\" />
     <Folder Include="views\" />
