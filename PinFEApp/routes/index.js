@@ -79,8 +79,8 @@ var playerStatus = "";
 router.post('/play', function (req, res) {
     console.log(req.body);
     console.log("POST play table:" + req.body.table);
-    var cmd = '"f:/Games/Visual Pinball/VPinballX_cab.exe" /play ' + '"c:\\' + tableDir + req.body.table + '"';
-    runPlayer('f:/Games/Visual Pinball/VPinballX_cab.exe', ["/play", "c:\\" + tableDir + req.body.table]);
+    //var cmd = '"f:/Games/Visual Pinball/VPinballX_cab.exe" /play ' + '"c:\\' + tableDir + req.body.table + '"';
+    runPlayer('C:/Games/PinFE/Apps/VisualPinball/VisualPinballCab.exe', ["/play", "c:\\" + tableDir + req.body.table,"-ForceDT","-minimized"]);
 
     res.end();
 });

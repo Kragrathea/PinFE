@@ -170,8 +170,8 @@ block content
                 swiper.slideNext();
                 break;
             case 13:
-                var dataIndex = parseInt($(swiper.slides[swiper.activeIndex]).attr("data-index"));
-                var table = filteredTables[dataIndex].table;
+                var curIndex = parseInt(swiper.virtual.slides[swiper.activeIndex]);
+                var table = filteredTables[curIndex].table;
                 $.ajax({
                     url: '/play', 
                     type: 'POST', 
