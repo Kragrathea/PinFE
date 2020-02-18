@@ -8,7 +8,7 @@ var fs = require('fs'),
     querystring = require('querystring');
 var url = require('url');
 
-var wheelsDir = "../../../Wheels/" // ./public/data";
+var wheelsDir = "../../../Wheels/"; // ./public/data";
 
 
 function findInDir(dir, filter, fileList = []) {
@@ -37,8 +37,8 @@ function loadWheelList() {
     wheelFiles.forEach((file) => {
         results.push({
             name: path.basename(file),
-            file: file,
-        })
+            file: file
+        });
     });
 
     wheelList = results;
@@ -55,7 +55,7 @@ function loadWheelList() {
         minMatchCharLength: 3,
         tokenize: true,
         keys: [
-            "name",
+            "name"
             //"author",
             //"comment",
         ]
@@ -66,19 +66,19 @@ loadWheelList();
 
 router.get('/search', function (req, res) {
     var query = url.parse(req.url, true).query;
-    var qry = (query.query);
+    var qry = query.query;
 
     var matches = wheelListIndex.search(qry);
     res.json({
-        matches: matches,
+        matches: matches
     });
-    //res.end();
+
 });
 
 router.get('/grid', function (req, res) {
     var query = url.parse(req.url, true).query;
-    var qry = (query.search);
-    var results = wheelList
+    var qry = query.search;
+    var results = wheelList;
     if (qry !== undefined) {
         results = wheelListIndex.search(qry);
     }
@@ -117,13 +117,13 @@ router.get('/grid', function (req, res) {
 
 router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
-    var qry = (query.search);
-    var image = (query.image);
-    var json = (query.json);
-    var imageIndex = (query.imageIndex);
+    var qry = query.search;
+    var image = query.image;
+    var json = query.json;
+    var imageIndex = query.imageIndex;
 
 
-    var results = wheelList
+    var results = wheelList;
     if (qry !== undefined) {
         results = wheelListIndex.search(qry);
     }
@@ -134,7 +134,7 @@ router.get('/', function (req, res) {
 
     if (json !== undefined) {
         res.json({
-            results: results,
+            results: results
         });
     }
     else if (image !== undefined) {
@@ -142,7 +142,7 @@ router.get('/', function (req, res) {
         fs.readFile(wheelsDir + image, function (err, content) {
             if (err) {
                 var size = (wheelsDir + image).length;
-                res.writeHead(400, { 'Content-type': 'text/html' })
+                res.writeHead(400, { 'Content-type': 'text/html' });
                 console.log(err);
                 res.end("No such image");
             } else {
@@ -153,7 +153,7 @@ router.get('/', function (req, res) {
         });
 
     } else {
-        var page = (query.page);
+        var page = query.page;
         if (page === undefined)
             page = 0;
         page = parseInt(page);

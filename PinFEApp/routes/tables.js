@@ -8,7 +8,7 @@ var fs = require('fs'),
     querystring = require('querystring');
 var url = require('url');
 
-var tablesDir = "../../../Tables/" // ./public/data";
+var tablesDir = "../../../Tables/"; // ./public/data";
 
 
 function findInDir(baseDir,dir, filter, fileList = []) {
@@ -57,8 +57,8 @@ function loadTablesList() {
             bgSmallPic: fs.existsSync(tablesDir + file + ".bg-small.jpg"),
             dtSmallPic: fs.existsSync(tablesDir + file + ".dt-small.jpg"),
             wheelPic: fs.existsSync(tablesDir + file + ".wheel.png"),
-            wheelSmallPic: fs.existsSync(tablesDir + file + ".wheel-small.png"),
-        })
+            wheelSmallPic: fs.existsSync(tablesDir + file + ".wheel-small.png")
+        });
     });
 
     tablesList = results;
@@ -77,7 +77,7 @@ function createTablesIndex() {
         minMatchCharLength: 3,
         tokenize: true,
         keys: [
-            "name",
+            "name"
             //"author",
             //"comment",
         ]
@@ -88,14 +88,14 @@ function createTablesIndex() {
 
 router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
-    var qry = (query.search);
-    var image = (query.image);
-    var json = (query.json);
+    var qry = query.search;
+    var image = query.image;
+    var json = query.json;
 
     if (!tablesList)
         loadTablesList(); 
 
-    var results = tablesList
+    var results = tablesList;
     if (qry !== undefined) {
         if (!tablesListIndex)
             createTablesIndex(); 
@@ -110,7 +110,7 @@ router.get('/', function (req, res) {
         fs.readFile(tablesDir + image, function (err, content) {
             if (err) {
                 var size = (tablesDir + image).length;
-                res.writeHead(400, { 'Content-type': 'text/html' })
+                res.writeHead(400, { 'Content-type': 'text/html' });
                 console.log(err);
                 res.end("No such image");
             } else {
@@ -121,10 +121,10 @@ router.get('/', function (req, res) {
         });
 
     } else {
-        var page = (query.page);
+        var page = query.page;
         if (page === undefined)
             page = 0;
-        var count = (query.count);
+        var count = query.count;
         if (count === undefined)
             count = 20;
 

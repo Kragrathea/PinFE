@@ -42,13 +42,14 @@ function loadMasterTableList() {
         if (err) throw err;
         var lines = data.toString().split("\n");
 
-        app.locals.masterTableList = []
+        app.locals.masterTableList = [];
 
         //table headers are on line 1
         var headers = lines[1].split("\t");
 
         //override headers to shorter javascript friendly.
-        var headers = ["name", "comment", "type", "vpver", "author", "version", "date", "rom"]; //,"check","notes"];
+        headers = ["name", "comment", "type", "vpver", "author", "version", "date", "rom"]; //,"check","notes"];
+
         for (var i = 2; i < lines.length; i++) { //NOTE 2. Bypassheaders.
             var obj = {id:i-2}; //NOTE -2
             var currentline = lines[i].split("\t");
@@ -69,7 +70,7 @@ function loadMasterTableList() {
             minMatchCharLength: 3,
             tokenize: true,
             keys: [
-                "name",
+                "name"
                 //"author",
                 //"comment",
             ]

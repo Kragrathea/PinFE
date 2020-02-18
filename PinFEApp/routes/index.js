@@ -56,18 +56,18 @@ function getTableInfo(dir, callback) {
     var results = [];
     tableFiles.forEach((file) => {
         results.push({
-                tableName: path.basename(file),
-                tableFolder: path.basename(path.dirname(file)),
-                table: file,
-                fsPic: fs.existsSync(tableDir +file + ".fs.jpg"),
-                bgPic: fs.existsSync(tableDir +file + ".bg.jpg"),
-                dtPic: fs.existsSync(tableDir +file + ".dt.jpg"),
-                fsSmallPic: fs.existsSync(tableDir +file + ".fs-small.jpg"),
-                bgSmallPic: fs.existsSync(tableDir +file + ".bg-small.jpg"),
-                dtSmallPic: fs.existsSync(tableDir +file + ".dt-small.jpg"),
-                wheelPic: fs.existsSync(tableDir+file + ".wheel.png"),
-                wheelSmallPic: fs.existsSync(tableDir +file + ".wheel-small.png"),
-            })
+            tableName: path.basename(file),
+            tableFolder: path.basename(path.dirname(file)),
+            table: file,
+            fsPic: fs.existsSync(tableDir + file + ".fs.jpg"),
+            bgPic: fs.existsSync(tableDir + file + ".bg.jpg"),
+            dtPic: fs.existsSync(tableDir + file + ".dt.jpg"),
+            fsSmallPic: fs.existsSync(tableDir + file + ".fs-small.jpg"),
+            bgSmallPic: fs.existsSync(tableDir + file + ".bg-small.jpg"),
+            dtSmallPic: fs.existsSync(tableDir + file + ".dt-small.jpg"),
+            wheelPic: fs.existsSync(tableDir + file + ".wheel.png"),
+            wheelSmallPic: fs.existsSync(tableDir + file + ".wheel-small.png")
+        });
     });
 
     callback("", results);
@@ -78,13 +78,13 @@ var playerActive = false;
 var playerStatus = "";
 router.post('/play', function (req, res) {
     var query = url.parse(req.url, true).query;
-    var view = (query.view);
+    var view = query.view;
 
     var arg = "-ForceFS";
-    if (view && view.toLowerCase() == "dt")
-        arg = "-ForceDT"
-    else if(view && view.toLowerCase() == "fss")
-        arg = "-ForceFSS"
+    if (view && view.toLowerCase() === "dt")
+        arg = "-ForceDT";
+    else if (view && view.toLowerCase() === "fss")
+        arg = "-ForceFSS";
 
 
     console.log("POST play table:" + req.body.table);
@@ -105,19 +105,19 @@ router.post('/select', function (req, res) {
 function sendStatus(res) {
 
     if (playerActive) {
-        var msg = JSON.stringify({ state: "Playing", "table": curSelectedTable });
-        res.write("data:"+ msg + " \n\n")
+        let msg = JSON.stringify({ state: "Playing", "table": curSelectedTable });
+        res.write("data:" + msg + " \n\n");
         //res.write("table: " + curSelectedTable + "\n\n");
     }
     else {
-        var msg = JSON.stringify({ state: "Idle", "table": curSelectedTable });
-        res.write("data:" +msg + " \n\n")
+        let msg = JSON.stringify({ state: "Idle", "table": curSelectedTable });
+        res.write("data:" + msg + " \n\n");
         //res.write("data: " + "Idle\n\n");
         //res.write("table: " + curSelectedTable + "\n\n");
     }
     //res.flush();
 
-    setTimeout(() => sendStatus(res), 1000)
+    setTimeout(() => sendStatus(res), 1000);
 
     //res.end()
 }
@@ -126,10 +126,10 @@ router.get('/status', function (req, res) {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive'
-    })
+    });
     res.flushHeaders();
-    sendStatus(res)
-})
+    sendStatus(res);
+});
 
 
 
@@ -173,20 +173,20 @@ var wheelsDir = '/Games/VPTables/Wheels';
 var wheelFiles;
 router.get('/search', function (req, res) {
     var query = url.parse(req.url, true).query;
-    var term = (query.term);
+    var term = query.term;
     res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive'
-    })
+    });
     res.flushHeaders();
-    sendStatus(res)
-})
+    sendStatus(res);
+});
 
 /* GET home page. */
 router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
-    var pic = (query.image);
+    var pic = query.image;
 
     if (typeof pic === 'undefined') {
         getTableInfo("/", function (err, tables) {
@@ -196,7 +196,7 @@ router.get('/', function (req, res) {
         //read the image using fs and send the image content back in the response
         fs.readFile(imageDir + pic, function (err, content) {
             if (err) {
-                res.writeHead(400, { 'Content-type': 'text/html' })
+                res.writeHead(400, { 'Content-type': 'text/html' });
                 console.log(err);
                 res.end("No such image");
             } else {
@@ -211,14 +211,14 @@ router.get('/', function (req, res) {
 
 router.get('/backglass', function (req, res) {
     var query = url.parse(req.url, true).query;
-    var pic = (query.image);
+    var pic = query.image;
     //figure out backglass image name
     var bgImage = "tables/?image=" + curSelectedTable + ".bg.jpg";
     res.render('backglass', { title: 'PinFE Backglass', table: curSelectedTable, image: encodeURIComponent(bgImage) });
 });
 router.get('/wheel', function (req, res) {
     var query = url.parse(req.url, true).query;
-    var pic = (query.image);
+    var pic = query.image;
     //figure out backglass image name
     var bgImage = "tables/?image=" + curSelectedTable + ".wheel.jpg";
     res.render('wheel', { title: 'PinFE', table: curSelectedTable, image: encodeURIComponent(bgImage) });

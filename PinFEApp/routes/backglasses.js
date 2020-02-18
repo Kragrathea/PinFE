@@ -8,7 +8,7 @@ var fs = require('fs'),
     querystring = require('querystring');
 var url = require('url');
 
-var bgDir = "../../..//Backglasses/" // ./public/data";
+var bgDir = "../../..//Backglasses/"; // ./public/data";
 var xml2js = require('xml2js');
 
 
@@ -40,8 +40,8 @@ function loadBGList() {
     files.forEach((file) => {
         results.push({
             name: path.basename(file),
-            file: encodeURIComponent(file),
-        })
+            file: encodeURIComponent(file)
+      });
     });
 
     bgList = results;
@@ -58,7 +58,7 @@ function loadBGList() {
         minMatchCharLength: 3,
         tokenize: true,
         keys: [
-            "name",
+            "name"
             //"author",
             //"comment",
         ]
@@ -69,18 +69,18 @@ loadBGList();
 
 router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
-    var qry = (query.search);
-    var image = (query.image);
-    var json = (query.json);
+    var qry = query.search;
+    var image = query.image;
+    var json = query.json;
 
-    var results = bgList
+    var results = bgList;
     if (qry !== undefined) {
         results = bgListIndex.search(qry);
     }
 
     if (json !== undefined) {
         res.json({
-            results: results,
+            results: results
         });
     }
     else if (image !== undefined) {
@@ -97,7 +97,7 @@ router.get('/', function (req, res) {
             res.end(img);
         });
     } else {
-        var page = (query.page);
+        var page = query.page;
         if (page === undefined)
             page = 0;
         page = parseInt(page);
