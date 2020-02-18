@@ -8,7 +8,7 @@ var fs = require('fs'),
     querystring = require('querystring');
 var url = require('url');
 
-var tablesDir = "/Games/VPTables/Sorted/VPXCollection/" // ./public/data";
+var tablesDir = "../../../Tables/" // ./public/data";
 
 
 function findInDir(baseDir,dir, filter, fileList = []) {

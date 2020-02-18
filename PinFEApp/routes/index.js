@@ -8,9 +8,9 @@ var fs = require('fs'),
     path = require('path'),
     querystring = require('querystring');
 var url = require('url');
-var imageDir = '/Games/VPTables/_index/FS/Gif/';
+//var imageDir = '/Games/VPTables/_index/FS/Gif/';
 
-var tableDir = '/Games/VPTables/Sorted/VPXCollection/';
+var tableDir = '../../../Tables/';
 
 var masterDir = "./public/Master";
 
@@ -77,10 +77,19 @@ function getTableInfo(dir, callback) {
 var playerActive = false;
 var playerStatus = "";
 router.post('/play', function (req, res) {
-    console.log(req.body);
+    var query = url.parse(req.url, true).query;
+    var view = (query.view);
+
+    var arg = "-ForceFS";
+    if (view && view.toLowerCase() == "dt")
+        arg = "-ForceDT"
+    else if(view && view.toLowerCase() == "fss")
+        arg = "-ForceFSS"
+
+
     console.log("POST play table:" + req.body.table);
     //var cmd = '"f:/Games/Visual Pinball/VPinballX_cab.exe" /play ' + '"c:\\' + tableDir + req.body.table + '"';
-    runPlayer('C:/Games/PinFE/Apps/VisualPinball/VisualPinballCab.exe', ["/play", "c:\\" + tableDir + req.body.table,"-ForceDT","-minimized"]);
+    runPlayer('../../VisualPinball/VisualPinballCab.exe', ["/play", tableDir + req.body.table, arg,"-minimized"]);
 
     res.end();
 });

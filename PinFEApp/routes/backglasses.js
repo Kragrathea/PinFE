@@ -8,7 +8,7 @@ var fs = require('fs'),
     querystring = require('querystring');
 var url = require('url');
 
-var bgDir = "/Games/VPTables/Sorted/Backglasses/" // ./public/data";
+var bgDir = "../../..//Backglasses/" // ./public/data";
 var xml2js = require('xml2js');
 
 

@@ -78,14 +78,7 @@ block content
             item.append(img);
         }
         
-        /*
-        if(e.dtSmallPic){
-            var img=$("<img/>");
-            img.attr("src","tables/?image="+encodeURIComponent(e.table)+".dt-small.jpg");
-            img.attr("style",'width:100%;')
-            item.append(img);
-        }
-        */
+
 
          if(true ){
             var div =$("<div class='wheel'></div>");
@@ -101,7 +94,19 @@ block content
             item.append(div);
         }
 
-        if(e.fsSmallPic){
+        var showDesktop=false;
+        if(window.location.href.toLowerCase().indexOf("view=dt") > -1)
+            showDesktop=true;
+
+        if(e.dtSmallPic && showDesktop){
+            var img=$("<img/>");
+            img.attr("src","tables/?image="+encodeURIComponent(e.table)+".dt-small.jpg");
+            img.attr("style",'width:100%;')
+            item.append(img);
+        }
+        
+        
+        if(e.fsSmallPic && !showDesktop){
             var img=$("<img/>");
             img.attr("src","tables/?image="+encodeURIComponent(e.table)+".fs-small.jpg");
             img.attr("style",'width:70%;position:absolute;top:60%;left:15%;max-height:400px;transform:rotateX(45deg);')
@@ -172,8 +177,12 @@ block content
             case 13:
                 var curIndex = parseInt(swiper.virtual.slides[swiper.activeIndex]);
                 var table = filteredTables[curIndex].table;
+                var playUrl = '/play?view=fs';
+                if(e.shiftKey || (window.location.href.toLowerCase().indexOf("view=dt") > -1))
+                    playUrl='/play?view=dt';
+
                 $.ajax({
-                    url: '/play', 
+                    url: playUrl, 
                     type: 'POST', 
                     contentType: 'application/json', 
                     data: JSON.stringify({table:table})}

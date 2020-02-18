@@ -8,7 +8,7 @@ var fs = require('fs'),
     querystring = require('querystring');
 var url = require('url');
 
-var wheelsDir = "/Games/VPTables/Wheels/" // ./public/data";
+var wheelsDir = "../../../Wheels/" // ./public/data";
 
 
 function findInDir(dir, filter, fileList = []) {
