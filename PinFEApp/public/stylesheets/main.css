@@ -6,7 +6,10 @@
 */
     background-color: #194671;
 }
-
+body.rot
+{
+    transform:rotate(-90deg);
+}
 a {
     color: #00B7FF;
 }
@@ -87,6 +90,7 @@ h2 {
 .swiper-slide-active .wheel img {
     transition-duration: 500ms;
     transform: scale(1.5);
+    z-index: 12;
 }
 
 .stars, .twinkling, .clouds {
