@@ -38,6 +38,36 @@ function loadMasterTableList() {
         return fileList;
     }
 
+    function fuzzyCompare(a, b) {
+        //console.log([a, b]);
+        var ca = a.toLowerCase().replace(" ", "").replace("-", "").replace("(", "").replace(")", "");
+        var cb = b.toLowerCase().replace(" ", "").replace("-", "").replace("(", "").replace(")", "");
+
+        //if (ca.Contains("pharaoh") && cb.Contains("pharaoh"))
+        //    Console.WriteLine("here");
+
+        if (ca == cb)
+            return true;
+        return false;
+    }
+    function simplifyName(tableName) {
+        if (tableName.indexOf(')') > 0)
+            tableName = tableName.substring(0, tableName.indexOf('('));
+        var ca = tableName.toLowerCase().replace(" ", "").replace("-", "").replace("_", "").replace("'", "").replace("\"", "").replace("&", "").replace("'", "").
+            replace(",", "").replace(".", "").replace("!", "").replace("the", "").replace("and", "").replace("do brasil", "").replace(" ", "");
+        return ca;
+    }
+    function superFuzzyCompare(a, b) {
+        var ca = simplifyName(a);
+        var cb = simplifyName(b);
+
+        //Console.WriteLine(ca);
+
+        if (ca == cb)
+            return true;
+        return false;
+    }
+
     fs.readFile(masterDir + '/MasterTableList.tsv', function (err, data) {
         if (err) throw err;
         var lines = data.toString().split("\n");
@@ -76,6 +106,18 @@ function loadMasterTableList() {
             ]
         };
         app.locals.masterTableIndex = new Fuse(app.locals.masterTableList, options);
+        app.locals.masterTableQuickSearch = function (tableName) {
+
+            //console.log("quickSearch for:" + query.query);
+            var results = app.locals.masterTableList.filter(a => fuzzyCompare(a.name, tableName));
+            //console.log("quickSearch found:" + results.length + " for" + simplifyName(qry));
+
+            if (results.length < 1)
+                results = app.locals.masterTableList.filter(a => superFuzzyCompare(a.name, tableName));
+            //console.log("quickSearch found:" + results.length + " for" + simplifyName(qry));
+            return (results);
+        }
+
     });
 }
 loadMasterTableList();

@@ -30,7 +30,7 @@ function findInDir(baseDir,dir, filter, fileList = []) {
 
 var tablesList;
 var tablesListIndex;
-function loadTablesList() {
+function loadTablesList(res) {
 
     function findBackglass() {
 
@@ -42,13 +42,43 @@ function loadTablesList() {
     files.forEach((file) => {
         //if db file exists load
         //else default info 
+
+        var dbase = {
+            masterName: ""
+        }
+
+        let suggestedMaster = "";
+        //load database file if any.
+        if (fs.existsSync(tablesDir + file + ".dbase")) {
+            //console.log(file)
+            let data = fs.readFileSync(tablesDir + file + ".dbase");
+            if (data)
+                dbase = JSON.parse(data);
+        } else {
+            let master = res.app.locals.masterTableQuickSearch(path.basename(path.dirname(file)));
+            if (master && master.length > 0) {
+                suggestedMaster = master[0].name;
+
+                //var dbName = tablesDir + file + ".dbase";
+                //dbase.masterName = suggestedMaster;
+                //fs.writeFileSync(dbName, JSON.stringify(dbase));
+            } else {
+                //let master = res.app.locals.masterTableIndex.search(path.basename(path.dirname(file)));
+                //if (master && master.length > 0) {
+                //    suggestedMaster = master[0].name;
+                //}
+            }
+        }
+
         results.push({
             id: count++,
             tableName: path.basename(file),
             tableFolder: path.basename(path.dirname(file)),
             table: file,
-            master: '/master/?search=' + encodeURIComponent(path.basename(path.dirname(file))) + "&json=1",
-            //master: app.locals.masterTableIndex.search(path.basename(path.dirname(file)))[0],
+            //master: '/master/quickSearch?query=' + encodeURIComponent(path.basename(path.dirname(file))) + "&json=1",
+            masterName: dbase.masterName,
+            suggestedMaster: suggestedMaster,
+            dbase: dbase,
             backglass: fs.existsSync(tablesDir + file + ".directb2s") || fs.existsSync(tablesDir + file.replace(".vpx", "") + ".directb2s"),
             fsPic: fs.existsSync(tablesDir + file + ".fs.jpg"),
             bgPic: fs.existsSync(tablesDir + file + ".bg.jpg"),
@@ -93,7 +123,7 @@ router.get('/', function (req, res) {
     var json = query.json;
 
     if (!tablesList)
-        loadTablesList(); 
+        loadTablesList(res); 
 
     var results = tablesList;
     if (qry !== undefined) {
@@ -132,6 +162,44 @@ router.get('/', function (req, res) {
         page = parseInt(page);
         res.render('tables', { title: 'PinFE', tables: results.slice(page * count, (page + 1) * count) });
     }
+
+});
+
+
+router.get('/sort', function (req, res) {
+    var query = url.parse(req.url, true).query;
+    var qry = query.search;
+    var image = query.image;
+    var json = query.json;
+
+    //if (!tablesList)
+        loadTablesList(res);
+
+    var results = tablesList;
+    if (qry !== undefined) {
+        if (!tablesListIndex)
+            createTablesIndex();
+
+        results = tablesListIndex.search(qry);
+    }
+
+    res.render('tablessort', { title: 'Sort Tables', tables: results});
+
+});
+router.post('/update', function (request, response) {
+    console.log(request.body);
+    var table = request.body.table;
+    let data = JSON.stringify(request.body.data);
+    console.log("Update Table:" + table);
+
+    var dbName = tablesDir + table + ".dbase";
+    console.log([dbName,data]);
+    
+
+    fs.writeFileSync(dbName, data);
+
+    response.send(request.body);    // echo the result back
+
 
 });
 

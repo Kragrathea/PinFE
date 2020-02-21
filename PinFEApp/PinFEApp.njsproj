@@ -44,6 +44,7 @@
     <Content Include="public\data\MasterTableList.tsv" />
     <Content Include="public\stylesheets\main.css" />
     <Content Include="README.md" />
+    <Content Include="views\tablessort.pug" />
     <Content Include="views\wheel.pug" />
     <Content Include="views\master.pug" />
     <Content Include="views\tables.pug" />

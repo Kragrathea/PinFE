@@ -80,19 +80,7 @@ block content
         
 
 
-         if(true ){
-            var div =$("<div class='wheel'></div>");
-            var img=$("<img/>");
-            img.attr("src","tables/?image="+encodeURIComponent(e.table)+".wheel.png");
-            
-            if(!e.wheelPic)
-                img.attr("src","images/"+"3D Search.png");
 
-            img.attr("style",'')
-            //max-height:120px;max-width:90%;
-            div.append(img)
-            item.append(div);
-        }
 
         var showDesktop=false;
         if(window.location.href.toLowerCase().indexOf("view=dt") > -1)
@@ -113,7 +101,19 @@ block content
             item.append(img);
         }
               
+         if(true ){
+            var div =$("<div class='wheel' style='transform:rotateX(0deg)'></div>");
+            var img=$("<img/>");
+            img.attr("src","tables/?image="+encodeURIComponent(e.table)+".wheel.png");
+            
+            if(!e.wheelPic)
+                img.attr("src","images/"+"3D Search.png");
 
+            img.attr("style",'')
+            //max-height:120px;max-width:90%;
+            div.append(img)
+            item.append(div);
+        }
         
         var text =$("<h2></h2>");
         text.attr("name",e.tableName);
@@ -263,7 +263,7 @@ block content
         //console.log(vslides);
 
         swiper = new Swiper('.swiper-container', {
-          effect: 'coverflow',
+          //effect: 'coverflow',
           slidesPerView: 5,
           centeredSlides: true,
           spaceBetween: 60,

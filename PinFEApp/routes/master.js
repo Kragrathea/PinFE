@@ -21,6 +21,17 @@ router.get('/search', function (req, res) {
     });
 
 });
+router.get('/quickSearch', function (req, res) {
+    var query = url.parse(req.url, true).query;
+    var qry = query.query;
+
+    console.log("quickSearch for:" + query.query);
+    var results = res.app.locals.masterTableQuickSearch(query.query);
+
+    res.json(results);
+});
+
+
 
 router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
