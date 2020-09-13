@@ -40,8 +40,11 @@ function loadMasterTableList() {
 
     function fuzzyCompare(a, b) {
         //console.log([a, b]);
-        var ca = a.toLowerCase().replace(" ", "").replace("-", "").replace("(", "").replace(")", "");
-        var cb = b.toLowerCase().replace(" ", "").replace("-", "").replace("(", "").replace(")", "");
+
+        if (a.startsWith("Bank") && b.startsWith("Bank"))
+            console.log([a, b]);
+        var ca = a.toLowerCase().replace(/ /g, "").replace(/-/g, "").replace(/\(/g, "").replace(/\)/g, "");
+        var cb = b.toLowerCase().replace(/ /g, "").replace(/-/g, "").replace(/\(/g, "").replace(/\)/g, "");
 
         //if (ca.Contains("pharaoh") && cb.Contains("pharaoh"))
         //    Console.WriteLine("here");
@@ -53,8 +56,8 @@ function loadMasterTableList() {
     function simplifyName(tableName) {
         if (tableName.indexOf(')') > 0)
             tableName = tableName.substring(0, tableName.indexOf('('));
-        var ca = tableName.toLowerCase().replace(" ", "").replace("-", "").replace("_", "").replace("'", "").replace("\"", "").replace("&", "").replace("'", "").
-            replace(",", "").replace(".", "").replace("!", "").replace("the", "").replace("and", "").replace("do brasil", "").replace(" ", "");
+        var ca = tableName.toLowerCase().replace(/ /g, "").replace(/\-/g, "").replace(/_/g, "").replace(/\'/g, "").replace(/\"/g, "").replace(/\&/g, "").replace(/\'/g, "").replace(/\(/g, "").replace(/\)/g, "").
+            replace(/\,/g, "").replace(/\./g, "").replace(/\!/g, "").replace(/the/g, "").replace(/and/g, "").replace(/do brasil/g, "").replace(/ /g, "");
         return ca;
     }
     function superFuzzyCompare(a, b) {
@@ -86,7 +89,8 @@ function loadMasterTableList() {
             for (var j = 0; j < headers.length; j++) {
                 obj[headers[j]] = currentline[j];
             }
-            app.locals.masterTableList.push(obj);
+            if(obj.name!=="")//get rid of blank rows.
+                app.locals.masterTableList.push(obj);
         }
         console.log("Loaded masterTableList. Length:" + app.locals. masterTableList.length);
 

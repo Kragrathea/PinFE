@@ -2,7 +2,7 @@
 
 
 block content
-  h1= Tables
+  h1= Backglasses
 
   button(onClick="updateTable()" style="z-index:12") click me
   div(style='position:absolute;left:10px;right:10px;bottom:10px;top:50px')
@@ -12,6 +12,7 @@ block content
 
     function updateTable(table,data)
     {
+    return;
         $.ajax({
               type: "POST",
               url: "/tables/update",
@@ -23,7 +24,7 @@ block content
         })
     }
 
-    $.getJSON( "/master/?json=1&justNames=1", function( data ) {
+    $.getJSON( "/backglasses/?json=1&justNames=1", function( data ) {
 
         masterNameList=data;
             

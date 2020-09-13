@@ -4,8 +4,7 @@
 block content
   h1= Tables
 
-  button(onClick="updateTable()" style="z-index:12") click me
-  div(style='position:absolute;left:10px;right:10px;bottom:10px;top:50px')
+  div(style='position:absolute;left:10px;right:10px;bottom:10px;top:10px')
     div.tables-table
 
   //div(style='width:100%;height:100%')
@@ -29,26 +28,154 @@ block content
                   console.log("ajax callback response:"+JSON.stringify(data));
         })
     }
+    var masterNameList=["a","b","c"];
+    function loadMasterNames()
+    {
+        $.getJSON( "/master/?json=1&justNames=1", function( data ) {
+
+            masterNameList=data;
+            
+            console.log(masterNameList)
+            loadTable();
+        });
+    }
+    loadMasterNames();
+
+    function setupContext(table)
+    {
+      $.contextMenu({
+          //selector: "div[tabulator-field='backglass']", 
+          selector: "div.tabulator-row", 
+          build: function($trigger, e) {
+              // this callback is executed every time the menu is to be shown
+              // its results are destroyed every time the menu is hidden
+              // e is the original contextmenu event, containing e.pageX and e.pageY (amongst other data)
+              return {
+                  callback: function(key, options) {
+                      var m = "clicked: " + e;
+                      console.log($trigger[0].parentNode); 
+
+                      let row = table.getRow($trigger[0].parentNode);
+
+                      var tableFile= row.getData()["table"]
+                      var masterName= row.getData()["masterName"]
+
+                      console.log([tableFile,masterName]); 
+                  },
+                  items: {
+                      "edit": {name: "Edit", icon: "edit"},
+                      "cut": {name: "Cut", icon: "cut"},
+                      "copy": {name: "Copy", icon: "copy"},
+                      "paste": {name: "Paste", icon: "paste"},
+                      "delete": {name: "Delete", icon: "delete"},
+                      "sep1": "---------",
+                      "quit": {name: "Quit", icon: function($element, key, item){ return 'context-menu-icon context-menu-icon-quit'; }}
+                  }
+              };
+          }
+      });
+
+    }
+
+    var theFuckenTable;
+    function loadTable(){
       var table = new Tabulator(".tables-table", 
         {
         height:"100%", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
         layout:"fitDataStretch",
+        selectable:true,
+        selectableRangeMode:"click",
         //pagination:"local",
         //paginationSize:30,
         //paginationSizeSelector:[30, 60, 80, 100],
+        groupBy:"masterName",
+        groupValues:[ [...new Set(masterNameList)] ],
         columns:[ //Define Table Columns
             {title:"Id", field:"id"},
-            {title:"File Name", field:"tableName"},
-            {title:"Master", field:"masterName",formatter:"link" },
-            {title:"Backglass", field:"backglass", align:"center", formatter:"tickCross", headerVertical:true},
-            {title:"FS Pic", field:"fsPic", align:"center", formatter:"tickCross",  headerVertical:true},
-            {title:"BG Pic", field:"fsPic", align:"center", formatter:"tickCross", headerVertical:true},
-            {title:"DT Pic", field:"fsPic", align:"center", formatter:"tickCross", headerVertical:true},
-            {title:"Wheel Pic", field:"wheelPic", align:"center", formatter:"tickCross", headerVertical:true},
+            {title:"File Name", field:"tableName", headerFilter:true},
+            //{title:"suggestedMaster", field:"suggestedMaster", headerFilter:true},
+            //{title:"Master", field:"masterName",formatter:"select", headerFilter:true,editor:"select", editorParams:function(cell){
+            //        return {values:masterNameList};
+            //    }
+            //},
+            {title:"Master", field:"masterName",editor:"autocomplete", editorParams:{
+                    showListOnEmpty:true, //show all values when the list is empty,
+                    freetext:false, //allow the user to set the value of the cell to a free text entry
+                    allowEmpty:true, //allow empty string values
+                    //searchFunc:function(term, values){ //search for exact matches
+                    //    var matches = []
+                    //
+                    //    values.forEach(function(item){
+                    //        if(item.value === term){
+                    //            matches.push(item);
+                    //        }
+                    //    });
+                    //
+                    //    return matches;
+                    //},
+                    values:masterNameList,
+                    //function(cell){
+                    //
+                    //    let map ={}
+                    //    masterNameList.forEach(function(o){
+                    //        map[o]=o;
+                    //    });
+                    //    //let list = masterNameList.map(x=>{x:x});
+                    //    console.log(map);
+                    //    return map;
+                    //},
+                    //function(cell){
+                    //    return {values:masterNameList};
+                    //    },
+                    //sortValuesList:"asc", //if creating a list of values from values:true then choose how it should be sorted
+                    //defaultValue:"Steve Johnson", //set the value that should be selected by default if the cells value is undefined
+                    //elementAttributes:{
+                    //    maxlength:"10", //set the maximum character length of the input element to 10 characters
+                    //},
+                    //verticalNavigation:"hybrid", //navigate to new row when at the top or bottom of the selection list
+                }
+            },
+
+            {title:"Backglass", field:"backglass", align:"center", formatter:"tickCross", headerVertical:true,cellClick:function(e, cell){
+                console.log("Click: " + cell.getRow().getData()["table"] );
+                window.open('/backglasses?search='+cell.getRow().getData()["masterName"] ,'_blank');
+                window.open('https://www.google.com/search?q='+cell.getRow().getData()["masterName"] +' directb2s','_blank');
+                }
+            },
+            {title:"FS Pic", field:"fsPic", align:"center", formatter:"tickCross",  headerVertical:true, cellClick:function(e, cell){
+                var playUrl = '/capture?view=fs'
+                $.ajax({
+                    url: playUrl, 
+                    type: 'POST', 
+                    contentType: 'application/json', 
+                    data: JSON.stringify({table:cell.getRow().getData()["table"]})
+                  });
+                }
+            },
+            {title:"BG Pic", field:"bgPic", align:"center", formatter:"tickCross", headerVertical:true},
+            {title:"DT Pic", field:"dtPic", align:"center", formatter:"tickCross", headerVertical:true, cellClick:function(e, cell){
+
+            return;
+                var playUrl = '/capture?view=dt'
+                $.ajax({
+                    url: playUrl, 
+                    type: 'POST', 
+                    contentType: 'application/json', 
+                    data: JSON.stringify({table:cell.getRow().getData()["table"]})
+                  });
+                }
+            },
+            {title:"Wheel Pic", field:"wheelPic", align:"center", formatter:"tickCross", headerVertical:true,cellClick:function(e, cell){
+                console.log("Click: " + cell.getRow().getData()["table"] );
+                window.open('/wheels?search='+cell.getRow().getData()["masterName"] ,'_blank');
+                //window.open('https://www.google.com/search?q='+cell.getRow().getData()["masterName"] +' directb2s','_blank');
+                }
+            },
+
             //{title:"Icon", field:"wheelSmallPic", align:"center", formatter:"tickCross", headerVertical:true},
 
             //{title:"Folder Name", field:"tableFolder"},
-            {title:"Full File Name", field:"table"},
+            {title:"Full File Name", field:"table", headerFilter:true},
             //{title:"Master Name", field:"type"},
             //{title:"Master Varient", field:"type"},
             //{title:"Date", field:"date", sorter:"date", align:"center"},
@@ -57,8 +184,10 @@ block content
         ]
         });
 
-    table.setData('/tables/?json=1');
+        table.setData('/tables/?json=1');
+        theFuckenTable=table;
+        setupContext(table);
 
-
+    }
     /*var tables = !{JSON.stringify(tables)}*/
     

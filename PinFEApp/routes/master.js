@@ -45,6 +45,8 @@ router.get('/', function (req, res) {
     }
 
     if (json !== undefined) {
+        if (query.justNames)
+            results = results.map(x => x.name);
         res.json( results );
     }
     else {

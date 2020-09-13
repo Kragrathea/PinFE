@@ -79,9 +79,9 @@ router.get('/', function (req, res) {
     }
 
     if (json !== undefined) {
-        res.json({
-            results: results
-        });
+        if (query.justNames)
+            results = results.map(x => x.name);
+        res.json(results);
     }
     else if (image !== undefined) {
         fs.readFile(bgDir + image, "utf8", function (err, data) {
@@ -101,7 +101,7 @@ router.get('/', function (req, res) {
         if (page === undefined)
             page = 0;
         page = parseInt(page);
-        res.render('backglasses', { title: 'PinFE', items: results.slice(page * 50, (page + 1) * 50) });
+        res.render('backglasses', { title: 'PinFE', items: results.slice(page * 250, (page + 1) * 250) });
     }
 
 });

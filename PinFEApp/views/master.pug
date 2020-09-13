@@ -28,13 +28,13 @@ block content
             {title:"Id", field:"id"},
             {title:"Name", field:"name"},
             {title:"Type", field:"type"},
+            {title:"ROM", field:"rom"},
             {title:"Date", field:"date", sorter:"date", align:"center"},
             {title:"Version", field:"version"},
             {title:"Comment", field:"comment", align:"left",width:"100"},
             {title:"Author", field:"author"},
         ]
         });
-        ["name", "comment", "type", "version", "author", "tver", "tdate", "rom"];
 
     table.setData('/master/?json=1');
     //$("#example-table").tabulator("setData", !{JSON.stringify(items)});

@@ -9,7 +9,14 @@ block content
   //.twinkling
   //.clouds
 
+  
+
   div.swiper-container(id='table-list' style='')
+  
+    div.message(id='message')
+    div.todo.final(id='final_span')
+    span.todo.interm(id='interm_span')
+
     //-webkit-box-reflect: below -100px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, transparent), to(rgba(255,255,255,0.2)));')
     h2.status(style='color:green;position:absolute;top:15px;right:15px;z-index:11')
     div(style:'z-index:10;float:left')
@@ -35,6 +42,101 @@ block content
         setFilter($(".search").val());
     });
     
+
+    var recognition = new webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognizing=false;
+
+    recognition.onstart = function () {
+        recognizing = true;
+        console.log("start");
+        //message.innerHTML = 'Speak now.';
+        //talk_button.innerHTML = 'Listen';
+    };
+
+    recognition.onresult = function (event) {
+        var interim_transcript = '';
+        for (var i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                final_transcript += event.results[i][0].transcript;
+            } else {
+                interim_transcript += event.results[i][0].transcript;
+            }
+        }
+
+        if(final_transcript!=""){
+          console.log(final_transcript)
+          if(final_transcript.indexOf("search")>-1)
+          {
+            var term = final_transcript.split("search")[1];
+            curFilter=term.trim();
+            setFilter(curFilter);
+
+          }
+          final_transcript="";
+          interim_transcript="";
+         }
+        //console.log(interim_transcript)
+        //final_span.innerHTML = final_transcript;
+        //interim_span.innerHTML = interim_transcript;
+    };
+
+    recognition.onend = function () {
+
+        recognizing = false;
+        if (ignore_onend) {
+            return;
+        }
+        //speechMyText(final_transcript);
+        if (!final_transcript) {
+            //message.innerHTML = 'Click "Talk" and begin speaking.';
+            //talk_button.innerHTML = 'Talk';
+            return;
+        }
+    };
+
+    recognition.onerror = function (event) {
+      console.log("Recognize error:"+even.error);
+        if (event.error == 'no-speech') {
+            //message.innerHTML = 'No speech was detected.';
+            ignore_onend = true;
+        }
+        if (event.error == 'audio-capture') {
+            //message.innerHTML = 'No microphone was found. Ensure that a microphone is installed.';
+            ignore_onend = true;
+        }
+        if (event.error == 'not-allowed') {
+            if (event.timeStamp - start_timestamp < 100) {
+                //message.innerHTML = 'Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions#media-stream';
+            } else {
+                //message.innerHTML = 'Permission to use microphone was denied.';
+            }
+            ignore_onend = true;
+        }
+    };
+
+    function talkWithApp(event) {
+      if (recognizing) {
+          recognition.stop();
+          //message.innerHTML = 'Click "Talk" and begin speaking.';
+          //talk_button.innerHTML = 'Talk';
+          return;
+      }
+      final_transcript = '';
+      //recognition.lang = language.value;
+      recognition.start();
+      ignore_onend = false;
+    }
+
+    function speechMyText(textToSpeech) {
+      var u = new SpeechSynthesisUtterance();
+      u.text = textToSpeech;
+      u.lang = language.value;
+      u.rate = 1.0;
+      u.onend = function (event) {}
+      speechSynthesis.speak(u);
+    }
 
     function setFilter(filter){
         
@@ -103,15 +205,23 @@ block content
               
          if(true ){
             var div =$("<div class='wheel' style='transform:rotateX(0deg)'></div>");
-            var img=$("<img/>");
-            img.attr("src","tables/?image="+encodeURIComponent(e.table)+".wheel.png");
             
             if(!e.wheelPic)
-                img.attr("src","images/"+"3D Search.png");
+            {
+                //img.attr("src","images/"+"3D Search.png");
+                let ntext =$("<h2></h2>");
+                //ntext.attr("name",e.tableName);
+                ntext.append(e.tableName);
+                div.append(ntext);
+            }else
+            {
+              var img=$("<img/>");
+              img.attr("src","tables/?image="+encodeURIComponent(e.table)+".wheel.png");
 
-            img.attr("style",'')
-            //max-height:120px;max-width:90%;
-            div.append(img)
+              img.attr("style",'')
+              //max-height:120px;max-width:90%;
+              div.append(img)
+            }
             item.append(div);
         }
         
