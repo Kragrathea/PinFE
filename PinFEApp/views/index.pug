@@ -17,8 +17,13 @@ block content
     div.todo.final(id='final_span')
     span.todo.interm(id='interm_span')
 
+    button.btn(id='speech' onClick='talkWithApp()' style='position:absolute;top:15px;left:15px;z-index:11')
+      i.fa.fa-microphone(aria-hidden="true")
+      div.pulse-ring(style='display:none')
+
     //-webkit-box-reflect: below -100px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, transparent), to(rgba(255,255,255,0.2)));')
     h2.status(style='color:green;position:absolute;top:15px;right:15px;z-index:11')
+
     div(style:'z-index:10;float:left')
       //input.search(type="text")
       //ul.pagination
@@ -51,6 +56,7 @@ block content
     recognition.onstart = function () {
         recognizing = true;
         console.log("start");
+        $(".pulse-ring").show();
         //message.innerHTML = 'Speak now.';
         //talk_button.innerHTML = 'Listen';
     };
@@ -83,6 +89,9 @@ block content
     };
 
     recognition.onend = function () {
+
+        console.log("onend");
+        $(".pulse-ring").hide();
 
         recognizing = false;
         if (ignore_onend) {

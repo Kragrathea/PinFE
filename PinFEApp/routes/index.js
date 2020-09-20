@@ -244,8 +244,8 @@ function captureVideo(command, args, outName) {
                     ffPicmpeg.on('close', function (code) {
                         console.log('FINISHED PIC: ');
 
-                        //ffPicargs = ["-i", picName, "-vf", "scale=480:-1", picName.replace(".jpg", "-small.jpg")];;
-                        //ffPicmpeg = child_process.spawn("../../Ffmpeg/ffmpeg.exe", ffPicargs);
+                        ffPicargs = ["-i", picName, "-vf", "scale=480:-1,transpose=1", "-y", picName.replace(".jpg", "-small.jpg")];;
+                        ffPicmpeg = child_process.spawn("../../Ffmpeg/ffmpeg.exe", ffPicargs);
                     });
 
 

@@ -51,25 +51,53 @@ block content
               // its results are destroyed every time the menu is hidden
               // e is the original contextmenu event, containing e.pageX and e.pageY (amongst other data)
               return {
-                  callback: function(key, options) {
-                      var m = "clicked: " + e;
-                      console.log($trigger[0].parentNode); 
+                  callback: function(key, options, rootMenu, originalEvent) {
 
-                      let row = table.getRow($trigger[0].parentNode);
+                    console.log("clicked: "); 
+                    console.log([key, options, rootMenu, originalEvent]);  
+                    console.log([options.$trigger[0]])
+
+                    console.log([table.getRow(options.$trigger[0])])
+                    
+                      //var m = "clicked: " + e;
+                      //console.log($trigger[0].parentNode); 
+
+                      let row = table.getRow(table.getRow(options.$trigger[0]));
+
+                      console.log([row]); 
 
                       var tableFile= row.getData()["table"]
                       var masterName= row.getData()["masterName"]
 
-                      console.log([tableFile,masterName]); 
+                      console.log([tableFile,masterName]);
+                    if(key=="edit")
+                    {
+                        document.location="/table?name="+tableFile
+
+                    }
+                    if(key=="capture")
+                    {
+                        var playUrl = '/capture?view=fs'
+                        $.ajax({
+                            url: playUrl, 
+                            type: 'POST', 
+                            contentType: 'application/json', 
+                            data: JSON.stringify({table:tableFile})
+                        });
+
+                    }
+ 
+                      
                   },
                   items: {
                       "edit": {name: "Edit", icon: "edit"},
-                      "cut": {name: "Cut", icon: "cut"},
-                      "copy": {name: "Copy", icon: "copy"},
-                      "paste": {name: "Paste", icon: "paste"},
-                      "delete": {name: "Delete", icon: "delete"},
+                      "capture": {name: "Capture", icon: "edit"},
+                      //"cut": {name: "Cut", icon: "cut"},
+                      //"copy": {name: "Copy", icon: "copy"},
+                      //"paste": {name: "Paste", icon: "paste"},
+                      //"delete": {name: "Delete", icon: "delete"},
                       "sep1": "---------",
-                      "quit": {name: "Quit", icon: function($element, key, item){ return 'context-menu-icon context-menu-icon-quit'; }}
+                      //"quit": {name: "Quit", icon: function($element, key, item){ return 'context-menu-icon context-menu-icon-quit'; }}
                   }
               };
           }
@@ -77,7 +105,6 @@ block content
 
     }
 
-    var theFuckenTable;
     function loadTable(){
       var table = new Tabulator(".tables-table", 
         {
@@ -89,7 +116,7 @@ block content
         //paginationSize:30,
         //paginationSizeSelector:[30, 60, 80, 100],
         groupBy:"masterName",
-        groupValues:[ [...new Set(masterNameList)] ],
+        //groupValues:[ [...new Set(masterNameList)] ],
         columns:[ //Define Table Columns
             {title:"Id", field:"id"},
             {title:"File Name", field:"tableName", headerFilter:true},
@@ -185,7 +212,6 @@ block content
         });
 
         table.setData('/tables/?json=1');
-        theFuckenTable=table;
         setupContext(table);
 
     }

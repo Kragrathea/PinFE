@@ -134,6 +134,7 @@ var users = require('./routes/users');
 var wheels = require('./routes/wheels');
 var backglasses = require('./routes/backglasses');
 var tables = require('./routes/tables');
+var table = require('./routes/table');
 
 
 // view engine setup
@@ -156,6 +157,7 @@ app.use('/master', master);
 app.use('/wheels', wheels);
 app.use('/backglasses', backglasses);
 app.use('/tables', tables);
+app.use('/table', table);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
