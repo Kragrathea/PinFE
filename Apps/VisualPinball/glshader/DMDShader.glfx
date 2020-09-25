@@ -1,0 +1,195 @@
+////GLOBAL
+#version 410
+
+////DEFINES
+
+uniform vec4 quadOffsetScale; //.xy =>Offset from center .wz =>Scale (1.0 is fullscreen)
+uniform vec4 quadOffsetScaleTex; //.xy =>Offset from center .wz =>Scale (1.0 is fullscreen)
+uniform vec4 vColor_Intensity;
+uniform vec3 vRes_Alpha;
+
+layout(std140) uniform matrixBlock {
+   mat4 matWorldViewProj[eyes];
+};
+
+//!! split into pure sprite & pure DMD?
+
+#include "Helpers.fxh"
+
+////VERTEX
+
+////GEOMETRY
+#extension GL_ARB_viewport_array : enable
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+#if eyes == 1
+   layout(invocations = 1) in;
+#else
+   layout(invocations = 2) in;
+#endif
+
+////FRAGMENT
+
+uniform sampler2D Texture0; // base texture
+
+out vec4 color;
+
+//
+// VS function output structures 
+//
+
+////vs_main
+
+in vec3 vPosition;
+in vec2 tc;
+
+out vec2 tex0_gs;
+
+void main()
+{
+    gl_Position = vec4((vPosition.x * quadOffsetScale.z + quadOffsetScale.x) * 2.0 - 1.0,
+							 1.0 - (vPosition.y * quadOffsetScale.w + quadOffsetScale.y) * 2.0, 0.0, 1.0);
+    tex0_gs = vec2(tc.x, 1.0 - tc.y) * quadOffsetScaleTex.zw + quadOffsetScaleTex.xy;
+}
+
+////vs_simple_world
+
+in vec3 vPosition;
+in vec2 tc;
+
+out vec2 tex0_gs;
+
+void main()
+{
+   gl_Position = vec4(vPosition, 1.0);
+   tex0_gs = tc;
+}
+
+////gs_simple_main
+
+in vec2 tex0_gs[];
+out vec2 tex0;
+
+void main()
+{
+   gl_ViewportIndex = gl_InvocationID;
+   for (int i=0;i<gl_in.length();i++) {
+      //Default
+      gl_Position = gl_in[i].gl_Position;
+      //Custom
+      tex0 = tex0_gs[i];
+      //Default
+      EmitVertex();
+   }
+   EndPrimitive();
+}
+
+////gs_simple_world
+
+in vec2 tex0_gs[];
+out vec2 tex0;
+
+void main()
+{
+   gl_ViewportIndex = gl_InvocationID;
+   for (int i=0;i<gl_in.length();i++) {
+      //Default
+      gl_Position = (matWorldViewProj[gl_InvocationID]*gl_in[i].gl_Position);
+      //Custom
+      tex0 = tex0_gs[i];
+      //Default
+      EmitVertex();
+    }
+    EndPrimitive();
+}
+
+//
+// PS functions (DMD and "sprites")
+//
+
+////ps_main_DMD
+
+in vec2 tex0;
+
+void main()
+{
+    vec2 ddxs = ddx(tex0) * 0.4; // use ddx and ddy to help the oversampling below/make filtering radius dependent on projected 'dot'/texel
+    vec2 ddys = ddy(tex0) * 0.4;
+
+   // brute force oversampling of DMD-texture and especially the dot-function (using 25 samples)
+    vec3 color2 = vec3(0., 0., 0.);
+    for (int j = -2; j <= 2; ++j)
+    {
+        vec2 uvj = tex0 + float(j) * ddys;
+        for (int i = -2; i <= 2; ++i)
+        {
+            vec2 uv = uvj + float(i) * ddxs;
+
+            vec4 rgba = textureLod(Texture0, uv, 0); //!! lots of tex access by doing this all the time, but (tex) cache should be able to catch all of it
+            color.rgb = vColor_Intensity.xyz * vColor_Intensity.w; //!! create function that resembles LUT from VPM?
+            if (rgba.a != 0.0)
+                color.rgb *= rgba.bgr;
+            else
+                color.rgb *= rgba.b * (255.9 / 100.);
+
+      // simulate dot within the sampled texel
+            vec2 dist = frac(uv*vRes_Alpha.xy) * 2.2 - 1.1;
+            float d = dist.x * dist.x + dist.y * dist.y;
+
+            color2 += color.rgb * smoothstep(0., 1., 1.0 - d * d);
+        }
+    }
+    color2 *= 1. / 25.;
+
+   /*vec3 colorg = vec3(0,0,0);
+   for(int j = -1; j <= 1; ++j)
+   for(int i = -1; i <= 1; ++i)
+   {
+      //collect glow from neighbors
+   }*/
+
+   //if (rgba.b > 200.0)
+   //   return vec4(InvToneMap(InvGamma(min(color2,vec3(1.5,1.5,1.5))/*+colorg*/)), 0.5);
+   //else
+    color = vec4(InvToneMap(InvGamma(color2 /*+colorg*/)), vRes_Alpha.z); //!! meh, this sucks a bit performance-wise, but how to avoid this when doing fullscreen-tonemap/gamma without stencil and depth read?
+}
+
+////ps_main_DMD_ext
+
+in vec2 tex0;
+
+void main()
+{
+   vec4 rgba = textureLod(Texture0, tex0, 0); //!! lots of tex access by doing this all the time, but (tex) cache should be able to catch all of it
+   color.rgb = rgba.rgb;
+   color.a = 1.0;
+}
+
+////ps_main_noDMD
+
+in vec2 tex0;
+
+void main()
+{
+    vec4 l = textureLod(Texture0, tex0, 0);
+
+    color = vec4(InvToneMap(InvGamma(l.xyz * vColor_Intensity.xyz * vColor_Intensity.w)), l.w); //!! meh, this sucks a bit performance-wise, but how to avoid this when doing fullscreen-tonemap/gamma without stencil and depth read?
+}
+
+////ps_main_noDMD_notex
+
+void main()
+{
+    color = vec4(InvToneMap(InvGamma(vColor_Intensity.xyz * vColor_Intensity.w)), 1.0f); //!! meh, this sucks a bit performance-wise, but how to avoid this when doing fullscreen-tonemap/gamma without stencil and depth read?
+}
+
+////TECHNIQUES
+
+basic_DMD:P0:vs_main():gs_simple_main():ps_main_DMD()
+basic_DMD_ext:P0:vs_main():gs_simple_main():ps_main_DMD_ext()
+basic_DMD_world:P0:vs_simple_world():gs_simple_world():ps_main_DMD()
+basic_DMD_world_ext:P0:vs_simple_world():gs_simple_world():ps_main_DMD_ext()
+basic_noDMD:P0:vs_main():gs_simple_main():ps_main_noDMD()
+basic_noDMD_world:P0:vs_simple_world():gs_simple_world():ps_main_noDMD()
+basic_noDMD_notex:P0:vs_main():gs_simple_main():ps_main_noDMD_notex()
+

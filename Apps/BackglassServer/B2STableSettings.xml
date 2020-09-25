@@ -1,0 +1,62 @@
+<B2STableSettings>
+  <HyperpinXMLFile>Unknown</HyperpinXMLFile>
+  <ArePluginsOn>1</ArePluginsOn>
+  <DefaultStartMode>2</DefaultStartMode>
+  <LogPath>
+  </LogPath>
+  <IsLampsStateLogOn>0</IsLampsStateLogOn>
+  <IsSolenoidsStateLogOn>0</IsSolenoidsStateLogOn>
+  <IsGIStringsStateLogOn>0</IsGIStringsStateLogOn>
+  <IsLEDsStateLogOn>0</IsLEDsStateLogOn>
+  <IsPaintingLogOn>0</IsPaintingLogOn>
+  <IsStatisticsBackglassOn>0</IsStatisticsBackglassOn>
+  <ShowStartupError>0</ShowStartupError>
+  <ScreenshotPath>
+  </ScreenshotPath>
+  <ScreenshotFileType>0</ScreenshotFileType>
+  <fs_lx5>
+    <HideGrill>2</HideGrill>
+    <HideB2SDMD>0</HideB2SDMD>
+    <HideDMD>2</HideDMD>
+    <LampsSkipFrames>1</LampsSkipFrames>
+    <SolenoidsSkipFrames>3</SolenoidsSkipFrames>
+    <GIStringsSkipFrames>3</GIStringsSkipFrames>
+    <LEDsSkipFrames>0</LEDsSkipFrames>
+    <UsedLEDType>0</UsedLEDType>
+    <IsGlowBulbOn>0</IsGlowBulbOn>
+    <GlowIndex>-1</GlowIndex>
+    <StartAsEXE>1</StartAsEXE>
+    <StartBackground>0</StartBackground>
+    <Animations />
+    <DualMode>1</DualMode>
+  </fs_lx5>
+  <DisableFuzzyMatching>0</DisableFuzzyMatching>
+  <seawitfp>
+    <HideGrill>2</HideGrill>
+    <HideB2SDMD>0</HideB2SDMD>
+    <HideDMD>2</HideDMD>
+    <LampsSkipFrames>1</LampsSkipFrames>
+    <SolenoidsSkipFrames>3</SolenoidsSkipFrames>
+    <GIStringsSkipFrames>3</GIStringsSkipFrames>
+    <StartAsEXE>1</StartAsEXE>
+    <StartBackground>0</StartBackground>
+    <FormToFront>1</FormToFront>
+    <Animations />
+  </seawitfp>
+  <flash_l1>
+    <HideGrill>2</HideGrill>
+    <HideB2SDMD>0</HideB2SDMD>
+    <HideDMD>2</HideDMD>
+    <LampsSkipFrames>1</LampsSkipFrames>
+    <SolenoidsSkipFrames>3</SolenoidsSkipFrames>
+    <GIStringsSkipFrames>3</GIStringsSkipFrames>
+    <LEDsSkipFrames>0</LEDsSkipFrames>
+    <UsedLEDType>2</UsedLEDType>
+    <IsGlowBulbOn>0</IsGlowBulbOn>
+    <GlowIndex>-1</GlowIndex>
+    <StartAsEXE>1</StartAsEXE>
+    <StartBackground>0</StartBackground>
+    <FormToFront>1</FormToFront>
+    <Animations />
+  </flash_l1>
+</B2STableSettings>

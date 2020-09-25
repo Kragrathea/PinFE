@@ -1,0 +1,397 @@
+<object classid="clsid:F389C8B7-144F-4C63-A2E3-246D168F9D39"
+	id="objController"
+	width=0
+	height=0>
+</object>
+<title>
+Visual PinMAME Test Page
+</title>
+<body>
+Please select a game:<BR>
+<select name="GameNames" size="10" MAXLENGTH=100>
+</select>
+<BR>
+
+<input type=button name=cmdStart value="Start">
+<input type=button name=cmdStop value="Stop">
+<input type=button name=cmdOptions value="Options">
+<input type=button name=cmdAbout value="Info...">
+<BR>
+Coin door switches:<BR>
+(the coin door switches will only work if the Keyboard is disabled for the VPinMAME 
+window. This is due the fact, that the simulator will continueslly check the keyboard state and
+set the appropriate switches, hence, will allways clear the coin door switches)<BR>
+<input type=button name=cmdCancel value="Cancel">
+<input type=button name=cmdDown value="Down">
+<input type=button name=cmdUp value="Up">
+<input type=button name=cmdEnter value="Enter">
+<BR>
+Game State: <span id=GameState>Stopped</span>
+<P>
+<input type=checkbox name=HandleKeyboard>Enable Keyboard for VPinMAME Window<BR>
+<input type=checkbox name=ShowTitle>Show the title of VPinMAME window<BR>
+<input type=checkbox name=ShowDMDOnly>Only show the DMD in the VPinMAME window<BR>
+<input type=checkbox name=HandleMechanics>If the sim for the machie is disbaled, this options allow to enable even the sim for mechanical playfield parts<BR>
+
+<P>
+<table>
+<tr><td>Lamp Matrix<td>Solenoid Matrix
+<tr><td>
+<table border cellpadding=4>
+<tr><td><td>1<td>2<td>3<td>4<td>5<td>6<td>7<td>8
+<tr><td>1
+<td id=Light11>0<td id=Light21>0<td id=Light31>0<td id=Light41>0<td id=Light51>0<td id=Light61>0<td id=Light71>0<td id=Light81>0
+<tr><td>2
+<td id=Light12>0<td id=Light22>0<td id=Light32>0<td id=Light42>0<td id=Light52>0<td id=Light62>0<td id=Light72>0<td id=Light82>0
+<tr><td>3
+<td id=Light13>0<td id=Light23>0<td id=Light33>0<td id=Light43>0<td id=Light53>0<td id=Light63>0<td id=Light73>0<td id=Light83>0
+<tr><td>4
+<td id=Light14>0<td id=Light24>0<td id=Light34>0<td id=Light44>0<td id=Light54>0<td id=Light64>0<td id=Light74>0<td id=Light84>0
+<tr><td>5
+<td id=Light15>0<td id=Light25>0<td id=Light35>0<td id=Light45>0<td id=Light55>0<td id=Light65>0<td id=Light75>0<td id=Light85>0
+<tr><td>6
+<td id=Light16>0<td id=Light26>0<td id=Light36>0<td id=Light46>0<td id=Light56>0<td id=Light66>0<td id=Light76>0<td id=Light86>0
+<tr><td>7
+<td id=Light17>0<td id=Light27>0<td id=Light37>0<td id=Light47>0<td id=Light57>0<td id=Light67>0<td id=Light77>0<td id=Light87>0
+<tr><td>8
+<td id=Light18>0<td id=Light28>0<td id=Light38>0<td id=Light48>0<td id=Light58>0<td id=Light68>0<td id=Light78>0<td id=Light88>0
+</table>
+<td>
+<table border cellpadding=4>
+<tr><td>1-8<td id=Sol1>0<td id=Sol2>0<td id=Sol3>0<td id=Sol4>0<td id=Sol5>0<td id=Sol6>0<td id=Sol7>0<td id=Sol8>0
+<tr><td>9-16<td id=Sol9>0<td id=Sol10>0<td id=Sol11>0<td id=Sol12>0<td id=Sol13>0<td id=Sol14>0<td id=Sol15>0<td id=Sol16>0
+<tr><td>17-24<td id=Sol17>0<td id=Sol18>0<td id=Sol19>0<td id=Sol20>0<td id=Sol21>0<td id=Sol22>0<td id=Sol23>0<td id=Sol24>0
+<tr><td>25-32<td id=Sol25>0<td id=Sol26>0<td id=Sol27>0<td id=Sol28>0<td id=Sol29>0<td id=Sol30>0<td id=Sol31>0<td id=Sol32>0
+</table>
+</table>
+
+<P>
+<textarea name="Msgs" rows="10" cols="65">
+</textarea>
+
+<script language=VBScript>
+
+Dim nGameState
+Dim CurrentGameName
+Dim Timer
+
+nGameState = 0
+CurrentGameName = ""
+
+objController.HandleKeyboard 	= true
+objController.ShowTitle 	= true
+objController.ShowDMDOnly 	= false
+
+Const swCoin1			=  1
+Const swCoin2			=  2
+Const swCoin3			=  3
+Const swCoin4			=  4
+Const swCancel			=  5
+Const swDown			=  6
+Const swUp			=  7
+Const swEnter			=  8
+
+Dim Lights(88)
+On Error Resume Next
+
+'11-18
+Set Lights(11) = Light11 
+Set Lights(12) = Light12
+Set Lights(13) = Light13
+Set Lights(14) = Light14
+Set Lights(15) = Light15
+Set Lights(16) = Light16
+Set Lights(17) = Light17
+Set Lights(18) = Light18
+'21-28
+Set Lights(21) = Light21
+Set Lights(22) = Light22
+Set Lights(23) = Light23
+Set Lights(24) = Light24
+Set Lights(25) = Light25
+Set Lights(26) = Light26
+Set Lights(27) = Light27
+Set Lights(28) = Light28
+'31-38
+Set Lights(31) = Light31
+Set Lights(32) = Light32
+Set Lights(33) = Light33
+Set Lights(34) = Light34
+Set Lights(35) = Light35
+Set Lights(36) = Light36
+Set Lights(37) = Light37
+Set Lights(38) = Light38
+'41-48
+Set Lights(41) = Light41
+Set Lights(42) = Light42
+Set Lights(43) = Light43
+Set Lights(44) = Light44
+Set Lights(45) = Light45
+Set Lights(46) = Light46
+Set Lights(47) = Light47
+Set Lights(48) = Light48
+'51-58
+Set Lights(51) = Light51
+Set Lights(52) = Light52
+Set Lights(53) = Light53
+Set Lights(54) = Light54
+Set Lights(55) = Light55
+Set Lights(56) = Light56
+Set Lights(57) = Light57
+Set Lights(58) = Light58
+'61-68
+Set Lights(61) = Light61
+Set Lights(62) = Light62
+Set Lights(63) = Light63
+Set Lights(64) = Light64
+Set Lights(65) = Light65
+Set Lights(66) = Light66
+Set Lights(67) = Light67
+Set Lights(68) = Light68
+'71-78
+Set Lights(71) = Light71
+Set Lights(72) = Light72
+Set Lights(73) = Light73
+Set Lights(74) = Light74
+Set Lights(75) = Light75
+Set Lights(76) = Light76
+Set Lights(77) = Light77
+Set Lights(78) = Light78
+'81-88
+Set Lights(81) = Light81
+Set Lights(82) = Light82
+Set Lights(83) = Light83
+Set Lights(84) = Light84
+Set Lights(85) = Light85
+Set Lights(86) = Light86
+Set Lights(87) = Light87
+Set Lights(88) = Light88
+
+Dim Sols(32)
+Set Sols(1) = Sol1
+Set Sols(2) = Sol2
+Set Sols(3) = Sol3
+Set Sols(4) = Sol4
+Set Sols(5) = Sol5
+Set Sols(6) = Sol6
+Set Sols(7) = Sol7
+Set Sols(8) = Sol8
+Set Sols(9) = Sol9
+Set Sols(10) = Sol10
+Set Sols(11) = Sol11
+Set Sols(12) = Sol12
+Set Sols(13) = Sol13
+Set Sols(14) = Sol14
+Set Sols(15) = Sol15
+Set Sols(16) = Sol16
+Set Sols(17) = Sol17
+Set Sols(18) = Sol18
+Set Sols(19) = Sol19
+Set Sols(20) = Sol20
+Set Sols(21) = Sol21
+Set Sols(22) = Sol22
+Set Sols(23) = Sol23
+Set Sols(24) = Sol24
+Set Sols(25) = Sol25
+Set Sols(26) = Sol26
+Set Sols(27) = Sol27
+Set Sols(28) = Sol28
+Set Sols(29) = Sol29
+Set Sols(30) = Sol30
+Set Sols(31) = Sol31
+Set Sols(32) = Sol32
+
+On Error Goto 0
+
+Sub AddNamesToList()
+	Dim i
+	Dim NewEntry
+	Dim Machine
+
+    	Machines = objController.Machines
+    	
+	Set NewEntry = document.createElement("OPTION")
+	NewEntry.innerText = "<Default>"
+	GameNames.insertAdjacentElement "beforeEnd", NewEntry
+
+	For Each GameName In Machines
+   		Set NewEntry = document.createElement("OPTION")
+   		NewEntry.innerText = GameName
+   		GameNames.insertAdjacentElement "beforeEnd", NewEntry
+    	Next
+
+	GameNames.selectedIndex = 5
+	GameNames_onClick
+End Sub
+
+Sub InitPage()
+
+	AddNamesToList
+
+	HandleKeyboard.checked = objController.HandleKeyboard
+	ShowTitle.checked = objController.ShowTitle
+	ShowDMDOnly.checked = objController.ShowDMDOnly
+	HandleMechanics.checked = objController.HandleMechanics
+End Sub
+
+Sub objController_OnStateChange(nState)
+	nGameState = nState
+	select case nGameState
+	case 0: 
+		GameState.InnerText = "Stopped"
+		window.clearInterval(Timer)
+
+	case 1: 
+		GameState.InnerText = "Running"
+   		Timer = window.setInterval("OnTimer",1)
+	end select
+End Sub
+
+Sub objController_OnSolenoid(nSolenoids, fIsActive)
+	Dim sText
+	sText = "Solenoids " & nSolenoids & " is now "
+	If ( fIsActive ) Then
+		sText = sText & "on"
+	Else
+		sText = sText & "off"
+	End IF
+	AddMsg sText
+End Sub
+
+Sub cmdStart_onClick
+	if ( nGameState<>0 ) Then Exit Sub
+
+	On Error Resume Next	
+	objController.Run
+	On Error Goto 0
+
+	If ( Err<>0 ) Then
+		MsgBox Erro.Description
+	End If
+End Sub
+
+Sub cmdStop_onClick
+	if ( nGameState<>1 ) Then Exit Sub
+
+	objController.Stop
+End Sub
+
+Sub cmdOptions_onClick()
+	objController.ShowOptsDialog
+End Sub
+
+Sub cmdAbout_onClick()
+	objController.ShowAboutDialog
+End Sub
+
+Sub GameNames_onClick()
+	CurrentGameName = gamenames.children(gamenames.selectedIndex).innerText
+	If ( CurrentGameName="<Default>" ) Then
+		CurrentGameName = ""
+	End If
+
+	objController.GameName = CurrentGameName
+End Sub
+
+Sub HandleKeyboard_onClick()
+	objController.HandleKeyboard = HandleKeyboard.checked
+End Sub
+
+Sub ShowTitle_onClick()
+	objController.ShowTitle = ShowTitle.checked
+End Sub
+
+Sub ShowDMDOnly_onClick()
+	objController.ShowDMDOnly = ShowDMDOnly.checked
+End Sub
+
+Sub HandleMechanics_onClick()
+	objController.HandleMechanics = HandleMechanics.checked
+End Sub
+
+Sub cmdCancel_onMouseDown()
+	objController.Switch(swCancel) = 1
+End Sub
+
+Sub cmdCancel_onMouseUp()
+	objController.Switch(swCancel) = 0
+End Sub
+
+Sub cmdDown_onMouseDown()
+	objController.Switch(swDown) = 1
+End Sub
+
+Sub cmdDown_onMouseUp()
+	objController.Switch(swDown) = 0
+End Sub
+
+Sub cmdUp_onMouseDown()
+	objController.Switch(swUp) = 1
+End Sub
+
+Sub cmdUp_onMouseUp()
+	objController.Switch(swUp) = 0
+End Sub
+
+Sub cmdEnter_onMouseDown()
+	objController.Switch(swEnter) = 1
+End Sub
+
+Sub cmdEnter_onMouseUp()
+	objController.Switch(swEnter) = 0
+End Sub
+
+Sub AddMsg(sMsg)
+	If ( sMsg="" ) Then Exit Sub
+
+	If ( Msgs.InnerText<>"" ) Then
+		Msgs.InnerText = Msgs.InnerText + chr(10) + sMsg
+	Else
+		Msgs.InnerText = sMsg
+	End If
+End Sub
+
+Sub HandleLamps()
+	Dim ChangedLamps
+	ChangedLamps = objController.ChangedLamps
+
+    	If (IsEmpty(ChangedLamps)) Then Exit Sub
+
+	Dim i, Count, sHelp, Result
+	Count = UBound(ChangedLamps,1)
+    	For i = 0 To Count
+		Lights(ChangedLamps(i, 0)).InnerText = ChangedLamps(i, 1)
+    	Next 
+End Sub
+
+Sub HandleSolenoids()
+	Dim Solenoids
+	Solenoids = objController.Solenoids
+
+    	If (IsEmpty(Solenoids)) Then Exit Sub
+	If (Not Solenoids(0,1)) Then Exit Sub
+
+	Dim i
+    	For i = 1 To 32
+		If ( Solenoids(i,1) ) Then
+			If ( Solenoids(i,0) ) Then
+				Sols(i).InnerText = 1
+			Else
+				Sols(i).InnerText = 0
+			End If
+		End If
+    	Next 
+End Sub
+
+Sub OnTimer()
+	HandleLamps
+	HandleSolenoids
+End Sub
+
+InitPage
+</script>
+
+</body>
+
+
+
