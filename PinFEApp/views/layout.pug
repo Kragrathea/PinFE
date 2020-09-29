@@ -10,13 +10,20 @@ html
     link(rel='stylesheet', href='/scripts/jquery-contextmenu/dist/jquery.contextMenu.min.css')
     script(src='/scripts/jquery-contextmenu/dist/jquery.contextMenu.min.js')
 
+    link(rel='stylesheet', href='/scripts/dropzone/dist/min/dropzone.min.css')
+    script(src='/scripts/dropzone/dist/min/dropzone.min.js')
+
+    //- link(rel='stylesheet', href='/scripts/filepond/dist/filepond.min.css')
+    //- script(src='/scripts/filepond/dist/filepond.min.js')
 
     //script(src='/scripts/jquery.flipster/dist/jquery.flipster.min.js')
     script(src='/scripts/swiper/js/swiper.min.js')
-    script(src='/scripts/swiper/js/reflection.js')
+    //- script(src='/scripts/swiper/js/reflection.js')
     script(src='/scripts/list.js/dist/list.min.js')
     script(src='/scripts/fuse.js/dist/fuse.js')
 
+    script(src='/bootstrap.bundle.min.js')
+    link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
     link(rel='stylesheet', href='/stylesheets/main.css')
 
     link(rel='stylesheet', href='/scripts/@fortawesome/fontawesome-free/css/all.min.css')
@@ -25,4 +32,45 @@ html
     script(src='/scripts/tabulator-tables/dist/js/tabulator.min.js')
 
   body
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-dark
+      a.navbar-brand(href="/") PinFE
+      button.navbar-toggler(type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation")
+        span.navbar-toggler-icon
+      #navbarSupportedContent.collapse.navbar-collapse
+        ul.navbar-nav.mr-auto
+          li.nav-item.active
+            a.nav-link(href="/")
+              | Home 
+              span.sr-only (current)
+          //- li.nav-item
+          //-   a.nav-link(href="#") Link
+          li.nav-item.dropdown
+            a#navbarDropdown.nav-link.dropdown-toggle(href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+              | View
+            .dropdown-menu(aria-labelledby="navbarDropdown")
+              a.dropdown-item(href="/") Select (Cab)
+              a.dropdown-item(href="/?view=dt") Select (Desktop) 
+              .dropdown-divider
+              a.dropdown-item(href="/playfield") Playfield
+              a.dropdown-item(href="/wheel") Wheel
+              a.dropdown-item(href="/backglass") Backglass
+              a.dropdown-item(href="http://localhost:9090/") DMD
+          li.nav-item.dropdown
+            a#navbarDropdown.nav-link.dropdown-toggle(href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+              | Library
+            .dropdown-menu(aria-labelledby="navbarDropdown")
+              a.dropdown-item(href="/tables") Tables
+              a.dropdown-item(href="/wheels") Wheels
+              a.dropdown-item(href="/backglasses") Backglasses
+              a.dropdown-item(href="/master") Master
+              .dropdown-divider
+              a.dropdown-item(href="#") Settings
+        form.form-inline.my-2.my-lg-0
+          input.form-control.mr-sm-2(id="menu-search-box" type="search"  placeholder="Search" aria-label="Search" onkeyup="searchBoxfilterFunction()")
+          //- button.btn.btn-outline-success.my-2.my-sm-0(type="submit" ) Search
+        button.btn(id='speech' onClick='talkWithApp()')
+          i.fa.fa-microphone(aria-hidden="true")
+          div.pulse-ring(style='display:none')
+          
     block content
+

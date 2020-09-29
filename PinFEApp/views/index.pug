@@ -17,23 +17,32 @@ block content
     div.todo.final(id='final_span')
     span.todo.interm(id='interm_span')
 
-    button.btn(id='speech' onClick='talkWithApp()' style='position:absolute;top:15px;left:15px;z-index:11')
-      i.fa.fa-microphone(aria-hidden="true")
-      div.pulse-ring(style='display:none')
+    <i class="fas fa-spinner fa-spin fa-5x " style='position:absolute;top:50%;left:50%;z-index:11;color:white;display:none'></i>
+
+
+
 
     //-webkit-box-reflect: below -100px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, transparent), to(rgba(255,255,255,0.2)));')
-    h2.status(style='color:green;position:absolute;top:15px;right:15px;z-index:11')
+    h5.status(style='color:green;position:absolute;top:15px;right:15px;z-index:11')
 
     div(style:'z-index:10;float:left')
       //input.search(type="text")
       //ul.pagination
       div(style='text-align:center;')
-        h2.filter(style='display:inline-block;height:25px;margin:0px')
-        h2.ratio(style='display:block;margin:0px')="1/"+tables.length
+        h5.filter(style='display:inline-block;height:25px;margin:0px')
+        h5.ratio(style='display:block;margin:0px')="1/"+tables.length
     ul.swiper-wrapper.list
+    div.gridview-wrapper
   div(style='text-align:center;')
-    h2.masterName(style='display:inline-block;height:25px;width:100%;margin:0px')
-    h2.tableName(style='display:inline-block;height:25px;margin:0px')
+    h5.masterName(style='display:inline-block;height:25px;width:100%;margin:0px')
+    h5.tableName(style='display:inline-block;height:25px;margin:0px')
+
+    // Modal
+    #tableEditModal.modal.fade(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true")
+        .modal-dialog(role="document" style='max-width:60%')
+            .modal-content
+
+
 
     //div.swiper-pagination
   script.
@@ -73,12 +82,14 @@ block content
 
         if(final_transcript!=""){
           console.log(final_transcript)
-          if(final_transcript.indexOf("search")>-1)
+          //if(final_transcript.indexOf("search")>-1)
           {
-            var term = final_transcript.split("search")[1];
+            //var term = final_transcript.split("search")[1];
+            var term = final_transcript;
+
             curFilter=term.trim();
             setFilter(curFilter);
-
+            recognition.stop();
           }
           final_transcript="";
           interim_transcript="";
@@ -174,11 +185,16 @@ block content
         swiper.slideTo(0);
         updateRatio();
 
+        window.history.pushState({
+            id: 'homepage'
+        }, 'Home | My App', '/?q='+filter);
+
     };
 
     function createTableItem(index){
         var e = filteredTables[index];
         var item=$("<div class='item-container'></div>");
+        item.attr("data-table",encodeURIComponent(e.table));
         
         //item.attr("style",'');
 
@@ -188,10 +204,6 @@ block content
             img.attr("style",'width:100%')
             item.append(img);
         }
-        
-
-
-
 
         var showDesktop=false;
         if(window.location.href.toLowerCase().indexOf("view=dt") > -1)
@@ -203,7 +215,6 @@ block content
             img.attr("style",'width:100%;')
             item.append(img);
         }
-        
         
         if(e.fsSmallPic && !showDesktop){
             var img=$("<img/>");
@@ -249,14 +260,74 @@ block content
 
         return(icontainer);
     }
+    function createGridTableItem(index){
+        var e = filteredTables[index];
+        var item=$("<div class='item-container' style='width:256px;height:auto;max-height:25%;float:left;filter: drop-shadow(22px 22px 22px rgba(0,0,0,1.0));'></div>");
+        item.attr("data-table",encodeURIComponent(e.table));
 
+        //- var showDesktop=false;
+        //- if(window.location.href.toLowerCase().indexOf("view=dt") > -1)
+        //-     showDesktop=true;
+
+        //- if(e.dtSmallPic){
+        //-     var img=$("<img/>");
+        //-     img.attr("src","tables/?image="+encodeURIComponent(e.table)+".dt-small.jpg");
+        //-     img.attr("style",'display:block;width:100%;height:auto;')
+        //-     item.append(img);
+        //- }
+        
+        
+        //- if(e.fsSmallPic){
+        //-     var img=$("<img/>");
+        //-     img.attr("src","tables/?image="+encodeURIComponent(e.table)+".fs-small.jpg");
+        //-     img.attr("style",'display:block;width:100%;height:auto;')
+        //-     item.append(img);
+        //- }
+
+        //- if(e.bgSmallPic && false){
+        //-     var img=$("<img/>");
+        //-     img.attr("src","tables/?image="+ encodeURIComponent(e.table)+".bg-small.jpg");
+        //-     img.attr("style",'display:block;width:100%;height:auto;')
+        //-     item.append(img);
+        //- }
+
+         if(true ){
+            var div =$("<div class='wheel' style='transform:rotateX(0deg)'></div>");
+            
+            if(!e.wheelPic)
+            {
+                //img.attr("src","images/"+"3D Search.png");
+                let ntext =$("<h5></h5>");
+                //ntext.attr("name",e.tableName);
+                ntext.append(e.tableName);
+                div.append(ntext);
+            }else
+            {
+              var img=$("<img/>");
+              img.attr("src","tables/?image="+encodeURIComponent(e.table)+".wheel.png");
+
+              img.attr("style",'display:block;width:100%;height:auto;')
+              //max-height:120px;max-width:90%;
+              div.append(img)
+            }
+            item.append(div);
+        }
+        
+        var text =$("<h2></h2>");
+        text.attr("name",e.tableName);
+
+        item.append(text);
+
+        return(item);
+
+    }
     function initTableList()
     {
         //$(".list").empty();
         filteredTables.forEach(function(e,i){
-            var item = createTableItem(i);
+            var item = createGridTableItem(i);
             //swiper.virtual.appendSlide(item.html());
-            //$(".list").append(item);
+            $(".gridview-wrapper").append(item);
         });
     }
 
@@ -336,8 +407,16 @@ block content
 
         source.addEventListener('message', function(e) {
             var status= JSON.parse(e.data);
-            if($(".status").val()!=status.state)
+            if($(".status").val()!=status.state){
                 $(".status").text(status.state);
+
+                //loading spinner
+                if(status.state.startsWith("Playing"))
+                    $(".fa-spinner").show();
+                else
+                    $(".fa-spinner").hide();
+                
+            }
 
         }, false)
 
@@ -368,51 +447,60 @@ block content
     var swiper;
 
     $(function() {
-        //initTableList();
-
-        function makeSlides()
+                //- var showDesktop=false;
+        if(window.location.href.toLowerCase().indexOf("view=grid") > -1)
         {
-              var slides = [];
-              for (var i = 0; i < 600; i += 1) {
-                slides.push(i);
-              }
-              return slides;
-        }
-        var vslides =makeSlides();
-        //console.log(vslides);
+            initTableList();    
+        }else{
 
-        swiper = new Swiper('.swiper-container', {
-          //effect: 'coverflow',
-          slidesPerView: 5,
-          centeredSlides: true,
-          spaceBetween: 60,
-          virtual: {
-            addSlidesBefore:5,
-            addSlidesAfter:5,
-            renderSlide:	function(slide, index){
-                //console.log([slide,index]);
-                //return $('<div class="swiper-slide">Slide</div>'); 
-                return createTableItem(slide);
+            function makeSlides()
+            {
+                var slides = [];
+                for (var i = 0; i < filteredTables.length; i += 1) {
+                    slides.push(i);
+                }
+                return slides;
+            }
+            var vslides =makeSlides();
+            //console.log(vslides);
+
+            swiper = new Swiper('.swiper-container', {
+            //effect: 'coverflow',
+            slidesPerView: 5,
+            centeredSlides: true,
+            spaceBetween: 60,
+            mousewheel: true,
+            //mousewheelForceToAxis: true,
+            virtual: {
+                addSlidesBefore:5,
+                addSlidesAfter:5,
+                renderSlide:	function(slide, index){
+                    //console.log([slide,index]);
+                    //return $('<div class="swiper-slide">Slide</div>'); 
+                    return createTableItem(slide);
+                },
+
+                slides:vslides,
+            
             },
+            //lazy: {
+            //  loadPrevNext: true,
+            //	loadPrevNextAmount: 5,
+            //},
+            //keyboard: {
+            //  enabled: true,
+            //},
+            coverflowEffect: {
+                rotate: 20,
+                stretch: 10,
+                depth: 100,
+                modifier: 1,
+                slideShadows : false,
+            },
+            });
+        }
 
-            slides:vslides,
-        
-          },
-          //lazy: {
-          //  loadPrevNext: true,
-          //	loadPrevNextAmount: 5,
-          //},
-          //keyboard: {
-          //  enabled: true,
-          //},
-          coverflowEffect: {
-            rotate: 20,
-            stretch: 10,
-            depth: 100,
-            modifier: 1,
-            slideShadows : false,
-          },
-        });
+        setupContext();
 
         updateRatio();
         var clickSoundIndex=0;
@@ -462,5 +550,101 @@ block content
         else
             $(".ratio").text(0 +"/" + filteredTables.length);
     }
+
+    function setupContext()
+    {
+      $.contextMenu({
+          //selector: "div[tabulator-field='backglass']", 
+          selector: "div.item-container", 
+          build: function($trigger, e) {
+              // this callback is executed every time the menu is to be shown
+              // its results are destroyed every time the menu is hidden
+              // e is the original contextmenu event, containing e.pageX and e.pageY (amongst other data)
+              console.log([$trigger,e])
+                let tableFile = $($trigger).attr("data-table");
+
+                //just search for the file part.
+                let searchText = decodeURIComponent(tableFile).split('\\').slice(-1)[0];
+              return {
+                  callback: function(key, options, rootMenu, originalEvent) {
+
+                    console.log("clicked: "); 
+                    console.log([key, options, rootMenu, originalEvent]);  
+                    console.log([options.$trigger.parent().attr("data-table")])
+
+
+                    if(key=="edit")
+                    {
+                        $('#tableEditModal .modal-content').load("/table?name="+tableFile, function() {
+                            
+                            //$('#tableEditModal.modal-title').text("Edit "+decodeURIComponent(tableFile))
+                            $('#tableEditModal').modal();
+                        });
+
+
+                        //document.location="/table?name="+tableFile
+                    }
+                    if(key=="searchWheel")
+                    {
+                        window.open('https://www.google.com/search?q='+searchText+" wheel",'_blank');
+                        //document.location="/table?name="+tableFile
+
+                    }
+                    if(key=="searchBG")
+                    {
+                        window.open('https://www.google.com/search?q='+searchText+" backglass",'_blank');
+                        //document.location="/table?name="+tableFile
+
+                    }
+                    if(key=="search")
+                    {
+                        window.open('https://www.google.com/search?q='+searchText,'_blank');
+                        //document.location="/table?name="+tableFile
+
+                    }                                           
+                    if(key=="play")
+                    {
+                        /*var playUrl = '/capture?view=fs'
+                        $.ajax({
+                            url: playUrl, 
+                            type: 'POST', 
+                            contentType: 'application/json', 
+                            data: JSON.stringify({table:tableFile})
+                        });*/
+                        var playUrl = '/play?view=fs';
+                        if(e.shiftKey || (window.location.href.toLowerCase().indexOf("view=dt") > -1))
+                            playUrl='/play?view=dt';
+
+                        $.ajax({
+                            url: playUrl, 
+                            type: 'POST', 
+                            contentType: 'application/json', 
+                            data: JSON.stringify({table:decodeURIComponent(tableFile)})}
+                        )
+
+                    }
+ 
+                      
+                  },
+                  items: {
+                      "edit": {name: "Edit", icon: "edit"},
+                      "play": {name: "Play", icon: "play"},
+                      "folder": {name: "Open Folder", icon: "folder"},
+                    //-   "searchWheel": {name: "Search for Wheel", icon: "search"},
+                    //-   "searchBG": {name: "Search for Backglass", icon: "search"},
+                    //-   "search": {name: "Search for:"+decodeURIComponent(tableFile), icon: "search"},
+                      //"cut": {name: "Cut", icon: "cut"},
+                      //"copy": {name: "Copy", icon: "copy"},
+                      //"paste": {name: "Paste", icon: "paste"},
+                      //"delete": {name: "Delete", icon: "delete"},
+                      //"sep1": "---------",
+                      //"quit": {name: "Quit", icon: function($element, key, item){ return 'context-menu-icon context-menu-icon-quit'; }}
+                  }
+              };
+          }
+      });
+
+    }
+
 
     //$("body").addClass("rot")

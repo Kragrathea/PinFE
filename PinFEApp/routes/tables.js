@@ -8,7 +8,6 @@ var fs = require('fs'),
     querystring = require('querystring');
 var url = require('url');
 
-var tablesDir = "../../../Tables/"; // ./public/data";
 
 
 function findInDir(baseDir,dir, filter, fileList = []) {
@@ -28,14 +27,7 @@ function findInDir(baseDir,dir, filter, fileList = []) {
     return fileList;
 }
 
-var tablesList;
-var tablesListIndex;
-function loadTablesList(res) {
-
-    function findBackglass() {
-
-    }
-
+function getTablesList(tablesDir) {
     var files = findInDir(tablesDir, ".", /\.vpx$/);
     var results = [];
     var count = 0;
@@ -55,19 +47,19 @@ function loadTablesList(res) {
             if (data)
                 dbase = JSON.parse(data);
         } else {
-            let master = res.app.locals.masterTableQuickSearch(path.basename(path.dirname(file)));
-            if (master && master.length > 0) {
-                suggestedMaster = master[0].name;
+            // let master = res.app.locals.masterTableQuickSearch(path.basename(path.dirname(file)));
+            // if (master && master.length > 0) {
+            //     suggestedMaster = master[0].name;
 
-                //var dbName = tablesDir + file + ".dbase";
-                //dbase.masterName = suggestedMaster;
-                //fs.writeFileSync(dbName, JSON.stringify(dbase));
-            } else {
-                //let master = res.app.locals.masterTableIndex.search(path.basename(path.dirname(file)));
-                //if (master && master.length > 0) {
-                //    suggestedMaster = master[0].name;
-                //}
-            }
+            //     //var dbName = tablesDir + file + ".dbase";
+            //     //dbase.masterName = suggestedMaster;
+            //     //fs.writeFileSync(dbName, JSON.stringify(dbase));
+            // } else {
+            //     //let master = res.app.locals.masterTableIndex.search(path.basename(path.dirname(file)));
+            //     //if (master && master.length > 0) {
+            //     //    suggestedMaster = master[0].name;
+            //     //}
+            // }
         }
 
         results.push({
@@ -91,11 +83,11 @@ function loadTablesList(res) {
         });
     });
 
-    tablesList = results;
+    console.log("Loaded tablesList. Length:" + results.length);
+    return(results);
 
-    console.log("Loaded tablesList. Length:" + tablesList.length);
 }
-function createTablesIndex() {
+function createTablesIndex(tablesList) {
     
     var options = {
         shouldSort: true,
@@ -122,45 +114,76 @@ router.get('/', function (req, res) {
     var image = query.image;
     var json = query.json;
 
-    if (!tablesList)
-        loadTablesList(res); 
+    let tablesDir = req.app.locals.FEDataDir+"/Tables/";
 
-    var results = tablesList;
-    if (qry !== undefined) {
-        if (!tablesListIndex)
-            createTablesIndex(); 
+    if (image !== undefined) {
+        if(image.toLowerCase().endsWith(".directb2s"))
+        {
+            fs.readFile(tablesDir + image, "utf8", function (err, data) {
+                if (err) {
+                    var size = (tablesDir + image).length;
+                    res.writeHead(400, { 'Content-type': 'text/html' });
+                    console.log(err);
+                    res.end("No such image");
+                    return;
+                }
 
-        results = tablesListIndex.search(qry);
-    }
-
-    if (json !== undefined) {
-        res.json(tablesList);
-    }
-    else if (image !== undefined) {
-        fs.readFile(tablesDir + image, function (err, content) {
-            if (err) {
-                var size = (tablesDir + image).length;
-                res.writeHead(400, { 'Content-type': 'text/html' });
-                console.log(err);
-                res.end("No such image");
-            } else {
-                //specify the content type in the response will be an image
-                res.writeHead(200, { 'Content-type': 'image/jpg' });
-                res.end(content);
-            }
-        });
+                var line = data.split("<BackglassImage Value=\"")[1];
+                if(line){
+                    line = line.split("\n")[0];
+                    var imgData = line.replace(/&#xD;&#xA;/g, "");
+                    var img = Buffer.from(imgData, 'base64');
+    
+                    res.writeHead(200, {
+                        'Content-Type': 'image/png',
+                        'Content-Length': img.length
+                    });
+                    res.end(img);
+                }else{
+                    //error not backglass
+                    res.writeHead(400, { 'Content-type': 'text/html' });
+                    console.log(err);
+                    res.end("No such image");
+                }
+            });
+        }else{
+            fs.readFile(tablesDir + image, function (err, content) {
+                if (err) {
+                    var size = (tablesDir + image).length;
+                    res.writeHead(400, { 'Content-type': 'text/html' });
+                    console.log(err);
+                    res.end("No such image");
+                } else {
+                    //specify the content type in the response will be an image
+                    res.writeHead(200, { 'Content-type': 'image/jpg' });
+                    res.end(content);
+                }
+            });
+        }
 
     } else {
-        var page = query.page;
-        if (page === undefined)
-            page = 0;
-        var count = query.count;
-        if (count === undefined)
-            count = 20;
+        if (json !== undefined) {
+            let results=getTablesList(tablesDir); 
 
-        count = parseInt(count);
-        page = parseInt(page);
-        res.render('tables', { title: 'PinFE', tables: results.slice(page * count, (page + 1) * count) });
+            if (qry !== undefined) {
+                let tablesListIndex=getSearchIndex(tablesList); 
+                results = tablesListIndex.search(qry);
+            }
+            var page = query.page;
+            if (page === undefined)
+                page = 0;
+            var count = query.count;
+            if (count === undefined)
+                count = results.length;
+    
+            count = parseInt(count);
+            page = parseInt(page);
+
+            res.json(results.slice(page * count, (page + 1) * count) );
+            return;
+        }
+
+        res.render('tables', { title: 'PinFE'});//, tables: results.slice(page * count, (page + 1) * count) });
     }
 
 });
@@ -192,6 +215,8 @@ router.post('/update', function (request, response) {
     let data = JSON.stringify(request.body.data);
     console.log("Update Table:" + table);
 
+    let tablesDir = req.app.locals.FEDataDir+"/Tables/";
+
     var dbName = tablesDir + table + ".dbase";
     console.log([dbName,data]);
     
@@ -202,5 +227,6 @@ router.post('/update', function (request, response) {
 
 
 });
+
 
 module.exports = router;

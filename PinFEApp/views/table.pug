@@ -1,19 +1,238 @@
-﻿extends layout
+﻿//- extends layout
 
 
 block content
-		h1=table.name
+	//- .modal-header
+	//- 	h5#tableEditModal.modal-title=tableInfo.name
+	//- 	button.btn-sm.close(type="button" data-dismiss="modal" aria-label="Close")
+	//- 		span(aria-hidden="true") ×
+	.modal-body
+		.float-right.pr-5
+			.row.d-flex.justify-content-center
+				i.fas.fa-search(onclick="window.open('https://www.google.com/search?tbm=isch&tbs=ic:trans&q="+ encodeURIComponent(tableInfo.name)+"','_blank')") 
+				img(id="wheelImage" src="tables/?image="+tableInfo.wheelPic style="width:200px;height:auto;min-height:200px")
+			.row.d-flex.justify-content-center
+				i.fas.fa-search(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name)+" directb2s','_blank')")
+				img(id="bgImage" src="tables/?image="+tableInfo.backglass, style="width:200px;height:auto;min-height:200px")
+			.row.d-flex.justify-content-center
+				i.fas.fa-search(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name)+"','_blank')")
+				img(id="tableImage" src="tables/?image="+tableInfo.fsSmallPic,style="width:200px;height:auto;min-height:200px")
+		.float-left.pl-5
+			.row
+				legend=tableInfo.name
+			.row
+				.col-sm-2
+					label.col-form-label(for="exampleSelect1") Master
+				.col-sm-5
+					select#exampleSelect1.form-control
+						option Batman '66 (Original 2018)
+						option 2
+						option 3
+						option 4
+						option 5
+			.row.d-flex.justify-content-center
+				.col-md-6.col-md-offset-3
+					form.dropzone(id="my-awesome-dropzone" method='POST' enctype="multipart/form-data" action='/table/uploadbg?table='+encodeURIComponent(tableInfo.file))
+						| Drop PNG and Directb2s Here
+	.modal-footer
+		//- button.btn.btn-secondary(type="button" data-dismiss="modal") Close
+		button.btn.btn-primary(type="button") Apply					
 
-		.main.container
-				.row
-						.col-md-6.col-md-offset-3
-								h1.display-4.m-b-2 Edit Resource
 
-								// register form
-								form(method='POST' action='/table/update')
-										div.form-group
-												label(for='name') Name:
-												input#name.form-control(type='text', name='name', required='', value=table.name)
-												input(type="submit" value="Submit")
-		script.
+				//- Table Author(s)	
+				//- Table URL	
+				//- IPDB Number	
+				//- Description(s)	
+				//- Type	
+				//- ROM
+				//- Table Date
+				//- Theme	
 
+				//- Last Played
+				//- Played count
+
+
+				//- Manufacturer	
+				//- Year	
+				//- Player(s)	
+				//- VP Version	
+				//- Table Version	
+
+
+
+
+
+
+
+
+		//- form
+		//- 	fieldset
+		//- 		legend=tableInfo.name
+		//- 			//- i.fas.fa-search(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name)+"','_blank')")
+					
+		//- 		.form-group.row
+		//- 			label.col-sm-1.col-form-label(for="file") Location
+		//- 			.col-sm-8
+		//- 				input#file.form-control-plaintext(type="text" readonly="" value=decodeURIComponent(tableInfo.file))
+
+		//- 		.form-group.row
+					//- label.col-sm-1.col-form-label(for="exampleSelect1") Master
+					//- .col-sm-8
+					//- 	select#exampleSelect1.form-control
+					//- 		option Batman '66 (Original 2018)
+					//- 		option 2
+					//- 		option 3
+					//- 		option 4
+					//- 		option 5									
+		//- 		.form-group.row
+		//- 			.col-sm-2
+		//- 				label(for="wheelImage") Wheel
+		//- 					i.fas.fa-search(onclick="window.open('https://www.google.com/search?tbm=isch&tbs=ic:trans&q="+ encodeURIComponent(tableInfo.name)+" wheel','_blank')") 
+		//- 				.col-sm-2
+		//- 					img(id="wheelImage" src="tables/?image="+tableInfo.wheelPic, style="width:200px;height:auto;")
+		//- 			.col-sm-2
+		//- 				label(for="bgImage") Backglass
+		//- 					i.fas.fa-search(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name)+" directb2s','_blank')")
+		//- 				.col-sm-2
+		//- 					img(id="bgImage" src="tables/?image="+tableInfo.backglass, style="width:200px;height:auto;")
+		//- 	fieldset
+		//- 		legend Images
+		//- 		.form-group.row
+		//- 			.col-sm-4
+		//- 				label(for="tableImage") Table Image
+		//- 				//- .col-sm-4(style="width:100%;height:100%")
+		//- 				img(id="tableImage" src="tables/?image="+tableInfo.fsPic,style="width:100%;transform:rotate(90deg) translateX(20%);height:auto;")
+		//- 			.col-sm-4
+		//- 				label(for="bgImage") Backglass
+		//- 				.col-sm-4
+		//- 					img(id="bgImage" src="tables/?image="+tableInfo.backglass, style="width:200px;height:auto;")
+		//- 					i.fas.fa-search(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name)+" directb2s','_blank')") Search for backglass
+		//- form.dropzone(id="my-awesome-dropzone" method='POST' enctype="multipart/form-data" action='/table/uploadbg?table='+encodeURIComponent(tableInfo.file))
+	
+	//- .modal-footer
+	//- 	button.btn.btn-secondary(type="button" data-dismiss="modal") Close
+	//- 	button.btn.btn-primary(type="button") Save changes
+
+
+
+
+
+	//- h1=tableInfo.name
+
+	//- .main.container
+	//- 	//- table
+	//- 	//- 	tr
+	//- 	//- 		td "File"
+	//- 	//- 		td=decodeURIComponent(tableInfo.file) 
+	//- 	//- 	tr
+	//- 	//- 		td "Master"
+	//- 	//- 		td=tableInfo.masterName 
+	//- 	.row(style='color:black')
+	//- 			.col-md-6.col-md-offset-3
+	//- 				h4="File:"+decodeURIComponent(tableInfo.file)
+	//- 			.col-md-6.col-md-offset-3
+	//- 				h3="Master:"+tableInfo.masterName
+	//- 			.col-md-6.col-md-offset-3
+	//- 				h3="Suggested Master:"+tableInfo.suggestedMaster
+	//- 			.col-md-6.col-md-offset-3
+	//- 				img(src="tables/?image="+tableInfo.wheelPic, style="width:500px;height:auto;")
+	//- 				button(onclick="window.open('https://www.google.com/search?tbm=isch&tbs=ic:trans&q="+ encodeURIComponent(tableInfo.name)+" wheel','_blank')") Search for wheel
+	
+	//- 			.col-md-6.col-md-offset-3
+	//- 				img(src="tables/?image="+tableInfo.backglass, style="width:500px;height:auto;")
+	//- 				button(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name)+" directb2s','_blank')") Search for backglass
+	//- 			.col-md-6.col-md-offset-3
+	//- 				img(src="tables/?image="+tableInfo.fsPic, style="width:500px;height:auto;")
+	//- 	.row
+	//- 			.col-md-6.col-md-offset-3
+	//- 					form.dropzone(id="my-awesome-dropzone" method='POST' enctype="multipart/form-data" action='/table/uploadbg?table='+encodeURIComponent(tableInfo.file))
+
+						//- // register form
+						//- form(method='POST' action='/table/update')
+						//- 		div.form-group
+						//- 				label(for='name') Name:
+						//- 				input#name.form-control(type='text', name='name', required='', value=tableInfo.name)
+						//- 				label(for='file') File:
+						//- 				input#name.form-control(type='text', name='file', required='no', value=tableInfo.file)
+						//- 				label(for='name') Name:
+						//- 				input#name.form-control(type='text', name='name', required='', value=tableInfo.name)
+						//- 				input(type="submit" value="Submit")
+						
+	script.
+		var dropbox =$(".dropzone")[0];// document.getElementById('dropbox');
+
+		dropbox.addEventListener('dragenter', noopHandler, false);
+		dropbox.addEventListener('dragexit', noopHandler, false);
+		dropbox.addEventListener('dragover', noopHandler, false);
+		dropbox.addEventListener('drop', drop, false);
+
+		function noopHandler(evt) {
+				evt.stopPropagation();
+				evt.preventDefault();
+		}
+		function drop(evt) {
+				evt.stopPropagation();
+				evt.preventDefault(); 
+				//console.log([evt,'!{tableInfo.file}'])
+				var imageUrl = evt.dataTransfer.getData('Text');
+				if(imageUrl && imageUrl!="")
+				{
+					$.ajax({
+							url: '/table/downloadPng', 
+							type: 'POST', 
+							contentType: 'application/json', 
+							data: JSON.stringify({url:imageUrl,tableFile:"!{tableInfo.file}"})}
+					)
+					//alert(imageUrl);
+				}
+
+		}
+		$(document).ready(function() {
+		
+			Dropzone.options.myAwesomeDropzone = {
+				url:'/batch/upload',
+				autoProcessQueue: false,
+				//paramName:'source_file', // Name used to transfer the file(s) (will have '[i=0,1,2,3,4...]' appended)
+				paramName: function(n) { return 'source_file[]';},  // Don't enumerate the transfers
+				uploadMultiple: true,
+				parallelUploads: 4,  // default is 2
+				//maxFilesize: 2, // MB
+
+				init: function() {
+					console.log("init dropzone")
+					var myDropzone = this;
+					this.on("completemultiple", function(files, response) {  // was queuecomplete
+					console.log("Complete!");
+					
+					// Now reload page...
+					location.reload(true);  // true => force server reload
+					console.log("Reloaded?");
+					});
+					
+					this.on("addedfile", function() { 
+					console.log("Added File! - show the upload button");
+					$('#batch-upload').show();
+					});
+					
+					$('#batch-upload').click( function(e) {
+					console.log("Clicked on upload button"); // , e.target.href
+					
+					e.preventDefault();
+					e.stopPropagation();
+					
+					myDropzone.processQueue();
+					}).hide();
+					
+				}
+			
+			};      
+			
+		});  
+		
+
+		//- const pond = FilePond.create({
+		//- 		multiple: true,
+		//- 		name: 'filepond'
+		//- });
+
+		//- document.body.appendChild(pond.element);

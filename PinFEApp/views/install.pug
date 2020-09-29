@@ -1,0 +1,15 @@
+﻿extends layout
+
+
+block content
+  h1= Zips
+
+  div(style='')
+    div(style:'float:left')
+    each item in items
+      //- div(style='width:15%;height:auto;max-height:25%;float:left;filter: drop-shadow(22px 22px 22px rgba(0,0,0,1.0));')
+      div(style='')=item
+  script.
+
+    /*var tables = !{JSON.stringify(tables)}*/
+    

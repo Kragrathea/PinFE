@@ -12,6 +12,13 @@ block content
     //img.backglass(src=image style="position:absolute;left:0px;top:0px;width:100%;height:100%")
     //div.swiper-pagination
   script.
+    window.searchBoxfilterFunction =function ()
+    {
+      let filter = $("#menu-search-box").val();
+      
+      window.history.pushState({id: 'homepage'},'Home | My App','?search='+filter);
+
+    }
 
     /*var tables = !{JSON.stringify(tables)}*/
     

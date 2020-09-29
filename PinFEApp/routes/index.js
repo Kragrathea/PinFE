@@ -10,7 +10,7 @@ var fs = require('fs'),
 var url = require('url');
 //var imageDir = '/Games/VPTables/_index/FS/Gif/';
 
-var tableDir = '../../../Tables/';
+var FEDataDir = '../';
 
 var masterDir = "./public/Master";
 
@@ -18,11 +18,11 @@ var masterDir = "./public/Master";
 //tableDir = masterDir;
 
 function findInDir(dir, filter, fileList = []) {
-    const files = fs.readdirSync(tableDir + dir);
+    const files = fs.readdirSync(dir);
 
     files.forEach((file) => {
         const filePath = path.join(dir, file);
-        const fileStat = fs.lstatSync(tableDir+filePath);
+        const fileStat = fs.lstatSync(filePath);
 
         if (fileStat.isDirectory()) {
             findInDir(filePath, filter, fileList);
@@ -55,18 +55,19 @@ function getTableInfo(dir, callback) {
     var tableFiles = findInDir(dir, /\.vpx$/);
     var results = [];
     tableFiles.forEach((file) => {
+        let relFile = path.relative( dir, file )
         results.push({
-            tableName: path.basename(file),
-            tableFolder: path.basename(path.dirname(file)),
-            table: file,
-            fsPic: fs.existsSync(tableDir + file + ".fs.jpg"),
-            bgPic: fs.existsSync(tableDir + file + ".bg.jpg"),
-            dtPic: fs.existsSync(tableDir + file + ".dt.jpg"),
-            fsSmallPic: fs.existsSync(tableDir + file + ".fs-small.jpg"),
-            bgSmallPic: fs.existsSync(tableDir + file + ".bg-small.jpg"),
-            dtSmallPic: fs.existsSync(tableDir + file + ".dt-small.jpg"),
-            wheelPic: fs.existsSync(tableDir + file + ".wheel.png"),
-            wheelSmallPic: fs.existsSync(tableDir + file + ".wheel-small.png")
+            tableName: path.basename(relFile),
+            tableFolder: path.basename(path.dirname(relFile)),
+            table: relFile,
+            fsPic: fs.existsSync(file + ".fs.jpg"),
+            bgPic: fs.existsSync(file + ".bg.jpg"),
+            dtPic: fs.existsSync(file + ".dt.jpg"),
+            fsSmallPic: fs.existsSync(file + ".fs-small.jpg"),
+            bgSmallPic: fs.existsSync(file + ".bg-small.jpg"),
+            dtSmallPic: fs.existsSync(file + ".dt-small.jpg"),
+            wheelPic: fs.existsSync(file + ".wheel.png"),
+            wheelSmallPic: fs.existsSync(file + ".wheel-small.png")
         });
     });
 
@@ -90,7 +91,10 @@ router.post('/play', function (req, res) {
     console.log("POST play table:" + req.body.table);
     //var cmd = '"f:/Games/Visual Pinball/VPinballX_cab.exe" /play ' + '"c:\\' + tableDir + req.body.table + '"';
 
-    runPlayer('../../VisualPinball/VisualPinballCab.exe', ["/play", tableDir + req.body.table, arg,"-minimized"]);
+    let tableDir=req.app.locals.FEDataDir+"/Tables/";
+    let tableFile= tableDir + req.body.table;
+    tableFile= path.resolve(tableFile)
+    runPlayer('../Apps/VisualPinball/VisualPinballCab.exe', ["/play", tableFile, arg,"-minimized"]);
 
     //captureVideo('../../VisualPinball/VisualPinballCab.exe', ["/play", tableDir + req.body.table, arg, "-minimized"], tableDir + req.body.table+".bg.mp4");
 
@@ -101,6 +105,7 @@ router.post('/capture', function (req, res) {
     var view = query.view;
 
     console.log("POST capture table:"+view +" " + req.body.table);
+    let tableDir=req.app.locals.FEDataDir+"/Tables/";
 
     if (view) {
         var arg = "";
@@ -119,7 +124,7 @@ router.post('/capture', function (req, res) {
             outName = tableDir + req.body.table + ".fs.mp4"
         }
         if(arg!=="")
-            captureVideo('../../VisualPinball/VisualPinballCab.exe', ["/play", tableDir + req.body.table, arg, "-minimized"], outName);
+            captureVideo('../Apps/VisualPinball/VisualPinballCab.exe', ["/play", tableDir + req.body.table, arg, "-minimized"], outName);
     }
 
     res.end();
@@ -129,8 +134,8 @@ router.post('/capture', function (req, res) {
 
 var curSelectedTable = "";
 router.post('/select', function (req, res) {
-    console.log(req.body);
-    console.log("POST select table:" + req.body.table);
+    //console.log(req.body);
+    //console.log("POST select table:" + req.body.table);
     curSelectedTable = req.body.table;
 
     res.end();
@@ -190,7 +195,7 @@ function captureVideo(command, args, outName) {
                 "-video_size", "1920x1080", "-ss", "6", "-t", "00:00:2", "-i", "desktop", "-c:v", "h264_nvenc", "-an", "-preset", "lossless", "-y", "-f", "mp4",
                 outName+"_"];
 
-            var ffmpeg = child_process.spawn("../../Ffmpeg/ffmpeg.exe", ffargs);
+            var ffmpeg = child_process.spawn("../Apps/Ffmpeg/ffmpeg.exe", ffargs);
             captureActive = true;
             ffmpeg.on('error', function (err) {
                 console.log('Error running player: ' + err);
@@ -216,7 +221,7 @@ function captureVideo(command, args, outName) {
 
 
                 let ffREargs = ["-i", outName + "_", "-loglevel", "error", "-stats", "-c:v", "libx264", "-an", "-crf", "20", "-preset", "slower", "-pix_fmt", "yuv420p", "-y", "-f", "mp4", outName];
-                let ffREmpeg = child_process.spawn("../../Ffmpeg/ffmpeg.exe", ffREargs);
+                let ffREmpeg = child_process.spawn("../Apps/Ffmpeg/ffmpeg.exe", ffREargs);
 
                 ffREmpeg.stdout.setEncoding('utf8');
                 ffREmpeg.stdout.on('data', function (data) {
@@ -233,7 +238,7 @@ function captureVideo(command, args, outName) {
 
                     let picName = outName.replace(".mp4", ".jpg");
                     let ffPicargs = ["-ss", "1", "-i", outName, "-vframes", "1", "-q:v", "2", "-loglevel", "error", "-y", "-stats", picName];
-                    let ffPicmpeg = child_process.spawn("../../Ffmpeg/ffmpeg.exe", ffPicargs);
+                    let ffPicmpeg = child_process.spawn("../Apps/Ffmpeg/ffmpeg.exe", ffPicargs);
 
                     ffPicmpeg.stdout.on('data', function (data) {
                         console.log('ffmpeg stdout: ' + data);
@@ -245,7 +250,7 @@ function captureVideo(command, args, outName) {
                         console.log('FINISHED PIC: ');
 
                         ffPicargs = ["-i", picName, "-vf", "scale=480:-1,transpose=1", "-y", picName.replace(".jpg", "-small.jpg")];;
-                        ffPicmpeg = child_process.spawn("../../Ffmpeg/ffmpeg.exe", ffPicargs);
+                        ffPicmpeg = child_process.spawn("../Apps/Ffmpeg/ffmpeg.exe", ffPicargs);
                     });
 
 
@@ -341,8 +346,10 @@ router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
     var pic = query.image;
 
+    let tableDir=req.app.locals.FEDataDir+"/Tables/";
+
     if (typeof pic === 'undefined') {
-        getTableInfo("/", function (err, tables) {
+        getTableInfo(tableDir, function (err, tables) {
             res.render('index', { title: 'PinFE', tables: tables/*.slice(0,30)*/});
         });
     } else {
@@ -375,8 +382,14 @@ router.get('/wheel', function (req, res) {
     //figure out backglass image name
     var bgImage = "tables/?image=" + curSelectedTable + ".wheel.jpg";
     res.render('wheel', { title: 'PinFE', table: curSelectedTable, image: encodeURIComponent(bgImage) });
+});
 
-
+router.get('/playfield', function (req, res) {
+    var query = url.parse(req.url, true).query;
+    var pic = query.image;
+    //figure out backglass image name
+    var bgImage = "tables/?image=" + curSelectedTable + ".fs.jpg";
+    res.render('playfield', { title: 'PinFE', table: curSelectedTable, image: encodeURIComponent(bgImage) });
 });
 
 

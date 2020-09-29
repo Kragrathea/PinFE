@@ -16,116 +16,9 @@ var Fuse = require('fuse.js');
 
 var fs = require('fs');
 
-app.locals.masterTableList = [];
-function loadMasterTableList() {
-
-    var masterDir = "./public/data";
-
-    function findInDir(dir, filter, fileList = []) {
-        const files = fs.readdirSync(masterDir + dir);
-
-        files.forEach((file) => {
-            const filePath = path.join(dir, file);
-            const fileStat = fs.lstatSync(masterDir + filePath);
-
-            if (fileStat.isDirectory()) {
-                findInDir(filePath, filter, fileList);
-            } else if (filter.test(filePath)) {
-                fileList.push(filePath);
-            }
-        });
-
-        return fileList;
-    }
-
-    function fuzzyCompare(a, b) {
-        //console.log([a, b]);
-
-        if (a.startsWith("Bank") && b.startsWith("Bank"))
-            console.log([a, b]);
-        var ca = a.toLowerCase().replace(/ /g, "").replace(/-/g, "").replace(/\(/g, "").replace(/\)/g, "");
-        var cb = b.toLowerCase().replace(/ /g, "").replace(/-/g, "").replace(/\(/g, "").replace(/\)/g, "");
-
-        //if (ca.Contains("pharaoh") && cb.Contains("pharaoh"))
-        //    Console.WriteLine("here");
-
-        if (ca == cb)
-            return true;
-        return false;
-    }
-    function simplifyName(tableName) {
-        if (tableName.indexOf(')') > 0)
-            tableName = tableName.substring(0, tableName.indexOf('('));
-        var ca = tableName.toLowerCase().replace(/ /g, "").replace(/\-/g, "").replace(/_/g, "").replace(/\'/g, "").replace(/\"/g, "").replace(/\&/g, "").replace(/\'/g, "").replace(/\(/g, "").replace(/\)/g, "").
-            replace(/\,/g, "").replace(/\./g, "").replace(/\!/g, "").replace(/the/g, "").replace(/and/g, "").replace(/do brasil/g, "").replace(/ /g, "");
-        return ca;
-    }
-    function superFuzzyCompare(a, b) {
-        var ca = simplifyName(a);
-        var cb = simplifyName(b);
-
-        //Console.WriteLine(ca);
-
-        if (ca == cb)
-            return true;
-        return false;
-    }
-
-    fs.readFile(masterDir + '/MasterTableList.tsv', function (err, data) {
-        if (err) throw err;
-        var lines = data.toString().split("\n");
-
-        app.locals.masterTableList = [];
-
-        //table headers are on line 1
-        var headers = lines[1].split("\t");
-
-        //override headers to shorter javascript friendly.
-        headers = ["name", "comment", "type", "vpver", "author", "version", "date", "rom"]; //,"check","notes"];
-
-        for (var i = 2; i < lines.length; i++) { //NOTE 2. Bypassheaders.
-            var obj = {id:i-2}; //NOTE -2
-            var currentline = lines[i].split("\t");
-            for (var j = 0; j < headers.length; j++) {
-                obj[headers[j]] = currentline[j];
-            }
-            if(obj.name!=="")//get rid of blank rows.
-                app.locals.masterTableList.push(obj);
-        }
-        console.log("Loaded masterTableList. Length:" + app.locals. masterTableList.length);
-
-        var options = {
-            shouldSort: true,
-            threshold: 0.3,
-            //includeScore:true,
-            location: 0,
-            distance: 100,
-            maxPatternLength: 32,
-            minMatchCharLength: 3,
-            tokenize: true,
-            keys: [
-                "name"
-                //"author",
-                //"comment",
-            ]
-        };
-        app.locals.masterTableIndex = new Fuse(app.locals.masterTableList, options);
-        app.locals.masterTableQuickSearch = function (tableName) {
-
-            //console.log("quickSearch for:" + query.query);
-            var results = app.locals.masterTableList.filter(a => fuzzyCompare(a.name, tableName));
-            //console.log("quickSearch found:" + results.length + " for" + simplifyName(qry));
-
-            if (results.length < 1)
-                results = app.locals.masterTableList.filter(a => superFuzzyCompare(a.name, tableName));
-            //console.log("quickSearch found:" + results.length + " for" + simplifyName(qry));
-            return (results);
-        }
-
-    });
-}
-loadMasterTableList();
-
+//todo. make configurable
+//app.locals.FEDataDir = '/Games/PinFE';
+app.locals.FEDataDir = '../';
 
 
 var master = require('./routes/master');
@@ -136,6 +29,7 @@ var backglasses = require('./routes/backglasses');
 var tables = require('./routes/tables');
 var table = require('./routes/table');
 
+var install = require('./routes/install');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -158,6 +52,9 @@ app.use('/wheels', wheels);
 app.use('/backglasses', backglasses);
 app.use('/tables', tables);
 app.use('/table', table);
+
+app.use('/install', install);
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

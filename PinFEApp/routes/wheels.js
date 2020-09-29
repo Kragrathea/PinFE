@@ -8,18 +8,18 @@ var fs = require('fs'),
     querystring = require('querystring');
 var url = require('url');
 
-var wheelsDir = "../../../Wheels/"; // ./public/data";
 
 
-function findInDir(dir, filter, fileList = []) {
-    const files = fs.readdirSync(wheelsDir + dir);
+
+function findInDir(baseDir,dir, filter, fileList = []) {
+    const files = fs.readdirSync(baseDir + dir);
 
     files.forEach((file) => {
         const filePath = path.join(dir, file);
-        const fileStat = fs.lstatSync(wheelsDir + filePath);
+        const fileStat = fs.lstatSync(baseDir + filePath);
 
         if (fileStat.isDirectory()) {
-            findInDir(filePath, filter, fileList);
+            findInDir(baseDir,filePath, filter, fileList);
         } else if (filter.test(filePath)) {
             fileList.push(filePath);
         }
@@ -28,11 +28,10 @@ function findInDir(dir, filter, fileList = []) {
     return fileList;
 }
 
-var wheelList = [];
-var wheelListIndex;
-function loadWheelList() {
 
-    var wheelFiles = findInDir(".", /\.png$/);
+function getWheelList(wheelsDir) {
+
+    var wheelFiles = findInDir(wheelsDir,".", /\.png$/);
     var results = [];
     wheelFiles.forEach((file) => {
         results.push({
@@ -41,9 +40,13 @@ function loadWheelList() {
         });
     });
 
-    wheelList = results;
+    //wheelList = results;
 
-    console.log("Loaded wheelList. Length:" + wheelList.length);
+    console.log("Loaded wheelList. Length:" + results.length);
+    return results;
+}
+
+function getSearchIndex(wheelList) {
 
     var options = {
         shouldSort: true,
@@ -60,60 +63,9 @@ function loadWheelList() {
             //"comment",
         ]
     };
-    wheelListIndex = new Fuse(wheelList, options);
+    let wheelListIndex = new Fuse(wheelList, options);
+    return(wheelListIndex);
 }
-loadWheelList();
-
-router.get('/search', function (req, res) {
-    var query = url.parse(req.url, true).query;
-    var qry = query.query;
-
-    var matches = wheelListIndex.search(qry);
-    res.json({
-        matches: matches
-    });
-
-});
-
-router.get('/grid', function (req, res) {
-    var query = url.parse(req.url, true).query;
-    var qry = query.search;
-    var results = wheelList;
-    if (qry !== undefined) {
-        results = wheelListIndex.search(qry);
-    }
-    res.render('wheels', { title: 'PinFE Wheels', wheels: results.slice(0,100) });
-});
-
-//router.get('/', function (req, res) {
-//    var query = url.parse(req.url, true).query;
-//    var qry = (query.search);
-//    var image = (query.image);
-
-//    var results = wheelList
-//    if (qry !== undefined) {
-//        var results = wheelListIndex.search(qry);
-//    }
-
-//    if (image === undefined) {
-//        res.json({
-//            results: wheelList,
-//        });
-//    } else {
-//        fs.readFile(wheelsDir + image, function (err, content) {
-//            if (err) {
-//                res.writeHead(400, { 'Content-type': 'text/html' })
-//                console.log(err);
-//                res.end("No such image");
-//            } else {
-//                //specify the content type in the response will be an image
-//                res.writeHead(200, { 'Content-type': 'image/jpg' });
-//                res.end(content);
-//            }
-//        });
-//    }
-
-//});
 
 router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
@@ -121,24 +73,11 @@ router.get('/', function (req, res) {
     var image = query.image;
     var json = query.json;
     var imageIndex = query.imageIndex;
+    var perPage = query.perPage;
 
+    let wheelsDir = req.app.locals.FEDataDir+"/Library/Wheels/";
 
-    var results = wheelList;
-    if (qry !== undefined) {
-        results = wheelListIndex.search(qry);
-    }
-
-    if (imageIndex !== undefined) {
-        image = results[imageIndex].file;
-    }
-
-    if (json !== undefined) {
-        res.json({
-            results: results
-        });
-    }
-    else if (image !== undefined) {
-
+    if (image !== undefined) {
         fs.readFile(wheelsDir + image, function (err, content) {
             if (err) {
                 var size = (wheelsDir + image).length;
@@ -153,11 +92,31 @@ router.get('/', function (req, res) {
         });
 
     } else {
+        var results = getWheelList(wheelsDir);
+    
+        if (qry !== undefined) {
+            let wheelListIndex=getSearchIndex(results);
+            results = wheelListIndex.search(qry);
+        }
+    
+        if (imageIndex !== undefined) {
+            image = results[imageIndex].file;
+        }
+    
+        if (perPage === undefined && isNaN(perPage)) {
+            perPage=100;
+        }
+        if (json !== undefined) {
+            res.json({
+                results: results
+            });
+        }
+ 
         var page = query.page;
         if (page === undefined)
             page = 0;
         page = parseInt(page);
-        res.render('wheels', { title: 'PinFE', items: results.slice(page * 100, (page + 1) * 100) });
+        res.render('wheels', { title: 'PinFE', items: results.slice(page * perPage, (page + 1) * perPage) });
     }
 
 });

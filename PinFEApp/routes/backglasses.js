@@ -8,7 +8,6 @@ var fs = require('fs'),
     querystring = require('querystring');
 var url = require('url');
 
-var bgDir = "../../..//Backglasses/"; // ./public/data";
 var xml2js = require('xml2js');
 
 
@@ -31,9 +30,7 @@ function findInDir(baseDir,dir, filter, fileList = []) {
     return fileList;
 }
 
-var bgList = [];
-var bgListIndex;
-function loadBGList() {
+function getBGList(bgDir) {
 
     var files = findInDir(bgDir,".", /\.directb2s/);
     var results = [];
@@ -44,9 +41,9 @@ function loadBGList() {
       });
     });
 
-    bgList = results;
-
-    console.log("Loaded bgList. Length:" + bgList.length);
+    return(results);
+}
+function getSearchIndex(bgList) {
 
     var options = {
         shouldSort: true,
@@ -63,9 +60,9 @@ function loadBGList() {
             //"comment",
         ]
     };
-    bgListIndex = new Fuse(bgList, options);
+    let bgListIndex = new Fuse(bgList, options);
+    return(bgListIndex);
 }
-loadBGList();
 
 router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
@@ -73,30 +70,41 @@ router.get('/', function (req, res) {
     var image = query.image;
     var json = query.json;
 
-    var results = bgList;
-    if (qry !== undefined) {
-        results = bgListIndex.search(qry);
-    }
-
-    if (json !== undefined) {
-        if (query.justNames)
-            results = results.map(x => x.name);
-        res.json(results);
-    }
-    else if (image !== undefined) {
+    let bgDir = req.app.locals.FEDataDir+"/Library/Backglasses/"; // ./public/data";
+    if (image !== undefined) {
         fs.readFile(bgDir + image, "utf8", function (err, data) {
             var line = data.split("<BackglassImage Value=\"")[1];
-            line = line.split("\n")[0];
-            var imgData = line.replace(/&#xD;&#xA;/g, "");
-            var img = Buffer.from(imgData, 'base64');
+            if(line){
+                line = line.split("\n")[0];
+                var imgData = line.replace(/&#xD;&#xA;/g, "");
+                var img = Buffer.from(imgData, 'base64');
 
-            res.writeHead(200, {
-                'Content-Type': 'image/png',
-                'Content-Length': img.length
-            });
-            res.end(img);
+                res.writeHead(200, {
+                    'Content-Type': 'image/png',
+                    'Content-Length': img.length
+                });
+                res.end(img);
+            }else{
+                // error not backglass
+                //var size = (wheelsDir + image).length;
+                res.writeHead(400, { 'Content-type': 'text/html' });
+                console.log("No such image");
+                res.end("No such image");
+            }
         });
     } else {
+        var results = getBGList(bgDir);
+        if (qry !== undefined) {
+            let bgListIndex=getSearchIndex(results);
+            results = bgListIndex.search(qry);
+        }
+    
+        if (json !== undefined) {
+            if (query.justNames)
+                results = results.map(x => x.name);
+            res.json(results);
+        }
+
         var page = query.page;
         if (page === undefined)
             page = 0;
