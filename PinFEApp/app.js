@@ -16,10 +16,15 @@ var Fuse = require('fuse.js');
 
 var fs = require('fs');
 
-//todo. make configurable
-//app.locals.FEDataDir = '/Games/PinFE';
-app.locals.FEDataDir = '../';
+var process = require('process');
+var myArgs = process.argv.slice(2);
+console.log('myArgs: ', myArgs);
 
+//todo. make configurable
+app.locals.FEDataDir = '/Games/PinFE';
+//app.locals.FEDataDir = '../../../';
+if(myArgs.length>0)
+    app.locals.FEDataDir =myArgs[0];
 
 var master = require('./routes/master');
 var routes = require('./routes/index');
