@@ -1,0 +1,13 @@
+
+{
+    "development": {
+        "config_id": "development",
+        "dataDir":"/Games/PinFE",
+        "node_port": 3000
+    },
+    "production": {
+        "config_id": "production",
+        "dataDir":"/Games/PinFE",
+        "node_port": 8080
+    }
+}

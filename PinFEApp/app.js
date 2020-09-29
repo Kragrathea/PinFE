@@ -16,15 +16,22 @@ var Fuse = require('fuse.js');
 
 var fs = require('fs');
 
+const config = require('./config.json');
+const defaultConfig = config.development;
+
 var process = require('process');
 var myArgs = process.argv.slice(2);
-console.log('myArgs: ', myArgs);
+//console.log('myArgs: ', myArgs);
 
 //todo. make configurable
-app.locals.FEDataDir = '/Games/PinFE';
+app.locals.FEDataDir = defaultConfig.dataDir;//'/Games/PinFE';
 //app.locals.FEDataDir = '../../../';
-if(myArgs.length>0)
+
+//override data dir from command line.
+if(myArgs.length>0)//todo. add switch syntax
     app.locals.FEDataDir =myArgs[0];
+
+console.log("Data directory set to:"+app.locals.FEDataDir)
 
 var master = require('./routes/master');
 var routes = require('./routes/index');

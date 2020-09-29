@@ -1,0 +1,1 @@
+notepad .\PinFEApp\config.json
