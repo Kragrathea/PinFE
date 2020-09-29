@@ -1,9 +1,9 @@
 Echo Install Node Packages
 pushd .
-npm install
+CMD /C npm install
 pause
 cd PinFEApp
-npm install
+CMD /C npm install
 pause
 popd
 
@@ -17,8 +17,8 @@ Echo DMD Setup
 FlexDMDUI.exe
 pause
 cd ..\BackglassServer
+Echo Register Backglass. NOTE:Might have to be done as Administrator.
 B2SBackglassServerRegisterApp.exe
 popd
 Echo All Done!
 pause
-
