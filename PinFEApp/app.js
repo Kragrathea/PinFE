@@ -25,6 +25,9 @@ var myArgs = process.argv.slice(2);
 
 //todo. make configurable
 app.locals.FEDataDir = defaultConfig.dataDir;//'/Games/PinFE';
+
+//for debugging.
+//app.locals.FEDataDir = 'C:\\Games\\PinFE\\Apps\\PinFE';
 //app.locals.FEDataDir = '../../../';
 
 //override data dir from command line.

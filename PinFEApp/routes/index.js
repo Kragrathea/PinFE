@@ -93,7 +93,10 @@ router.post('/play', function (req, res) {
 
     let tableDir=req.app.locals.FEDataDir+"/Tables/";
     let tableFile= tableDir + req.body.table;
-    tableFile= path.resolve(tableFile)
+    tableFile= path.resolve(tableFile);
+
+    //copy over roms.
+    prepareTable(tableFile);
     runPlayer('../Apps/VisualPinball/VisualPinballCab.exe', ["/play", tableFile, arg,"-minimized"]);
 
     //captureVideo('../../VisualPinball/VisualPinballCab.exe', ["/play", tableDir + req.body.table, arg, "-minimized"], tableDir + req.body.table+".bg.mp4");
@@ -106,6 +109,8 @@ router.post('/capture', function (req, res) {
 
     console.log("POST capture table:"+view +" " + req.body.table);
     let tableDir=req.app.locals.FEDataDir+"/Tables/";
+    let tableFile= tableDir + req.body.table;
+    tableFile= path.resolve(tableFile)
 
     if (view) {
         var arg = "";
@@ -124,7 +129,11 @@ router.post('/capture', function (req, res) {
             outName = tableDir + req.body.table + ".fs.mp4"
         }
         if(arg!=="")
-            captureVideo('../Apps/VisualPinball/VisualPinballCab.exe', ["/play", tableDir + req.body.table, arg, "-minimized"], outName);
+        {
+            //copy over roms.
+            prepareTable(tableFile);
+            captureVideo('../Apps/VisualPinball/VisualPinballCab.exe', ["/play", tableFile, arg, "-minimized"], outName);
+        }
     }
 
     res.end();
@@ -140,6 +149,26 @@ router.post('/select', function (req, res) {
 
     res.end();
 });
+
+function prepareTable(tableFile) {
+    console.log("prepareTable:"+tableFile);
+    let tableRomsDir = path.dirname(tableFile) + "\\Roms\\";
+    if (romPath && fs.existsSync(tableRomsDir)) {
+        const files = fs.readdirSync(tableRomsDir);
+
+        files.forEach((file) => {
+            const filePath = path.join(tableRomsDir, file);
+            if (!fs.existsSync(romPath + file)) {
+                //need copy
+                console.log("Copy:" + filePath + "->" + romPath);
+                fs.copyFileSync(filePath,romPath);
+            } else {
+                //already there.
+                //console.log("Exists:"+romPath+file);
+            }
+        });
+    }
+}
 
 function sendStatus(res) {
 
@@ -290,6 +319,29 @@ function captureVideo(command, args, outName) {
     });
 }
 
+var Registry = require('winreg')
+var romPath=null;//todo make this sync
+function loadRomPath()
+{
+    let   regKey = new Registry({                                       // new operator is optional
+        hive: Registry.HKCU,                                        // open registry hive HKEY_CURRENT_USER
+        key:  '\\Software\\Freeware\\Visual PinMame\\globals' // key containing autostart programs
+        })
+
+    regKey.values(function (err, items /* array of RegistryItem */) {
+    if (err)
+        console.log('ERROR: '+err);
+    else
+        for (var i=0; i<items.length; i++){
+            //console.log('ITEM: '+items[i].name+'\t'+items[i].type+'\t'+items[i].value);
+            if(items[i].name==="rompath"){
+                romPath=items[i].value+"\\";
+                console.log("Setting romPath:"+romPath);
+            }
+        }
+    });
+}
+loadRomPath();//todo make this sync
 
 function runPlayer(command, args, callback) {
     console.log("Starting Process.");
