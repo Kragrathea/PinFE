@@ -31,15 +31,16 @@ function findInDir(baseDir,dir, filter, fileList = []) {
 
 function getWheelList(wheelsDir) {
 
-    var wheelFiles = findInDir(wheelsDir,".", /\.png$/);
     var results = [];
-    wheelFiles.forEach((file) => {
-        results.push({
-            name: path.basename(file),
-            file: file
+    if(fs.existsSync(wheelsDir)){
+        var wheelFiles = findInDir(wheelsDir,".", /\.png$/);
+        wheelFiles.forEach((file) => {
+            results.push({
+                name: path.basename(file),
+                file: file
+            });
         });
-    });
-
+    }
     //wheelList = results;
 
     console.log("Loaded wheelList. Length:" + results.length);
@@ -77,7 +78,7 @@ router.get('/', function (req, res) {
 
     let wheelsDir = req.app.locals.FEDataDir+"/Library/Wheels/";
 
-    if (image !== undefined) {
+    if (image !== undefined && fs.existsSync(wheelsDir)) {
         fs.readFile(wheelsDir + image, function (err, content) {
             if (err) {
                 var size = (wheelsDir + image).length;

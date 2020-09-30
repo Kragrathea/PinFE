@@ -32,15 +32,16 @@ function findInDir(baseDir,dir, filter, fileList = []) {
 
 function getBGList(bgDir) {
 
-    var files = findInDir(bgDir,".", /\.directb2s/);
     var results = [];
-    files.forEach((file) => {
-        results.push({
-            name: path.basename(file),
-            file: encodeURIComponent(file)
-      });
-    });
-
+    if(fs.existsSync(bgDir)){
+        var files = findInDir(bgDir,".", /\.directb2s/);
+        files.forEach((file) => {
+            results.push({
+                name: path.basename(file),
+                file: encodeURIComponent(file)
+        });
+        });
+    }
     return(results);
 }
 function getSearchIndex(bgList) {
@@ -71,7 +72,7 @@ router.get('/', function (req, res) {
     var json = query.json;
 
     let bgDir = req.app.locals.FEDataDir+"/Library/Backglasses/"; // ./public/data";
-    if (image !== undefined) {
+    if (image !== undefined && fs.existsSync(bgDir)) {
         fs.readFile(bgDir + image, "utf8", function (err, data) {
             var line = data.split("<BackglassImage Value=\"")[1];
             if(line){
