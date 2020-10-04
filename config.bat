@@ -1,1 +1,1 @@
-notepad .\PinFEApp\config.json
+notepad .\Apps\PinFEApp\config.json

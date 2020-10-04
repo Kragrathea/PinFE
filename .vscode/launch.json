@@ -11,8 +11,8 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\PinFEApp\\app.js",
-            "cwd":"${workspaceFolder}\\PinFEApp\\"
+            "program": "${workspaceFolder}\\Apps\\PinFEApp\\app.js",
+            "cwd":"${workspaceFolder}\\Apps\\PinFEApp\\"
         }
     ]
 }

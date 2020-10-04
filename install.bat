@@ -1,6 +1,6 @@
 Echo Install Node Packages
 pushd .
-cd PinFEApp
+cd .\Apps\PinFEApp
 CMD /C npm install
 pause
 popd

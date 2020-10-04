@@ -109,9 +109,9 @@ router.post('/play', function (req, res) {
     //copy over roms.
     prepareTable(tableFile);
     if(query.editMode){
-        runPlayer('../Apps/VisualPinball/VisualPinballCab.exe', ["/play", tableFile, arg,""]);
+        runPlayer('../VisualPinball/VisualPinballCab.exe', ["/play", tableFile, arg,""]);
     }else{
-        runPlayer('../Apps/VisualPinball/VisualPinballCab.exe', ["/play", tableFile, arg,"-minimized"]);
+        runPlayer('../VisualPinball/VisualPinballCab.exe', ["/play", tableFile, arg,"-minimized"]);
     }
 
     //captureVideo('../../VisualPinball/VisualPinballCab.exe', ["/play", tableDir + req.body.table, arg, "-minimized"], tableDir + req.body.table+".bg.mp4");
@@ -147,7 +147,7 @@ router.post('/capture', function (req, res) {
         {
             //copy over roms.
             prepareTable(tableFile);
-            captureVideo('../Apps/VisualPinball/VisualPinballCab.exe', ["/play", tableFile, arg, "-minimized"], outName);
+            captureVideo('../VisualPinball/VisualPinballCab.exe', ["/play", tableFile, arg, "-minimized"], outName);
         }
     }
 
@@ -239,7 +239,7 @@ function captureVideo(command, args, outName) {
                 "-video_size", "1920x1080", "-ss", "6", "-t", "00:00:2", "-i", "desktop", "-c:v", "h264_nvenc", "-an", "-preset", "lossless", "-y", "-f", "mp4",
                 outName+"_"];
 
-            var ffmpeg = child_process.spawn("../Apps/Ffmpeg/ffmpeg.exe", ffargs);
+            var ffmpeg = child_process.spawn("../Ffmpeg/ffmpeg.exe", ffargs);
             captureActive = true;
             ffmpeg.on('error', function (err) {
                 console.log('Error running player: ' + err);
@@ -265,7 +265,7 @@ function captureVideo(command, args, outName) {
 
 
                 let ffREargs = ["-i", outName + "_", "-loglevel", "error", "-stats", "-c:v", "libx264", "-an", "-crf", "20", "-preset", "slower", "-pix_fmt", "yuv420p", "-y", "-f", "mp4", outName];
-                let ffREmpeg = child_process.spawn("../Apps/Ffmpeg/ffmpeg.exe", ffREargs);
+                let ffREmpeg = child_process.spawn("../Ffmpeg/ffmpeg.exe", ffREargs);
 
                 ffREmpeg.stdout.setEncoding('utf8');
                 ffREmpeg.stdout.on('data', function (data) {
@@ -282,7 +282,7 @@ function captureVideo(command, args, outName) {
 
                     let picName = outName.replace(".mp4", ".jpg");
                     let ffPicargs = ["-ss", "1", "-i", outName, "-vframes", "1", "-q:v", "2", "-loglevel", "error", "-y", "-stats", picName];
-                    let ffPicmpeg = child_process.spawn("../Apps/Ffmpeg/ffmpeg.exe", ffPicargs);
+                    let ffPicmpeg = child_process.spawn("../Ffmpeg/ffmpeg.exe", ffPicargs);
 
                     ffPicmpeg.stdout.on('data', function (data) {
                         console.log('ffmpeg stdout: ' + data);
@@ -294,7 +294,7 @@ function captureVideo(command, args, outName) {
                         console.log('FINISHED PIC: ');
 
                         ffPicargs = ["-i", picName, "-vf", "scale=480:-1,transpose=1", "-y", picName.replace(".jpg", "-small.jpg")];;
-                        ffPicmpeg = child_process.spawn("../Apps/Ffmpeg/ffmpeg.exe", ffPicargs);
+                        ffPicmpeg = child_process.spawn("../Ffmpeg/ffmpeg.exe", ffPicargs);
                     });
 
 
