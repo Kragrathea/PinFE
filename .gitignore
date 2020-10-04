@@ -7,8 +7,11 @@
 *.userosscache
 *.sln.docstates
 
-[Ll]ibrary
-[Tt]ables
+
+[Tt]ables/*.zip
+[Tt]ables/New
+[Tt]ables/Starter
+[Tt]ables/Inbox/*
 
 
 # User-specific files (MonoDevelop/Xamarin Studio)
