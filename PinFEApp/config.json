@@ -2,7 +2,8 @@
 {
     "development": {
         "config_id": "development",
-        "dataDir":"/Games/PinFE",
+        "libDirs":"../Library",
+        "tableDirs":"../Tables",
         "node_port": 3000
     },
     "production": {

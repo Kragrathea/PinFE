@@ -2,48 +2,57 @@
 
 
 block content
-  //h1= Pinball
-  //p Welcome to #{title}
-    
-  //.stars
-  //.twinkling
-  //.clouds
+  script(src='/js/slideshow.js')
+  link(rel='stylesheet', href='/stylesheets/slideshow.css')
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js')
+  link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css')
+
 
   
 
   div.swiper-container(id='table-list' style='')
-  
-    div.message(id='message')
-    div.todo.final(id='final_span')
-    span.todo.interm(id='interm_span')
+    ul.swiper-wrapper.list  
+    //- div.message(id='message')
+    //- div.todo.final(id='final_span')
+    //- span.todo.interm(id='interm_span')
 
-    <i class="fas fa-spinner fa-spin fa-5x " style='position:absolute;top:50%;left:50%;z-index:11;color:white;display:none'></i>
+    //- <i class="fas fa-spinner fa-spin fa-5x " style='position:absolute;top:50%;left:50%;z-index:11;color:white;display:none'></i>
 
 
 
 
     //-webkit-box-reflect: below -100px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, transparent), to(rgba(255,255,255,0.2)));')
-    h5.status(style='color:green;position:absolute;top:15px;right:15px;z-index:11')
+    //- h5.status(style='color:green;position:absolute;top:15px;right:15px;z-index:11')
 
-    div(style:'z-index:10;float:left')
-      //input.search(type="text")
-      //ul.pagination
-      div(style='text-align:center;')
-        h5.filter(style='display:inline-block;height:25px;margin:0px')
-        h5.ratio(style='display:block;margin:0px')="1/"+tables.length
-    ul.swiper-wrapper.list
-    div.gridview-wrapper
-  div(style='text-align:center;')
-    h5.masterName(style='display:inline-block;height:25px;width:100%;margin:0px')
-    h5.tableName(style='display:inline-block;height:25px;margin:0px')
+    //- div(style:'z-index:10;float:left')
+    //-   //input.search(type="text")
+    //-   //ul.pagination
+    //-   div(style='text-align:center;')
+    //-     h5.filter(style='display:inline-block;height:25px;margin:0px')
+    //-     h5.ratio(style='display:block;margin:0px')="1/"+tables.length
 
+    div(style='text-align:center;margin-top:-60px')
+      h5.masterName(style='display:inline-block;height:25px;width:100%;margin:0px')
+      h5.tableName(style='display:inline-block;height:25px;margin:0px')
+
+
+            
+
+    div.background(id="slideshow")
+        img(src='https://w.wallha.com/ws/10/npWx9agY.jpg')
+        img(src='https://wallpapermemory.com/uploads/652/pinball-wallpaper-hd-1280x854-469683.jpg')
+        img(src='https://i.pinimg.com/originals/48/42/94/4842947688123d7606173ab02494c956.jpg')
+        img(src='https://c4.wallpaperflare.com/wallpaper/441/505/132/pinball-wallpaper-preview.jpg')
+        img(src='https://cdn.hipwallpaper.com/i/26/52/iFgoV8.jpg')
+        img(src='https://images2.alphacoders.com/679/thumb-1920-679000.jpg')
+        img(src='https://images7.alphacoders.com/477/thumb-1920-477985.jpg')
+        img(src='https://www.wallpaperup.com/uploads/wallpapers/2014/04/13/331425/7b6a848d6341223fd205e228c03b8cc2-700.jpg')
+        img(src='https://www.wallpaperup.com/uploads/wallpapers/2014/04/13/331441/4120469257d5887f7ddc9345a91d8f5b-700.jpg')
+        
     // Modal
     #tableEditModal.modal.fade(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true")
         .modal-dialog(role="document" style='max-width:60%')
             .modal-content
-
-
-
     //div.swiper-pagination
   script.
 
@@ -203,6 +212,15 @@ block content
             img.attr("src","tables/?image="+ encodeURIComponent(e.table)+".bg-small.jpg");
             img.attr("style",'width:100%')
             item.append(img);
+        }else{
+            console.log("here:"+e.backglass)
+            if(e.backglass)//fallback to actual backglass if any.
+            {
+                var img=$("<img/>");
+                img.attr("src","tables/?image="+ encodeURIComponent(e.backglass));
+                img.attr("style",'width:100%;min-height:200px;min-width:200px;')
+                item.append(img);
+            }
         }
 
         var showDesktop=false;
@@ -219,12 +237,12 @@ block content
         if(e.fsSmallPic && !showDesktop){
             var img=$("<img/>");
             img.attr("src","tables/?image="+encodeURIComponent(e.table)+".fs-small.jpg");
-            img.attr("style",'width:70%;position:absolute;top:60%;left:15%;max-height:400px;transform:rotateX(45deg);')
+            img.attr("style",'margin-top:-45px;width:70%;transform:rotateX(45deg);')
             item.append(img);
         }
               
          if(true ){
-            var div =$("<div class='wheel' style='transform:rotateX(0deg)'></div>");
+            var div =$("<div class='wheel' style='margin-top:-60px;padding-bottom:60px;transform:rotateX(0deg)'></div>");
             
             if(!e.wheelPic)
             {
@@ -500,6 +518,10 @@ block content
             });
         }
 
+        var urlParams = new URLSearchParams(window.location.search)
+        if(urlParams.get("q")){
+            setFilter(urlParams.get("q"))
+        }
         setupContext();
 
         updateRatio();
@@ -623,13 +645,57 @@ block content
                         )
 
                     }
- 
-                      
+                    if(key=="test")
+                    {
+                        /*var playUrl = '/capture?view=fs'
+                        $.ajax({
+                            url: playUrl, 
+                            type: 'POST', 
+                            contentType: 'application/json', 
+                            data: JSON.stringify({table:tableFile})
+                        });*/
+                        var playUrl = '/capture?view=fs';
+                        if(e.shiftKey || (window.location.href.toLowerCase().indexOf("view=dt") > -1))
+                            playUrl='/capture?view=dt';
+
+                        $.ajax({
+                            url: playUrl, 
+                            type: 'POST', 
+                            contentType: 'application/json', 
+                            data: JSON.stringify({table:decodeURIComponent(tableFile)})}
+                        )
+
+                    }
+                    if(key=="load")
+                    {
+                        /*var playUrl = '/capture?view=fs'
+                        $.ajax({
+                            url: playUrl, 
+                            type: 'POST', 
+                            contentType: 'application/json', 
+                            data: JSON.stringify({table:tableFile})
+                        });*/
+                        var playUrl = '/play?view=fs';
+                        if(e.shiftKey || (window.location.href.toLowerCase().indexOf("view=dt") > -1))
+                            playUrl='/play?view=dt';
+
+                        playUrl+="&editMode=true"
+                        $.ajax({
+                            url: playUrl, 
+                            type: 'POST', 
+                            contentType: 'application/json', 
+                            data: JSON.stringify({table:decodeURIComponent(tableFile)})}
+                        )
+
+                    }                      
                   },
                   items: {
                       "edit": {name: "Edit", icon: "edit"},
                       "play": {name: "Play", icon: "play"},
+                      "test": {name: "Test", icon: "test"},
                       "folder": {name: "Open Folder", icon: "folder"},
+                      "load": {name: "Load in VP", icon: "load"},
+
                     //-   "searchWheel": {name: "Search for Wheel", icon: "search"},
                     //-   "searchBG": {name: "Search for Backglass", icon: "search"},
                     //-   "search": {name: "Search for:"+decodeURIComponent(tableFile), icon: "search"},

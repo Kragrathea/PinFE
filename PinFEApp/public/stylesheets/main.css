@@ -1,10 +1,15 @@
-﻿body {
+﻿html {
+    scroll-behavior: smooth;
+}
+
+body {
     padding: 0px;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    background: radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat fixed center;
 /*    background-image: url("/images/night-sky-wallpaper.jpg");
     background-size: 100% 125%;
 */
-    background-color: #194671;
+    /* background-color: #194671; */
 }
 body.rot
 {
@@ -20,19 +25,19 @@ h2 {
     display: inline-block;
     padding: 5px;
 }
+.modal-backdrop{
+    z-index:-1;
+}
 
 
 .swiper-container {
-    width: 100%;
-
-    /*margin: 20px auto;*/
+    /* width: 100%; */
+    padding-top:165px;
+    height:80%;
+    border:1px red
 }
 .swiper-slide {
-    height: 700px;
     text-align: center;
-    /*font-size: 18px;
-  background: #fff;
-      */
     /* Center slide text vertically */
     -webkit-box-pack: center;
     -ms-flex-pack: center;
@@ -50,6 +55,9 @@ h2 {
 .swiper-slide .item-container {
     transition-duration: 500ms;
     transform: scale(1.0);
+
+    width:280px;
+    height:100%;
 
     text-align: center;
     perspective: 1000px;

@@ -9,13 +9,13 @@ block content
 	.modal-body
 		.float-right.pr-5
 			.row.d-flex.justify-content-center
-				i.fas.fa-search(onclick="window.open('https://www.google.com/search?tbm=isch&tbs=ic:trans&q="+ encodeURIComponent(tableInfo.name)+"','_blank')") 
+				i.fas.fa-search(onclick="window.open('https://www.google.com/search?tbm=isch&tbs=ic:trans&q="+ encodeURIComponent(tableInfo.name).replace(/[!'()*]/g, escape)+"','_blank')") 
 				img(id="wheelImage" src="tables/?image="+tableInfo.wheelPic style="width:200px;height:auto;min-height:200px")
 			.row.d-flex.justify-content-center
-				i.fas.fa-search(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name)+" directb2s','_blank')")
+				i.fas.fa-search(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name).replace(/[!'()*]/g, escape)+" directb2s','_blank')")
 				img(id="bgImage" src="tables/?image="+tableInfo.backglass, style="width:200px;height:auto;min-height:200px")
 			.row.d-flex.justify-content-center
-				i.fas.fa-search(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name)+"','_blank')")
+				i.fas.fa-search(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name).replace(/[!'()*]/g, escape)+"','_blank')")
 				img(id="tableImage" src="tables/?image="+tableInfo.fsSmallPic,style="width:200px;height:auto;min-height:200px")
 		.float-left.pl-5
 			.row
@@ -30,8 +30,8 @@ block content
 						option 3
 						option 4
 						option 5
-			.row.d-flex.justify-content-center
-				.col-md-6.col-md-offset-3
+			.row
+				.col-sm-5
 					form.dropzone(id="my-awesome-dropzone" method='POST' enctype="multipart/form-data" action='/table/uploadbg?table='+encodeURIComponent(tableInfo.file))
 						| Drop PNG and Directb2s Here
 	.modal-footer
@@ -182,33 +182,41 @@ block content
 							type: 'POST', 
 							contentType: 'application/json', 
 							data: JSON.stringify({url:imageUrl,tableFile:"!{tableInfo.file}"})}
-					)
+					).done(function() {
+						$("#wheelImage").attr("src",$("#wheelImage").attr("src")+"&tt="+new Date().getTime())
+					});
 					//alert(imageUrl);
 				}
 
 		}
-		$(document).ready(function() {
+		//$(document).ready(function() {
 		
-			Dropzone.options.myAwesomeDropzone = {
-				url:'/batch/upload',
-				autoProcessQueue: false,
+		$(".dropzone").dropzone({
+				//url:'/uploadbg',
+				//autoProcessQueue: true,
 				//paramName:'source_file', // Name used to transfer the file(s) (will have '[i=0,1,2,3,4...]' appended)
-				paramName: function(n) { return 'source_file[]';},  // Don't enumerate the transfers
-				uploadMultiple: true,
-				parallelUploads: 4,  // default is 2
+				//paramName: function(n) { return 'source_file[]';},  // Don't enumerate the transfers
+				//uploadMultiple: true,
+				//parallelUploads: 4,  // default is 2
 				//maxFilesize: 2, // MB
 
 				init: function() {
 					console.log("init dropzone")
 					var myDropzone = this;
 					this.on("completemultiple", function(files, response) {  // was queuecomplete
+						console.log("multiple Complete!");
+					
+						// Now reload page...
+						//location.reload(true);  // true => force server reload
+						//console.log("Reloaded?");
+					});
+					this.on("complete", function(files, response) {  // was queuecomplete
 					console.log("Complete!");
 					
-					// Now reload page...
-					location.reload(true);  // true => force server reload
-					console.log("Reloaded?");
-					});
-					
+						// Now reload page...
+						//location.reload(true);  // true => force server reload
+						console.log("Reloaded?");
+					});					
 					this.on("addedfile", function() { 
 					console.log("Added File! - show the upload button");
 					$('#batch-upload').show();
@@ -225,9 +233,9 @@ block content
 					
 				}
 			
-			};      
+			});      
 			
-		});  
+		//});  
 		
 
 		//- const pond = FilePond.create({

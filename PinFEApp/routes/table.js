@@ -19,6 +19,8 @@ var download = function(url, dest, cb) {
         if(response.headers["content-type"]==="image/png" || response.headers["content-type"]==="image/jpg"){  
             response.pipe(file);
             file.on('finish', function() {
+                console.log("Downloaded:"+url)
+                console.log("To:"+dest)
                 file.close(cb);  // close() is async, call cb after close completes.
             });
         }else{
@@ -38,7 +40,7 @@ router.post('/downloadPng', function (req, res) {
     try{
         console.log([req.body.url,decodeURIComponent(req.body.tableFile)]);
 
-        let tablesDir = req.app.locals.FEDataDir+"/Tables/";
+        let tablesDir = req.app.locals.FETableDirs+"/";
 
         let fname = req.body.url.split('/').slice(-1)[0];
         let destName = decodeURIComponent(req.body.tableFile)+".wheel.png";
@@ -49,9 +51,8 @@ router.post('/downloadPng', function (req, res) {
         //destName =decodeURIComponent(destName)
         console.log("downloadPng:" + [req.body.url,fname,destName]);
         download(req.body.url,destName)
-        
 
-        response.send(req.body);    // echo the result back
+        res.send(req.body);    // echo the result back
     }catch(e)
     {
         console.log("downloadPng exception:"+e.message)
@@ -70,7 +71,7 @@ router.get('/', function (req, res) {
 
     var json = query.json;
 
-    let tablesDir = req.app.locals.FEDataDir+"/Tables/";
+    let tablesDir = req.app.locals.FETableDirs+"/";
     var exists = fs.existsSync(tablesDir + name);
 
 
@@ -119,6 +120,8 @@ router.get('/', function (req, res) {
     var backglass =  file.replace(".vpx", "") + ".directb2s"
     if(!fs.existsSync(tablesDir +backglass))
         backglass = file + ".directb2s"
+    if(!fs.existsSync(tablesDir +backglass))
+        backglass = null
     
     var tableInfo = {
         name: path.basename(file),
@@ -159,7 +162,7 @@ router.post('/uploadbg', upload_files.single('file'), (req, res, next) => {
     var query = url.parse(req.url, true).query;
     var tableFile = decodeURIComponent(query.table);
 
-    let tablesDir = req.app.locals.FEDataDir+"/Tables/";
+    let tablesDir = req.app.locals.FETableDirs+"/";
 
     if (req.file.mimetype.startsWith('application/') && req.file.originalname.toLowerCase().endsWith(".directb2s")) {
         var destName = tablesDir+ tableFile+".directb2s";
@@ -174,13 +177,26 @@ router.post('/uploadbg', upload_files.single('file'), (req, res, next) => {
         });
         return res.status(200).send(req.file);
       }
+      if (req.file.mimetype.startsWith('image/') && req.file.originalname.toLowerCase().endsWith(".png")) {
+        var destName = tablesDir+ tableFile+".wheel.png";
+        // if(fs.existsSync(destName))
+        // {
+        //     return res.status(422).json({
+        //         error :'File exists.'
+        //       });
+        // }
+        fs.writeFile(destName, req.file.buffer, function (err) {
+            //res.redirect("back");
+        });
+        return res.status(200).send(req.file);
+      }
+    if (req.file.mimetype.startsWith('image/')) {
 
-     if (!req.file.mimetype.startsWith('image/')) {
-         return res.status(422).json({
-           error :'The uploaded file must be an image'
-         });
-       }
-    
+    }
+    return res.status(422).json({
+        error :'The uploaded file must be an BG or PNG image'
+      });
+ 
       return res.status(200)//.send(req.file);
   });
 

@@ -71,7 +71,7 @@ router.get('/', function (req, res) {
     var image = query.image;
     var json = query.json;
 
-    let bgDir = req.app.locals.FEDataDir+"/Library/Backglasses/"; // ./public/data";
+    let bgDir = req.app.locals.FELibDirs+"/Backglasses/"; // ./public/data";
     if (image !== undefined && fs.existsSync(bgDir)) {
         fs.readFile(bgDir + image, "utf8", function (err, data) {
             var line = data.split("<BackglassImage Value=\"")[1];

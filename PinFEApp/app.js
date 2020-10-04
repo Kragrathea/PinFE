@@ -24,17 +24,18 @@ var myArgs = process.argv.slice(2);
 //console.log('myArgs: ', myArgs);
 
 //todo. make configurable
-app.locals.FEDataDir = defaultConfig.dataDir;//'/Games/PinFE';
+app.locals.FELibDirs = defaultConfig.libDirs;//'/Games/PinFE';
+app.locals.FETableDirs = defaultConfig.tableDirs;//'/Games/PinFE';
 
 //for debugging.
 //app.locals.FEDataDir = 'C:\\Games\\PinFE\\Apps\\PinFE';
 //app.locals.FEDataDir = '../../../';
 
 //override data dir from command line.
-if(myArgs.length>0)//todo. add switch syntax
-    app.locals.FEDataDir =myArgs[0];
+// if(myArgs.length>0)//todo. add switch syntax
+//     app.locals.FELibDir =myArgs[0];
 
-console.log("Data directory set to:"+app.locals.FEDataDir)
+console.log("Library data directory set to:"+app.locals.FELibDirs)
 
 var master = require('./routes/master');
 var routes = require('./routes/index');
@@ -43,6 +44,7 @@ var wheels = require('./routes/wheels');
 var backglasses = require('./routes/backglasses');
 var tables = require('./routes/tables');
 var table = require('./routes/table');
+var grid = require('./routes/grid');
 
 var install = require('./routes/install');
 
@@ -67,6 +69,7 @@ app.use('/wheels', wheels);
 app.use('/backglasses', backglasses);
 app.use('/tables', tables);
 app.use('/table', table);
+app.use('/grid', grid);
 
 app.use('/install', install);
 

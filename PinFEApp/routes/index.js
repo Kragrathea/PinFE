@@ -10,7 +10,6 @@ var fs = require('fs'),
 var url = require('url');
 //var imageDir = '/Games/VPTables/_index/FS/Gif/';
 
-var FEDataDir = '../';
 
 var masterDir = "./public/Master";
 
@@ -55,11 +54,22 @@ function getTableInfo(dir, callback) {
     var tableFiles = findInDir(dir, /\.vpx$/);
     var results = [];
     tableFiles.forEach((file) => {
+
+        var bgFile=""
+        if(fs.existsSync(file.replace(".vpx", "") + ".directb2s"))
+            bgFile=(file.replace(".vpx", "") + ".directb2s");
+        else if (fs.existsSync(file + ".directb2s"))
+            bgFile=(file + ".directb2s");
+
+        
+        bgFile=path.relative( dir, bgFile )
+    
         let relFile = path.relative( dir, file )
         results.push({
             tableName: path.basename(relFile),
             tableFolder: path.basename(path.dirname(relFile)),
             table: relFile,
+            backglass:bgFile,
             fsPic: fs.existsSync(file + ".fs.jpg"),
             bgPic: fs.existsSync(file + ".bg.jpg"),
             dtPic: fs.existsSync(file + ".dt.jpg"),
@@ -80,6 +90,7 @@ var playerStatus = "";
 router.post('/play', function (req, res) {
     var query = url.parse(req.url, true).query;
     var view = query.view;
+    var editMode = query.editMode;
 
     var arg = "-ForceFS";
     if (view && view.toLowerCase() === "dt")
@@ -91,13 +102,17 @@ router.post('/play', function (req, res) {
     console.log("POST play table:" + req.body.table);
     //var cmd = '"f:/Games/Visual Pinball/VPinballX_cab.exe" /play ' + '"c:\\' + tableDir + req.body.table + '"';
 
-    let tableDir=req.app.locals.FEDataDir+"/Tables/";
+    let tableDir=req.app.locals.FETableDirs+"/";
     let tableFile= tableDir + req.body.table;
     tableFile= path.resolve(tableFile);
 
     //copy over roms.
     prepareTable(tableFile);
-    runPlayer('../Apps/VisualPinball/VisualPinballCab.exe', ["/play", tableFile, arg,"-minimized"]);
+    if(query.editMode){
+        runPlayer('../Apps/VisualPinball/VisualPinballCab.exe', ["/play", tableFile, arg,""]);
+    }else{
+        runPlayer('../Apps/VisualPinball/VisualPinballCab.exe', ["/play", tableFile, arg,"-minimized"]);
+    }
 
     //captureVideo('../../VisualPinball/VisualPinballCab.exe', ["/play", tableDir + req.body.table, arg, "-minimized"], tableDir + req.body.table+".bg.mp4");
 
@@ -108,7 +123,7 @@ router.post('/capture', function (req, res) {
     var view = query.view;
 
     console.log("POST capture table:"+view +" " + req.body.table);
-    let tableDir=req.app.locals.FEDataDir+"/Tables/";
+    let tableDir=req.app.locals.FETableDirs+"/";
     let tableFile= tableDir + req.body.table;
     tableFile= path.resolve(tableFile)
 
@@ -398,7 +413,7 @@ router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
     var pic = query.image;
 
-    let tableDir=req.app.locals.FEDataDir+"/Tables/";
+    let tableDir=req.app.locals.FETableDirs+"/";
 
     if (typeof pic === 'undefined') {
         getTableInfo(tableDir, function (err, tables) {

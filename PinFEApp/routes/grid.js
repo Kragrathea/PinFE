@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 var express = require('express');
 var router = express.Router();
 var Fuse = require('fuse.js');
@@ -7,9 +7,6 @@ var fs = require('fs'),
     path = require('path'),
     querystring = require('querystring');
 var url = require('url');
-
-
-
 
 function findInDir(baseDir,dir, filter, fileList = []) {
     const files = fs.readdirSync(baseDir + dir);
@@ -27,7 +24,43 @@ function findInDir(baseDir,dir, filter, fileList = []) {
 
     return fileList;
 }
+function scan(baseDir,dir, filter ) {
+    const files = fs.readdirSync(baseDir + dir);
 
+    let fileList=[]
+
+    files.forEach((file) => {
+        const filePath = path.join(dir, file);
+        const fileStat = fs.lstatSync(baseDir + filePath);
+
+        if (fileStat.isDirectory()) {
+            let icon = null;
+            const iconFiles = fs.readdirSync(baseDir + filePath);
+            iconFiles.forEach((iFile) => {
+                if(iFile.toLowerCase().endsWith(".png") && iFile.toLowerCase().indexOf("wheel")>-1){
+                    icon=encodeURIComponent((filePath+"\\"+iFile));
+                    //break;
+                }
+            });
+            fileList.push({
+                name: path.basename(filePath),
+                type:"folder",
+                path:filePath.replace(/\\/g,"/"),
+                items:scan(baseDir,filePath, filter),
+                icon:icon
+            });
+        } else if (filter.test(filePath)) {
+            fileList.push({
+                name: path.basename(file),
+                type:"file",
+                path:filePath.replace(/\\/g,"/"),
+                size:1234
+            });
+        }
+    });
+
+    return fileList;
+}
 
 function getWheelList(wheelsDir) {
 
@@ -68,6 +101,40 @@ function getSearchIndex(wheelList) {
     return(wheelListIndex);
 }
 
+router.get('/scan', function (req, res) {
+    // var query = url.parse(req.url, true).query;
+    // var qry = query.search;
+    // var image = query.image;
+    // var json = query.json;
+    // var imageIndex = query.imageIndex;
+    // var perPage = query.perPage;
+
+    let results={};
+    if(true)
+    {
+        let dir = req.app.locals.FETableDirs+"/";
+
+        results={
+            name: "",
+            type:"folder",
+            path:"",
+            //items:scan(wheelsDir,"/", /\.(png|directb2s)\b/)
+            items:scan(dir,"/", /\.vpx$/)
+        };
+    }else{
+        let wheelsDir = req.app.locals.FELibDirs+"/Wheels/";
+
+        results={
+            name: "",
+            type:"folder",
+            path:"",
+            //items:scan(wheelsDir,"/", /\.(png|directb2s)\b/)
+            items:scan(wheelsDir,"/", /\.png$/)
+        };
+    }
+
+    res.json(results);
+});
 router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
     var qry = query.search;
@@ -76,7 +143,7 @@ router.get('/', function (req, res) {
     var imageIndex = query.imageIndex;
     var perPage = query.perPage;
 
-    let wheelsDir = req.app.locals.FELibDirs+"/Wheels/";
+    let wheelsDir = req.app.locals.libDirs+"/Wheels/";
 
     if (image !== undefined && fs.existsSync(wheelsDir)) {
         fs.readFile(wheelsDir + image, function (err, content) {
@@ -117,7 +184,7 @@ router.get('/', function (req, res) {
         if (page === undefined)
             page = 0;
         page = parseInt(page);
-        res.render('wheels', { title: 'PinFE', items: results.slice(page * perPage, (page + 1) * perPage) });
+        res.render('grid', { title: 'PinFE', items: results.slice(page * perPage, (page + 1) * perPage) });
     }
 
 });

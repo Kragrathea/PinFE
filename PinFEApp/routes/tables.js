@@ -114,7 +114,7 @@ router.get('/', function (req, res) {
     var image = query.image;
     var json = query.json;
 
-    let tablesDir = req.app.locals.FEDataDir+"/Tables/";
+    let tablesDir = req.app.locals.FETableDirs+"/";
 
     if (image !== undefined) {
         if(image.toLowerCase().endsWith(".directb2s"))
@@ -215,7 +215,7 @@ router.post('/update', function (request, response) {
     let data = JSON.stringify(request.body.data);
     console.log("Update Table:" + table);
 
-    let tablesDir = req.app.locals.FEDataDir+"/Tables/";
+    let tablesDir = req.app.locals.FETableDirs+"/";
 
     var dbName = tablesDir + table + ".dbase";
     console.log([dbName,data]);

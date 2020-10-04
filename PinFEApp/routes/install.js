@@ -169,7 +169,7 @@ function getZipList(dir) {
     var allFiles = findInDir(dir,".", /\.zip$/);
     var results = [];
     allFiles.forEach((file) => {
-        results.push(file);
+        results.push(dir+file);
     });
 
     //wheelList = results;
@@ -177,62 +177,116 @@ function getZipList(dir) {
     console.log("Loaded zipList. Length:" + results.length);
     return results;
 }
+function suggestMasterName(filename)
+{
+    if(true){
+        let masterList = getMasterTableList();
+        
+        let qryStr=path.basename(filename).toLowerCase().replace(".vpx","").replace(".zip","");
+        let simpleResults = masterList.filter(a => fuzzyCompare(a.name, qryStr));
+        if (simpleResults.length < 1)
+            simpleResults = masterList.filter(a => superFuzzyCompare(a.name, qryStr));
 
-
-
-router.get('/', function (req, res) {
-    var query = url.parse(req.url, true).query;
-    var qry = query.search;
-    var image = query.image;
-    var json = query.json;
-    var imageIndex = query.imageIndex;
-    var perPage = query.perPage;
-
-    let installDir = "z://VPTables//ZIPS//PD//";// req.app.locals.FEDataDir+"/_incoming";
-    //let installDir = "z://VPTables//ZIPS//PD//";// req.app.locals.FEDataDir+"/_incoming";
-
-    var results = getZipList(installDir);
-    
-    // if (qry !== undefined) {
-    //     let wheelListIndex=getSearchIndex(results);
-    //     results = wheelListIndex.search(qry);
-    // }
-
-    let masterList = getMasterTableList();
-    let searchIndex = getSearchIndex(masterList);
-
-    let xxx = searchIndex.search("jokerz");
-    let yyy = searchIndex.search("jp s jokerz v1 0 1");
-    let zzz = searchIndex.search("jp s jokerz 0");
-
-    let qqq = searchIndex.search("jp s jokerz v");
-
-
-    let goodName = null;
-    for (let file of results) {
-        //console.log("zip:"+file);
-        //console.log("quickSearch for:" + query.query);
-        let qryStr=path.basename(file).replace(".zip","");
-        let fileNameResults = masterList.filter(a => fuzzyCompare(a.name, qryStr));
-        //console.log("quickSearch found:" + fileNameResults.length + " for:" + simplifyName(qryStr));
-    
-        if (fileNameResults.length < 1)
-            fileNameResults = masterList.filter(a => superFuzzyCompare(a.name, qryStr));
-
-        if (fileNameResults.length >0)
-            goodName=fileNameResults[0].name;
-
-        if(false)
+        if(simpleResults.length)
         {
-            console.log("quickSearch found:" + fileNameResults.length + " for:" + simplifyName(qryStr));
-            for(let fnr of fileNameResults) {
-                console.log("\t"+fnr.name);
+            console.log("Simple suggested name:"+simpleResults[0].name);
+            return(simpleResults[0].name);
+
+        }else{
+            let searchIndex = getSearchIndex(masterList);
+            let fuseResults = searchIndex.search(simplifyName(qryStr," "));
+            if(fuseResults.length)
+            {
+                console.log("Fuse suggested name:"+fuseResults[0].item.name);
+                return(fuseResults[0].item.name);
             }
         }
+        return null;
+        //if(filename.toLowerCase.endsWith(".vpx"))
+        //let tableQryStr=ename.replace(".vpx","");
+        //let qryStr=path.basename(file).replace(".zip","");
+        // if(true)
+        // {
+        //     let simpleTableResults = masterList.filter(a => fuzzyCompare(a.name, tableQryStr));
+        //     if (simpleTableResults.length < 1)
+        //         simpleTableResults = masterList.filter(a => superFuzzyCompare(a.name, tableQryStr));
+            
+        //     if(simpleTableResults.length){
+        //         results.push("Simple suggested name:"+simpleTableResults[0].name);
+        //         console.log("Simple suggested name:"+simpleTableResults[0].name);
+        //     }
+            
+        //     let simpleFileResults = masterList.filter(a => fuzzyCompare(a.name, qryStr));
+        //     if (simpleFileResults.length < 1)
+        //         simpleFileResults = masterList.filter(a => superFuzzyCompare(a.name, qryStr));    
+
+        //     if(simpleFileResults.length){
+        //         results.push("Simple suggested name:"+simpleFileResults[0].name);
+        //         console.log("Simple suggested name:"+simpleFileResults[0].name);
+        //     }
+            
+        //     // results.push("Simple suggested names:"+[simpleTableResults.length?simpleTableResults[0].name:"",
+        //     // simpleFileResults.length?simpleFileResults[0].name:""]);
+        //     // console.log("Simple suggested names:"+[simpleTableResults.length?simpleTableResults[0].name:"",
+        //     //     simpleFileResults.length?simpleFileResults[0].name:""]);
+        // }
+
+        // if(true)//fuse search.
+        // {
+        //     let fuseTableResults = searchIndex.search(simplifyName(tableQryStr," "));
+        //     if(fuseTableResults.length)
+        //     {
+        //         results.push("Fuse suggested name:"+[fuseTableResults[0].score,fuseTableResults[0].item.name]);
+        //         console.log("Fuse suggested name:"+[fuseTableResults[0].score,fuseTableResults[0].item.name]);
+        //     }
+        //     let fuseFileResults = searchIndex.search(simplifyName(qryStr," "));
+        //     if(fuseFileResults.length)
+        //     {
+        //         results.push("Fuse suggested name:"+[fuseFileResults[0].score,fuseFileResults[0].item.name]);
+        //         console.log("Fuse suggested name:"+[fuseFileResults[0].score,fuseFileResults[0].item.name]);
+        //     }
+        //     // let fuseFileResults = searchIndex.search(simplifyName(qryStr," "));
+        //     // results.push("Fuse suggested names:"+[fuseTableResults.length?fuseTableResults[0].item.name:"",
+        //     //     fuseFileResults.length?fuseFileResults[0].item.name:""]);
+        //     // console.log("Fuse suggested names:"+[fuseTableResults.length?fuseTableResults[0].item.name:"",
+        //     //     fuseFileResults.length?fuseFileResults[0].item.name:""]);
+
+        //     // for(let fnr of tableNameResults.slice(0,3)) {
+        //     //     if(fnr.score>0.85 || fnr.item.name.startsWith("2001") || fnr.item.name.startsWith("1-2-3"))
+        //     //     break;//Hackish. Give Up at this point. 
+        //     //     console.log("\t"+[fnr.score,fnr.item.name]);
+        //     // }    
+        // }
+
+
+    }
+
+}
+function processZipFiles(zipFiles)
+{
+    
+
+
+    let results=[];
+    let goodName = null;
+    for (let file of zipFiles) {
+        //console.log("zip:"+file);
+        //console.log("quickSearch for:" + query.query);
+        // let qryStr=path.basename(file).replace(".zip","");
+        // let fileNameResults = masterList.filter(a => fuzzyCompare(a.name, qryStr));
+        //console.log("quickSearch found:" + fileNameResults.length + " for:" + simplifyName(qryStr));
+    
+        // if (fileNameResults.length < 1)
+        //     fileNameResults = masterList.filter(a => superFuzzyCompare(a.name, qryStr));
+
+        // if (fileNameResults.length >0)
+        //     goodName=fileNameResults[0].name;
+
+        results.push("ZIP:"+file);
 
 
         try{
-            var zip = new AdmZip(installDir+file);
+            var zip = new AdmZip(file);
             var zipEntries = zip.getEntries(); 
             let foundTables=[];
             let foundBg=[];
@@ -248,65 +302,32 @@ router.get('/', function (req, res) {
                 let ename=entry.entryName.toLowerCase();
                 if(ename.endsWith(".vpx"))
                 {
-                    if(!goodName){
-                        let tableQryStr=ename.replace(".vpx","");
-                        let tableNameResults = masterList.filter(a => fuzzyCompare(a.name, tableQryStr));
+                    results.push("-->"+"Found vpx:"+ename);
 
-                        if (tableNameResults.length < 1)
-                            tableNameResults = masterList.filter(a => superFuzzyCompare(a.name, tableQryStr));
+                    results.push("-->"+suggestMasterName(file));
 
-                        if (tableNameResults.length >0){
-                            goodName=tableNameResults[0].name;
-                            break;
-                        }
-
-                        if (tableNameResults.length < 1)
-                        {
-                            //console.log("NAME NOT FOUND:" + " for:"+qryStr+"\n-->\t" + simplifyName(qryStr));
-                            tableNameResults = searchIndex.search(simplifyName(tableQryStr," "));
-                            fileNameResults = searchIndex.search(simplifyName(qryStr," "));
-                            console.log("Best Guess:");
-                            if(tableNameResults.length>0 && fileNameResults.length>0){
-                                
-                                if(fileNameResults[0].item && tableNameResults[0].item.name===fileNameResults[0].item.name)
-                                {
-                                    if(!tableNameResults[0].item.name.startsWith("2001") && !tableNameResults[0].item.name.startsWith("1-2-3"))
-                                        console.log("AGREE:"+tableNameResults[0].item.name);
-
-                                }
-                            }
-                            console.log("Table:"+simplifyName(tableQryStr," ")+"->"+tableQryStr);
-                            //console.log("\t"+tableNameResults.length);
-                            for(let fnr of tableNameResults.slice(0,3)) {
-                                if(fnr.score>0.85 || fnr.item.name.startsWith("2001") || fnr.item.name.startsWith("1-2-3"))
-                                break;//Hackish. Give Up at this point. 
-                                console.log("\t"+[fnr.score,fnr.item.name]);
-                            }                
-                            console.log("File:"+simplifyName(qryStr," ")+"->"+qryStr);
-                            //console.log("\t"+fileNameResults.length);
-                            for(let fnr of fileNameResults.slice(0,3)) {
-                                if(fnr.score>0.85 || fnr.item.name.startsWith("2001") || fnr.item.name.startsWith("1-2-3"))
-                                break;//Hackish. Give Up at this point. 
-                                console.log("\t"+[fnr.score,fnr.item.name]);
-                            }                
-                        }
-                    }
-                    if(goodName)
-                        console.log(goodName);
                     //console.log(entry.name); 
                     foundTables.push(ename);
                 }else if(ename.endsWith(".directb2s"))
                 {
+                    results.push("-->"+"Found backglass:"+ename);
                     //console.log(entry.name); 
                     foundBg.push(ename);
+                }                    //foundMusic++;
+                else if(ename.indexOf("ultradmd")>-1)//Needs to be checked early.
+                {
+                    //console.log(entry.name); 
+                    //foundMusic++;
                 }else if(ename.endsWith(".png"))
                 {
+                    results.push("-->"+"Possible wheel:"+ename);
                     //console.log(entry.name); 
                     foundWheels++;
                 }else if(ename.endsWith(".mp3")||ename.endsWith(".ogg"))
                 {
                     //todo. part of pup or something?
                     //console.log(entry.name); 
+                    results.push("-->"+"Music:"+ename);
                     foundMusic++;
                 }else if(ename.endsWith(".vbs"))
                 {
@@ -327,6 +348,10 @@ router.get('/', function (req, res) {
                     //maybe ignore?
                     //console.log(entry.name); 
 
+                }else if(ename.endsWith(".zip") && ename.indexOf("roms")>-1 )
+                {
+                    results.push("-->"+"Possible ROM:"+ename);
+                    //console.log(entry.name); 
                 }else if(ename.endsWith(".zip") || ename.endsWith(".rar") )
                 {
                     //console.log(entry.name); 
@@ -340,11 +365,6 @@ router.get('/', function (req, res) {
                 {
                     //vp9 table!
                     //console.log(entry.name); 
-                    //foundMusic++;
-                }else if(ename.indexOf("ultradmd")>-1)
-                {
-                    //console.log(entry.name); 
-                    //foundMusic++;
                 }else if(ename.endsWith(".txt")||ename.endsWith(".mp4")||ename.endsWith(".avi")||ename.endsWith(".f4v")
                     ||ename.endsWith(".jpg")||ename.endsWith(".bmp")
                     ||ename.endsWith(".pdf")||ename.endsWith(".doc")||ename.endsWith(".docx")
@@ -390,6 +410,35 @@ router.get('/', function (req, res) {
         }
         //break;
     }
+    return results;
+}
+
+router.get('/', function (req, res) {
+    var query = url.parse(req.url, true).query;
+    var qry = query.search;
+    var image = query.image;
+    var json = query.json;
+    var imageIndex = query.imageIndex;
+    var perPage = query.perPage;
+
+    let inboxDir = req.app.locals.FETableDirs+"/Inbox/";
+
+    var results = getZipList(inboxDir);
+    
+    // if (qry !== undefined) {
+    //     let wheelListIndex=getSearchIndex(results);
+    //     results = wheelListIndex.search(qry);
+    // }
+
+
+    // let xxx = searchIndex.search("jokerz");
+    // let yyy = searchIndex.search("jp s jokerz v1 0 1");
+    // let zzz = searchIndex.search("jp s jokerz 0");
+
+    // let qqq = searchIndex.search("jp s jokerz v");
+
+
+    results = processZipFiles(results);
 
     if (perPage === undefined && isNaN(perPage)) {
         perPage=results.length;

@@ -1,0 +1,40 @@
+extends layout
+
+block content
+    script(src='/jquery/jquery.js')
+    script(src='/js/cute-file-browser.js')
+    link(rel='stylesheet', href='/stylesheets/cute-file-browser.css')
+    script(src='/js/slideshow.js')
+    link(rel='stylesheet', href='/stylesheets/slideshow.css')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css')
+
+    .filemanager
+      div.row.breadrow
+        .search
+            input.fa.fa-microphone(aria-hidden="true" type="search" placeholder="Find a file..")
+        a#backButton.button.folderName(href="")
+            i.fa.fa-arrow-left(aria-hidden="true")
+            //- |  Go Back
+        a.button(href="/grid")
+            i.fa.fa-home(aria-hidden="true")
+        //- |  Home
+        .breadcrumbs
+      ul.data
+      .nothingfound
+        .nofiles
+        span No files here.
+    
+
+    div.background(id="slideshow")
+        img(src='https://w.wallha.com/ws/10/npWx9agY.jpg')
+        img(src='https://wallpapermemory.com/uploads/652/pinball-wallpaper-hd-1280x854-469683.jpg')
+        img(src='https://i.pinimg.com/originals/48/42/94/4842947688123d7606173ab02494c956.jpg')
+        img(src='https://c4.wallpaperflare.com/wallpaper/441/505/132/pinball-wallpaper-preview.jpg')
+        img(src='https://cdn.hipwallpaper.com/i/26/52/iFgoV8.jpg')
+        img(src='https://images2.alphacoders.com/679/thumb-1920-679000.jpg')
+        img(src='https://images7.alphacoders.com/477/thumb-1920-477985.jpg')
+        img(src='https://www.wallpaperup.com/uploads/wallpapers/2014/04/13/331425/7b6a848d6341223fd205e228c03b8cc2-700.jpg')
+        img(src='https://www.wallpaperup.com/uploads/wallpapers/2014/04/13/331441/4120469257d5887f7ddc9345a91d8f5b-700.jpg')
+
+    script.
