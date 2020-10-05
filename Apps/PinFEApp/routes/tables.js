@@ -123,7 +123,7 @@ router.get('/', function (req, res) {
                 if (err) {
                     var size = (tablesDir + image).length;
                     res.writeHead(400, { 'Content-type': 'text/html' });
-                    console.log(err);
+                    //console.log(err);
                     res.end("No such image");
                     return;
                 }
@@ -142,7 +142,7 @@ router.get('/', function (req, res) {
                 }else{
                     //error not backglass
                     res.writeHead(400, { 'Content-type': 'text/html' });
-                    console.log(err);
+                    //console.log(err);
                     res.end("No such image");
                 }
             });
@@ -151,7 +151,7 @@ router.get('/', function (req, res) {
                 if (err) {
                     var size = (tablesDir + image).length;
                     res.writeHead(400, { 'Content-type': 'text/html' });
-                    console.log(err);
+                    //console.log(err);
                     res.end("No such image");
                 } else {
                     //specify the content type in the response will be an image

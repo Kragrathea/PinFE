@@ -67,12 +67,40 @@ html
               .dropdown-divider
               a.dropdown-item(href="#") Settings
               a.dropdown-item(href="http://localhost:3030") Storage
-        form.form-inline.my-2.my-lg-0
-          input.form-control.mr-sm-2(id="menu-search-box" type="search"  placeholder="Search" aria-label="Search")
+        //- form.form-inline.my-2.my-lg-0
+        //-   input.form-control.mr-sm-2(id="menu-search-box" type="search"  placeholder="Search" aria-label="Search")
           //- button.btn.btn-outline-success.my-2.my-sm-0(type="submit" ) Search
+
         button.btn(id='speech' onClick='talkWithApp()')
           i.fa.fa-microphone(aria-hidden="true")
           div.pulse-ring(style='display:none')
-          
+    button.btn(id='fstoggle' )
+      i.fas.fa-expand(aria-hidden="true")          
     block content
+
+    script.
+      $('#fstoggle').on('click',function() {
+        if(document.fullscreenElement||document.webkitFullscreenElement||document.mozFullScreenElement||document.msFullscreenElement) { //in fullscreen, so exit it
+          if(document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if(document.msExitFullscreen) {
+            document.msExitFullscreen();
+          } else if(document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if(document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          }
+        } else { //not fullscreen, so enter it
+          if(document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen();
+          } else if(document.documentElement.webkitRequestFullscreen) {
+            document.documentElement.webkitRequestFullscreen();
+          } else if(document.documentElement.mozRequestFullScreen) {
+            document.documentElement.mozRequestFullScreen();
+          } else if(document.documentElement.msRequestFullscreen) {
+            document.documentElement.msRequestFullscreen();
+          }
+        }
+      });
+
 

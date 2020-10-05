@@ -2,15 +2,14 @@
 
 
 block content
-  script(src='/js/slideshow.js')
-  link(rel='stylesheet', href='/stylesheets/slideshow.css')
-  script(src='https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js')
-  link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css')
 
 
-  
 
-  div.swiper-container(id='table-list' style='')
+  div.row(style='text-align:center;position:fixed;left:0px;top:80px;width:100%;z-index:1')
+    h5.filter(style='height:25px;width:100%;color:#dbde10;')
+    h5.ratio(style='height:25px;width:100%;color:#dbde10;')="1/"+tables.length
+
+  div.row.align-middle.swiper-container(id='table-list' style='')
     ul.swiper-wrapper.list  
     //- div.message(id='message')
     //- div.todo.final(id='final_span')
@@ -27,13 +26,11 @@ block content
     //- div(style:'z-index:10;float:left')
     //-   //input.search(type="text")
     //-   //ul.pagination
-    //-   div(style='text-align:center;')
-    //-     h5.filter(style='display:inline-block;height:25px;margin:0px')
-    //-     h5.ratio(style='display:block;margin:0px')="1/"+tables.length
 
-    div(style='text-align:center;margin-top:-60px')
-      h5.masterName(style='display:inline-block;height:25px;width:100%;margin:0px')
-      h5.tableName(style='display:inline-block;height:25px;margin:0px')
+
+  div.row(style='text-align:center;position:fixed;bottom:0px;width:100%;')
+    h5.masterName(style='height:25px;')
+    h5.tableName(style='height:55px;width:100%;background:black;color:#dbde10;')
 
 
             
@@ -50,10 +47,16 @@ block content
         img(src='https://www.wallpaperup.com/uploads/wallpapers/2014/04/13/331441/4120469257d5887f7ddc9345a91d8f5b-700.jpg')
         
     // Modal
-    #tableEditModal.modal.fade(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true")
-        .modal-dialog(role="document" style='max-width:60%')
-            .modal-content
+  #tableEditModal.modal.fade(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true")
+    .modal-dialog(role="document" style='max-width:60%')
+      .modal-content
     //div.swiper-pagination
+    
+  script(src='/js/slideshow.js')
+  link(rel='stylesheet', href='/stylesheets/slideshow.css')
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js')
+  link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css')
+
   script.
 
     var tables = !{JSON.stringify(tables)}
@@ -89,8 +92,29 @@ block content
             }
         }
 
+        
         if(final_transcript!=""){
-          console.log(final_transcript)
+            console.log("PreParse:"+final_transcript)
+            final_transcript=final_transcript.toLowerCase();
+            
+            if(final_transcript.startsWith("alfred "))
+            {
+                final_transcript=final_transcript.replace("alfred ","");
+                if(final_transcript.startsWith("watch batman"))
+                {
+                    window.open('https://therokuchannel.roku.com/watch/4f2ca5c014ce507cae55abfa62f6d8e6','_blank');
+                    final_transcript="";//hack. already processed.
+                }
+            }
+            if(final_transcript.startsWith("pinbot "))
+                final_transcript=final_transcript.replace("pinbot ","")
+
+            if(final_transcript.startsWith("search for "))
+                final_transcript=final_transcript.replace("search for ","")
+            if(final_transcript.startsWith("search"))
+                final_transcript=final_transcript.replace("search","")
+            console.log("Parsed"+final_transcript)
+
           //if(final_transcript.indexOf("search")>-1)
           {
             //var term = final_transcript.split("search")[1];
@@ -126,7 +150,7 @@ block content
     };
 
     recognition.onerror = function (event) {
-      console.log("Recognize error:"+even.error);
+      console.log("Recognize error:"+event.error);
         if (event.error == 'no-speech') {
             //message.innerHTML = 'No speech was detected.';
             ignore_onend = true;
@@ -202,26 +226,23 @@ block content
 
     function createTableItem(index){
         var e = filteredTables[index];
-        var item=$("<div class='item-container'></div>");
+        var item=$("<div class='item-container align-middle'></div>");
         item.attr("data-table",encodeURIComponent(e.table));
         
         //item.attr("style",'');
+        var img=$("<img/>");
+        img.attr("style",'width:100%;min-height:200px;min-width:200px;background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;')
 
         if(e.bgSmallPic){
-            var img=$("<img/>");
             img.attr("src","tables/?image="+ encodeURIComponent(e.table)+".bg-small.jpg");
-            img.attr("style",'width:100%')
-            item.append(img);
         }else{
-            console.log("here:"+e.backglass)
-            if(e.backglass)//fallback to actual backglass if any.
+            //console.log("here:"+e.backglass)
+            if(e.backglass && e.backglass!=="")//fallback to actual backglass if any.
             {
-                var img=$("<img/>");
                 img.attr("src","tables/?image="+ encodeURIComponent(e.backglass));
-                img.attr("style",'width:100%;min-height:200px;min-width:200px;')
-                item.append(img);
             }
         }
+        item.append(img);
 
         var showDesktop=false;
         if(window.location.href.toLowerCase().indexOf("view=dt") > -1)
@@ -242,7 +263,7 @@ block content
         }
               
          if(true ){
-            var div =$("<div class='wheel' style='margin-top:-60px;padding-bottom:60px;transform:rotateX(0deg)'></div>");
+            var div =$("<div class='wheel align-bottom' style='margin-top:-60px;padding-bottom:60px;transform:rotateX(0deg)'></div>");
             
             if(!e.wheelPic)
             {
@@ -253,7 +274,7 @@ block content
                 div.append(ntext);
             }else
             {
-              var img=$("<img/>");
+              var img=$("<img class='align-bottom'/>");
               img.attr("src","tables/?image="+encodeURIComponent(e.table)+".wheel.png");
 
               img.attr("style",'')
@@ -271,7 +292,7 @@ block content
 
         item.append(text);
 
-        var icontainer=$("<li class='swiper-slide'></li>");
+        var icontainer=$("<li class='swiper-slide align-middle'></li>");
         icontainer.attr("data-index",index);
         icontainer.append(item);
 
@@ -525,6 +546,7 @@ block content
         setupContext();
 
         updateRatio();
+
         var clickSoundIndex=0;
         var tockSoundsIndex=0;
         var clickSounds =[new Audio('/sounds/button16.wav'),new Audio('/sounds/button16.wav'),new Audio('/sounds/button16.wav'),new Audio('/sounds/button16.wav'),new Audio('/sounds/button16.wav'),new Audio('/sounds/button16.wav'),];
@@ -571,6 +593,10 @@ block content
             $(".ratio").text((curIndex+1) +"/" + filteredTables.length);
         else
             $(".ratio").text(0 +"/" + filteredTables.length);
+
+        //also set table name. 
+        if(filteredTables.length)
+            $(".tableName").text(filteredTables[0].table);
     }
 
     function setupContext()

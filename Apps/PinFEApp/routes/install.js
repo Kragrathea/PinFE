@@ -457,4 +457,60 @@ router.get('/', function (req, res) {
 
 });
 
+var upload_files = require('multer')();
+
+router.post('/upload', upload_files.single('file'), (req, res, next) => {
+
+    var query = url.parse(req.url, true).query;
+    var tableFile = decodeURIComponent(query.table);
+
+    let tablesDir = req.app.locals.FETableDirs+"/";
+
+    //console.log("Upload:"+req.file.originalname);
+    console.log("Upload:"+req.body.fullPath);
+    if (req.file.mimetype.startsWith('application/') && req.file.originalname.toLowerCase().endsWith(".vpx")) {
+        var destName = tablesDir+ "/Inbox/"+req.file.originalname;
+        if(fs.existsSync(destName))
+        {
+            return res.status(422).json({
+                error :'File exists.'
+              });
+        }
+        console.log("Writing:"+destName);
+        fs.writeFile(destName, req.file.buffer, function (err) {
+            //res.redirect("back");
+        });
+        return res.status(200).send(req.file);
+      }
+    if (req.file.mimetype.startsWith('application/') && req.file.originalname.toLowerCase().endsWith(".directb2s")) {
+        // var destName = tablesDir+ tableFile+".directb2s";
+        // if(fs.existsSync(destName))
+        // {
+        //     return res.status(422).json({
+        //         error :'File exists.'
+        //       });
+        // }
+        // fs.writeFile(destName, req.file.buffer, function (err) {
+        //     //res.redirect("back");
+        // });
+        return res.status(200).send(req.file);
+      }
+      if (req.file.mimetype.startsWith('image/') && req.file.originalname.toLowerCase().endsWith(".png")) {
+        // var destName = tablesDir+ tableFile+".wheel.png";
+        // fs.writeFile(destName, req.file.buffer, function (err) {
+        //     //res.redirect("back");
+        //});
+        return res.status(200).send(req.file);
+      }
+    if (req.file.mimetype.startsWith('image/')) {
+
+    }
+    // return res.status(422).json({
+    //     error :'The uploaded file must be an BG or PNG image'
+    //   });
+ 
+    return res.status(200)//.send(req.file);
+  });
+
+
 module.exports = router;

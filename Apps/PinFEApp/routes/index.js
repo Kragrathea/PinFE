@@ -23,7 +23,7 @@ function findInDir(dir, filter, fileList = []) {
         const filePath = path.join(dir, file);
         const fileStat = fs.lstatSync(filePath);
 
-        if (fileStat.isDirectory()) {
+        if (fileStat.isDirectory() || fileStat.isSymbolicLink()) {
             findInDir(filePath, filter, fileList);
         } else if (filter.test(filePath)) {
             fileList.push(filePath);
@@ -55,14 +55,14 @@ function getTableInfo(dir, callback) {
     var results = [];
     tableFiles.forEach((file) => {
 
-        var bgFile=""
+        var bgFile=null
         if(fs.existsSync(file.replace(".vpx", "") + ".directb2s"))
             bgFile=(file.replace(".vpx", "") + ".directb2s");
         else if (fs.existsSync(file + ".directb2s"))
             bgFile=(file + ".directb2s");
 
-        
-        bgFile=path.relative( dir, bgFile )
+        if(bgFile)
+            bgFile=path.relative( dir, bgFile )
     
         let relFile = path.relative( dir, file )
         results.push({

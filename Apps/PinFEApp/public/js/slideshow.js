@@ -12,4 +12,4 @@ $(function(){
         if(i>1){ images[i-2].className = "";}
         i++;
     }
-})();
+});
