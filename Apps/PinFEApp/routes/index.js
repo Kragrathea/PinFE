@@ -293,7 +293,10 @@ function captureVideo(command, args, outName) {
                     ffPicmpeg.on('close', function (code) {
                         console.log('FINISHED PIC: ');
 
-                        ffPicargs = ["-i", picName, "-vf", "scale=480:-1,transpose=1", "-y", picName.replace(".jpg", "-small.jpg")];;
+                        if(picName.indexOf(".vpx.fs")>-1)//if fullscreen table pic then rotate small version (transpose=1)
+                            ffPicargs = ["-i", picName, "-vf", "scale=480:-1,transpose=1", "-y", picName.replace(".jpg", "-small.jpg")];
+                        else
+                            ffPicargs = ["-i", picName, "-vf", "scale=480:-1", "-y", picName.replace(".jpg", "-small.jpg")];;
                         ffPicmpeg = child_process.spawn("../Ffmpeg/ffmpeg.exe", ffPicargs);
                     });
 
