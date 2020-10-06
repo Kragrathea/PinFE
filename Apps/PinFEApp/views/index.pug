@@ -48,7 +48,7 @@ block content
         
     // Modal
   #tableEditModal.modal.fade(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true")
-    .modal-dialog(role="document" style='max-width:60%')
+    .modal-dialog(role="document" style='max-width:50%')
       .modal-content
     //div.swiper-pagination
     
@@ -241,6 +241,10 @@ block content
             {
                 img.attr("src","tables/?image="+ encodeURIComponent(e.backglass));
             }
+            else{
+                //img='<form><div class="dropzone" id="my-awesome-dropzone" method="POST" enctype="multipart/form-data" action="/install/upload?table=">Drop Here</div></form>'
+                //img.addClass("dropzone");
+            }
         }
         item.append(img);
 
@@ -248,20 +252,22 @@ block content
         if(window.location.href.toLowerCase().indexOf("view=dt") > -1)
             showDesktop=true;
 
-        if(e.dtSmallPic && showDesktop){
-            var img=$("<img/>");
-            img.attr("src","tables/?image="+encodeURIComponent(e.table)+".dt-small.jpg");
-            img.attr("style",'width:100%;')
+        if(showDesktop){
+            img=$("<img/>");
+            img.attr("style",'margin-top:25px;width:100%;min-height:180px;background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;')
+            if(e.dtSmallPic && showDesktop){
+                img.attr("src","tables/?image="+encodeURIComponent(e.table)+".dt-small.jpg");
+            }
             item.append(img);
         }
-        
-        if(e.fsSmallPic && !showDesktop){
-            var img=$("<img/>");
-            img.attr("src","tables/?image="+encodeURIComponent(e.table)+".fs-small.jpg");
-            img.attr("style",'margin-top:-45px;width:70%;transform:rotateX(45deg);')
+        if(!showDesktop){
+            img=$("<img/>");
+            img.attr("style",'margin-top:-45px;width:70%;min-height:400px;transform:rotateX(45deg);background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;')
+            if(e.fsSmallPic && !showDesktop){
+                img.attr("src","tables/?image="+encodeURIComponent(e.table)+".fs-small.jpg");
+            }
             item.append(img);
-        }
-              
+        }      
          if(true ){
             var div =$("<div class='wheel align-bottom' style='margin-top:-60px;padding-bottom:60px;transform:rotateX(0deg)'></div>");
             
@@ -538,6 +544,24 @@ block content
             },
             });
         }
+
+        var fullScreenDropzone = new Dropzone(document.body,{ 
+            url: "/install/upload?table=",
+            init: function() {
+                this.on("addedfile", function(file) { /*alert("Added file."); */});
+                this.on("sending", function(file, xhr, data) {
+                    console.log(file.fullPath)
+
+                    console.log(file.name)          
+                    // if file is actually a folder
+                    if(file.fullPath){
+                        data.append("fullPath", file.fullPath);
+                    }else{
+                        data.append("fullPath", file.name);  
+                    }
+                });
+            } 
+        });
 
         var urlParams = new URLSearchParams(window.location.search)
         if(urlParams.get("q")){
