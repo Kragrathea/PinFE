@@ -10,7 +10,7 @@ block content
     link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css')
 
     .filemanager
-      div.row.breadrow
+      div.row.breadrow.w-75
         .search
             input.fa.fa-microphone(aria-hidden="true" type="search" placeholder="Find a file..")
         a#backButton.button.folderName(href="")
@@ -25,6 +25,9 @@ block content
         .nofiles
         span No files here.
     
+      #cardModal.modal.fade(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true")
+        .modal-dialog(role="document" style='max-width:50%')
+          .modal-content
 
     div.background(id="slideshow")
         img(src='https://w.wallha.com/ws/10/npWx9agY.jpg')
@@ -38,3 +41,22 @@ block content
         img(src='https://www.wallpaperup.com/uploads/wallpapers/2014/04/13/331441/4120469257d5887f7ddc9345a91d8f5b-700.jpg')
 
     script.
+
+        function showCard(gameName)
+        {
+            $('#tableEditModal .modal-content').load("/game?name="+gameName, function() {
+
+            //$('#tableEditModal.modal-title').text("Edit "+decodeURIComponent(tableFile))
+            $('#tableEditModal').modal();
+            });
+        }
+        $(function(){
+            console.log("install click")
+            $(".filemanager .files a").on("click",function(evt,a){
+                console.log("here:"+[evt,a])
+                evt.stopPropagation();
+                evt.preventDefault();
+                showCard(a.attr("href"))
+
+            })
+        })

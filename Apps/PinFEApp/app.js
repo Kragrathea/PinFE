@@ -45,6 +45,7 @@ var backglasses = require('./routes/backglasses');
 var tables = require('./routes/tables');
 var table = require('./routes/table');
 var grid = require('./routes/grid');
+var game = require('./routes/game');
 
 var install = require('./routes/install');
 
@@ -70,6 +71,7 @@ app.use('/backglasses', backglasses);
 app.use('/tables', tables);
 app.use('/table', table);
 app.use('/grid', grid);
+app.use('/game', game);
 
 app.use('/install', install);
 

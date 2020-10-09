@@ -1,0 +1,175 @@
+body {
+    /* background: unset; */
+  }
+  
+  ul {
+    list-style-type: none;
+  }
+  
+  span {
+    font-weight: bold;
+  }
+
+.ribbon {
+ font-size: 20px !important;
+ /* This ribbon is based on a 16px font side and a 24px vertical rhythm. I've used em's to position each element for scalability. If you want to use a different font size you may have to play with the position of the ribbon elements */
+
+ width: 50%;
+    
+ position: relative;
+ background: #ba89b6;
+ color: #fff;
+ text-align: center;
+ padding: 1em 2em; /* Adjust to suit */
+ margin: 2em auto 3em; /* Based on 24px vertical rhythm. 48px bottom margin - normally 24 but the ribbon 'graphics' take up 24px themselves so we double it. */
+}
+.ribbon:before, .ribbon:after {
+ content: "";
+ position: absolute;
+ display: block;
+ bottom: -1em;
+ border: 1.5em solid #986794;
+ z-index: -1;
+}
+.ribbon:before {
+ left: -2em;
+ border-right-width: 1.5em;
+ border-left-color: transparent;
+}
+.ribbon:after {
+ right: -2em;
+ border-left-width: 1.5em;
+ border-right-color: transparent;
+}
+.ribbon .ribbon-content:before, .ribbon .ribbon-content:after {
+ content: "";
+ position: absolute;
+ display: block;
+ border-style: solid;
+ border-color: #804f7c transparent transparent transparent;
+ bottom: -1em;
+}
+.ribbon .ribbon-content:before {
+ left: 0;
+ border-width: 1em 0 0 1em;
+}
+.ribbon .ribbon-content:after {
+ right: 0;
+ border-width: 1em 1em 0 0;
+}
+  
+  .card {
+    background: linear-gradient(to bottom right, #330066, #5c00e6, #0000cc, #330066);
+    /*   border-radius: 5px; */
+    box-shadow: 3px 3px 6px 1px rgba(0, 0, 0, 0.36);
+    border: solid black 1px;
+    padding: 8px;
+    border-radius: 8px;
+    width: 328px;
+
+    position:fixed;
+    top:10%;
+    left:40%;
+
+
+    transform: perspective(1000px);
+    transform-style: preserve-3d;
+  }
+  .to-corner{
+    top:10%;
+    left:75%;
+    transition: all 0.3s ease-in-out;
+  }
+  .decorative {
+    background: linear-gradient(to bottom right, red, yellow);
+    border-radius: 4px;
+    border: 1px black;
+    box-shadow: 3px 3px 6px 1px rgba(0, 0, 0, 0.36);
+    padding: 5px;
+  }
+  
+  .top {
+    text-shadow: 2px 2px #030303;
+  }
+  .border {
+    background: linear-gradient(to bottom right, rgb(165, 36, 36), rgb(40, 111, 151));      
+    min-height: 300px;
+
+    border-radius: 4px;
+    box-shadow: 3px 3px 2px 0px rgba(0, 0, 0, 0.17);
+    border: solid black 2px;
+  }
+  .border-img {
+    height: 100%;
+    width: 100%;
+    background-position: center center;
+    background-size: cover; 
+    background-repeat:no-repeat;
+  }
+  
+  .name {
+    border: solid black 2px;
+    border-radius: 4px;
+    background-color: rgba(77, 51, 25, 0.3);
+    /*   box-shadow: 3px 3px 6px 1px rgba(0, 0, 0, 0.36); */
+    color: white;
+    display: inline-block;
+    padding: 11px;
+    box-sizing: border-box;
+    width:100%;
+  }
+
+  .middle{
+      
+  }
+  
+  .middle img {
+    height: 300px;
+    width: 300px;
+
+    margin: 7px;
+    position:fixed;
+    margin-top:-90%;
+  }
+  .wheel{
+    padding: 2px;
+  }
+  .wheel img {
+    height: 300px;
+    width: 300px;
+    box-shadow: 3px 3px 2px 0px rgba(0, 0, 0, 0.17);
+
+    margin: 7px;
+    position:fixed;
+    margin-top:100%;
+  } 
+  .bottom {
+    border: solid black 2px;
+    border-radius: 5px;
+    box-shadow: 3px 3px 2px 0px rgba(0, 0, 0, 0.17);
+    padding: 2px;
+    margin: 7px;
+    color: white;
+    background-color: rgba(77, 51, 25, 0.69);
+    font-family: monospace;
+    text-shadow: 2px 2px #030303;
+    font-size: larger;
+  }
+  .bottom ul{
+      padding: 5px;
+  }
+  .interesting_fact {
+    font-style: italic;
+  }
+  
+  .description {}
+  
+  .info {}
+  
+  
+  .name h3 {
+    font-size: 20px;
+    font-family: "Papyrus";
+    text-align: center; 
+    margin: 0 auto;
+  }

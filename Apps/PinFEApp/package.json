@@ -31,6 +31,7 @@
     "serve-favicon": "^2.3.0",
     "swiper": "^5.4.5",
     "tabulator-tables": "^4.5.3",
+    "vanilla-tilt": "^1.7.0",
     "winreg": "^1.2.4",
     "xml2js": "^0.4.23"
   }

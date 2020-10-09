@@ -11,8 +11,9 @@
 [Tt]ables/*.zip
 [Tt]ables/New
 [Tt]ables/Starter
+Library/Wheels/MyLib
+[Ll]ibrary/[Bb]ackglasses/MyLib
 [Tt]ables/MyLib
-
 
 
 # User-specific files (MonoDevelop/Xamarin Studio)

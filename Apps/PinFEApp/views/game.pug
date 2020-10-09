@@ -1,0 +1,144 @@
+head
+    script(src='/jquery/jquery.js')
+    script(src='/scripts/jquery-ui-dist/jquery-ui.min.js')
+    script(src='/js/bootstrap.bundle.min.js')
+    link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+    link(rel='stylesheet', href='/stylesheets/gamecard.css')
+
+block content
+    .row.h-100(style="width:100%;")
+        iframe.paine(src='' style="width:100%;height:100%;")
+        //- .h-100.w-75.ml-5(style="background:green;font-size: 20px;")
+        //-     ul.nav.nav-tabs
+        //-         li.nav-item.active
+        //-             a(data-toggle="tab" href="#home") IPDB
+        //-         li.nav-item
+        //-             a(data-toggle="tab" href="#menu1") Table
+        //-         li.nav-item
+        //-             a(data-toggle="tab" href="#menu2") Wheel
+        //-         li.nav-item
+        //-             a(data-toggle="tab" href="#menu3") Backglass   
+        //-     .tab-content
+        //-         #home.tab-pane.active
+        //-             iframe(style="width:100%;height:90%" src='https://www.ipdb.org/machine.cgi?id='+game.ipdb)
+ 
+        //-         #menu1.tab-pane.fade
+        //-             iframe(style="width:100%;height:90%" src='https://www.bing.com/search?q='+game.name+" vpx")
+        //-         #menu2.tab-pane.fade
+        //-             iframe(style="width:100%;height:90%" src='https://www.bing.com/search?q='+game.name+"&qft=+filterui:photo-transparent")
+        //-         #menu3.tab-pane.fade
+        //-             iframe(style="width:100%;height:90%" src='https://www.bing.com/search?q='+game.name+" directb2s")
+                        
+
+        .col-md-4.ml-auto
+            .card.mx-auto(data-tilt data-tilt-max="20" data-tilt-glare data-tilt-max-glare="1.0" data-tilt-scale="1.1" style="")
+                .decorative(style="")
+                    .top
+                        div.ribbon(style="transform: translateZ(15px);")
+                            strong.ribbon-content=game.name
+                        .border(style="transform: translateZ(15px);height:250px;")
+                            div.border-img(style="transform: translateZ(15px);background-image:url('/backglasses?imageIndex=0&fuzzySearch=1&search="+game.name+')')
+                        .middle
+                            img(src="/wheels/?search="+encodeURIComponent(game.name).replace(/[!'()*]/g, escape)+"&fuzzySearch=1&imageIndex=0" 
+                                    style="transform: translateZ(50px);" alt=game.name)
+                    .bottom(style="transform: translateZ(15px);")
+                        // Edit everything in white to customize
+                        p.bottom-name=game.name 
+                        p.description=game.comment 
+                        ul
+                            li
+                                span Manufacturer
+                                | : 
+                                =game.manufacturer
+                            li
+                                span Year
+                                | : 
+                                =game.year
+                            //- li
+                            //-     span Type
+                            //-     | : 
+                            //-     =game.type
+                            //- li
+                            //-     span Theme
+                            //-     | : 
+                            //-     =game.theme
+                            //- li
+                            //-     span Author(s)
+                            //-     | : 
+                            //-     =game.author                      
+                            li
+                                span IPDB
+                                | :  
+                                a(href='#' onclick='setSearch("https://www.ipdb.org/machine.cgi?id='+game.ipdb+'")')=game.ipdb                                             
+                            li
+                                span Search
+                                | : 
+                                //- a.fas.fa-search(href='#' onClick="window.open('https://www.google.com/search?q="+game.name+" vpx','_blank');") 
+                                a(href='#' onclick='setSearch("https://www.bing.com/search?q='+game.name+' vpx")') Table
+                                a(href='#' onclick='setSearch("https://www.bing.com/search?q='+game.name+' directb2s")') , Backglass
+                            li
+                                span Search Wheel
+                                | : 
+                                a(href='#' onclick='setSearch("/wheels/?search='+game.name+'")') Local
+                                
+                                a(href='#' onclick='setSearch("https://www.bing.com/images/search?qft=+filterui:photo-transparent&q='+game.name+'")') , Web
+                            li
+                                span Other
+                                | : 
+                                a(href='#' onclick='setSearch("https://3dwarehouse.sketchup.com/search/?searchTab=model&q='+game.name.split("(")[0]+' pinball")') Model
+                                
+                            li
+                                span Video
+                                | : 
+                                //- a(href='#' onclick='setSearch("https://www.youtube.com/embed/?listType=search&list='+game.name+' vpx")') YouTube
+                                a(href='https://www.youtube.com/embed/?listType=search&list='+game.name+' vpx') YouTube 
+                form.dropzone(style="height:100px;width:100%;" id="my-awesome-dropzone" method='POST' enctype="multipart/form-data" action='/table/uploadbg?table='+encodeURIComponent(""))
+                    input(style="width:100%;" type="text")                
+
+                        //- p.info
+                        //-     | Some more info
+                            
+
+    script(src='/scripts/vanilla-tilt/dist/vanilla-tilt.js')
+
+script. 
+
+    function setSearch(url){
+        //alert(url);
+        $(".paine").attr("src",url);
+        $(".card")[0].vanillaTilt.destroy();
+        $(".card").addClass("to-corner")
+
+    }
+    var dropbox =$(".dropzone")[0];// document.getElementById('dropbox');
+
+    dropbox.addEventListener('dragenter', noopHandler, false);
+    dropbox.addEventListener('dragexit', noopHandler, false);
+    dropbox.addEventListener('dragover', noopHandler, false);
+    dropbox.addEventListener('drop', drop, false);
+
+    function noopHandler(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+    }
+    function drop(evt) {
+            evt.stopPropagation();
+            evt.preventDefault(); 
+            
+            
+            var imageUrl = evt.dataTransfer.getData('Text');
+            console.log("drop:"+imageUrl)
+            if(imageUrl && imageUrl!="")
+            {
+                $.ajax({
+                        url: '/table/downloadPng', 
+                        type: 'POST', 
+                        contentType: 'application/json', 
+                        data: JSON.stringify({url:imageUrl,tableFile:"!{game.name}"})}
+                ).done(function() {
+                    $("#wheelImage").attr("src",$("#wheelImage").attr("src")+"&tt="+new Date().getTime())
+                });
+                //alert(imageUrl);
+            }
+
+    }

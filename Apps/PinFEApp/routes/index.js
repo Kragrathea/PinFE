@@ -130,6 +130,7 @@ router.post('/capture', function (req, res) {
     if (view) {
         var arg = "";
         var outName;
+        var xOffset = -1920;    //TODO:Make config!!!
         if (view && view.toLowerCase() === "dt") {
             arg = "-ForceDT";
             outName = tableDir + req.body.table + ".dt.mp4"
@@ -139,6 +140,7 @@ router.post('/capture', function (req, res) {
         } else if (view && view.toLowerCase() === "bg") {
             arg = "-ForceFS";
             outName = tableDir + req.body.table + ".bg.mp4"
+            xOffset=0;
         } else if (view && view.toLowerCase() === "fs") {
             arg = "-ForceFS";
             outName = tableDir + req.body.table + ".fs.mp4"
@@ -262,6 +264,32 @@ function captureVideo(command, args, outName) {
             ffmpeg.on('close', function (code) {
                 //kill vp
                 child.kill();
+
+                // console.log("Screenshot Backglass")
+                // var xxargs = ["foo.png"];
+
+//                var xx = child_process.spawn("../ScreenCapture.bat", xxargs);
+
+            //     child_process.exec('..\\screenCapture.bat foo.png Form1', function(error, stdout, stderr) {
+            //         console.log("ScreenCapture:"+error);
+            //         console.log("ScreenCapture:"+stdout);
+            //         console.log("ScreenCapture:"+stderr);
+            //         //kill vp
+            //         child.kill();
+
+            //   });
+                // xx.on('error', function (err) {
+                //     console.log('Error running ss: ' + err);
+
+                // });
+
+                // xx.stdout.setEncoding('utf8');
+                // xx.stdout.on('data', function (data) {
+                //     console.log('xx stdout: ' + data);
+                //                         //kill vp
+                //                         child.kill();
+                // });
+
 
 
                 let ffREargs = ["-i", outName + "_", "-loglevel", "error", "-stats", "-c:v", "libx264", "-an", "-crf", "20", "-preset", "slower", "-pix_fmt", "yuv420p", "-y", "-f", "mp4", outName];

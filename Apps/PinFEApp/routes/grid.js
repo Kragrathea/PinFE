@@ -3,6 +3,8 @@ var express = require('express');
 var router = express.Router();
 var Fuse = require('fuse.js');
 
+var fuzzy=require('./fuzzycompare.js');
+
 var fs = require('fs'),
     path = require('path'),
     querystring = require('querystring');
@@ -38,7 +40,7 @@ function scan(baseDir,dir, filter ) {
             const iconFiles = fs.readdirSync(baseDir + filePath);
             iconFiles.forEach((iFile) => {
                 if(iFile.toLowerCase().endsWith(".png") && iFile.toLowerCase().indexOf("wheel")>-1){
-                    icon=encodeURIComponent((filePath+"\\"+iFile));
+                    icon=encodeURIComponent((filePath+"\\"+iFile)).replace(/[!'()*]/g, escape);
                     //break;
                 }
             });
@@ -62,7 +64,11 @@ function scan(baseDir,dir, filter ) {
     return fileList;
 }
 
-function getWheelList(wheelsDir) {
+var allWheels=null;
+function getAllWheels(wheelsDir) {
+
+    if(allWheels!=null)
+        return allWheels;
 
     var results = [];
     if(fs.existsSync(wheelsDir)){
@@ -74,10 +80,10 @@ function getWheelList(wheelsDir) {
             });
         });
     }
-    //wheelList = results;
 
     console.log("Loaded wheelList. Length:" + results.length);
-    return results;
+    allWheels=results;
+    return allWheels;
 }
 
 function getSearchIndex(wheelList) {
@@ -100,17 +106,105 @@ function getSearchIndex(wheelList) {
     let wheelListIndex = new Fuse(wheelList, options);
     return(wheelListIndex);
 }
+var Registry = require('winreg')
+var romPath=null;//todo make this sync
+function loadRomPath()
+{
+    let   regKey = new Registry({                                       // new operator is optional
+        hive: Registry.HKCU,                                        // open registry hive HKEY_CURRENT_USER
+        key:  '\\Software\\Freeware\\Visual PinMame\\globals' // key containing autostart programs
+        })
+
+    regKey.values(function (err, items /* array of RegistryItem */) {
+    if (err)
+        console.log('ERROR: '+err);
+    else
+        for (var i=0; i<items.length; i++){
+            //console.log('ITEM: '+items[i].name+'\t'+items[i].type+'\t'+items[i].value);
+            if(items[i].name==="rompath"){
+                romPath=items[i].value+"\\";
+                console.log("Setting romPath:"+romPath);
+            }
+        }
+    });
+}
+loadRomPath();//todo make this sync
+
+var allGames=null;
+function getAllGames()
+{
+    let masterDir = "./public/data";
+
+    if(allGames)
+        return allGames;
+    allGames={};
+    let data = fs.readFileSync(masterDir + '/PinballX Database Sheet.tsv');
+    if(data) {
+        //if (err) throw err;
+        var lines = data.toString().split("\n");
+
+        //table headers are on line 0
+        var headers = lines[0].split("\t");
+
+        //Table Name (Manufacturer Year)	Manufacturer	Year	Theme	Player(s)	IPDB Number	Description(s)	Type	VP Version	Table URL	Table Author(s)	Table Version	Table Date
+        //override headers to shorter javascript friendly.
+        headers = ["name", "manufacturer", "year","theme","players","ipdb", "comment", "type", "vpver","url", "author", "version", "date"];//, "rom"]; //,"check","notes"];
+
+        for (var i = 1; i < lines.length; i++) { //NOTE 1. Bypassheaders.
+            var obj = {id:i-1}; //NOTE -1
+
+            var currentline = lines[i].replace("\r","").split("\t");//note /r gets rid of trailing line feed.
+            for (var j = 0; j < headers.length; j++) {
+                obj[headers[j]] = currentline[j];
+            }
+            if(obj.vpver!=="VPX")//only load vpx tables..
+                continue;
+            if(!allGames[obj.name])
+                allGames[obj.name]=[]
+
+            allGames[obj.name].push(obj);
+            //if(obj.name.startsWith("Jokerz!"))
+            {
+                //obj.name=obj.name.replace(/\!/g, "").replace(/\'/g, "");//HACK.
+                //console.log([obj]);    
+            }
+        }
+    }
+    
+    //console.log("getMasterTableList Length:" + Object.keys(allGames).length);
+    console.log("getAllGames Length:" + Object.keys(allGames).length);
+    return allGames;
+}
+function romToGames(romName)
+{
+    var masterDir = "./public/data";
+
+    let games = getAllGames();
+    gameObjs=Object.values(games);
+    results=gameObjs.filter(a => a.rom.toLowerCase()+".zip" === romName.toLowerCase());
+    return results;
+}
+function nameToWheels(gameName,wheelDir)
+{
+    var masterDir = "./public/data";
+
+    let results = getAllWheels(wheelDir);
+    results=results.filter(a => fuzzy.superFuzzyCompare(a.name, gameName) );
+    return results;
+}
 
 router.get('/scan', function (req, res) {
-    // var query = url.parse(req.url, true).query;
+    var query = url.parse(req.url, true).query;
     // var qry = query.search;
-    // var image = query.image;
+    var type = query.type;
     // var json = query.json;
     // var imageIndex = query.imageIndex;
     // var perPage = query.perPage;
 
+    if(!type)
+        type="vpx"
     let results={};
-    if(true)
+    if(type==="vpx")
     {
         let dir = req.app.locals.FETableDirs+"/";
 
@@ -121,16 +215,83 @@ router.get('/scan', function (req, res) {
             //items:scan(wheelsDir,"/", /\.(png|directb2s)\b/)
             items:scan(dir,"/", /\.vpx$/)
         };
-    }else{
-        let wheelsDir = req.app.locals.FELibDirs+"/Wheels/";
+    }else if(type==="wheel"){
+        let dir = req.app.locals.FELibDirs+"/Wheels/";
 
         results={
             name: "",
             type:"folder",
             path:"",
-            //items:scan(wheelsDir,"/", /\.(png|directb2s)\b/)
-            items:scan(wheelsDir,"/", /\.png$/)
+            //items:scan(dir,"/", /\.(png|directb2s)\b/)
+            items:scan(dir,"/", /\.png$/)
         };
+    }else if(type==="rom"){
+        let dir =romPath;
+
+        results={
+            name: "",
+            type:"folder",
+            path:"",
+            //items:scan(dir,"/", /\.(png|directb2s)\b/)
+            items:scan(dir,"/", /\.zip$/)
+        };
+        let newItems=[]
+        for(let li of results.items){
+            let gg=romToGames(li.name);
+            li.size=gg.length;
+            if(gg.length>0)
+            {
+                let gname= gg[0].name;
+                li.name=gname;
+                let wheelsDir=req.app.locals.FELibDirs+"/Wheels/";
+                let icons = nameToWheels(gname,wheelsDir);
+                if(icons.length)
+                    li.icon="/wheels/?image="+encodeURIComponent(icons[0].file.replace(/\\/g,"/")).replace(/[!'()*]/g, escape);
+                    newItems.push(li);
+            }
+        }
+        results.items=newItems;
+    }else if(type==="games"){
+        let games= getAllGames();
+
+        function sortFunc(a,b)
+        {
+            let ad = Date.parse(b.date!=""?b.date:"1900-1-1");
+            let bd = Date.parse(a.date!=""?a.date:"1900-1-1")
+            //console.log([ad,bd]);
+            return(ad-bd);
+            
+        }
+
+        //let gameNames = Object.keys(games).sort((a,b)=>a.date-b.date);
+        let gamesArray=Object.values(games).flat();
+        gamesArray = gamesArray.sort(sortFunc);
+
+        let newItems=[]
+        for(let game of gamesArray){
+            //let gname= gg.name;
+            let li ={
+                name: game.name,
+                type:"file",
+                path:"/game?name="+encodeURIComponent(game.name.replace(/\\/g,"/")).replace(/[!'()*]/g, escape),
+                icon:null,
+            };
+
+            //let wheelsDir=req.app.locals.FELibDirs+"/Wheels/";
+            //let icons = nameToWheels(game.name,wheelsDir);
+            //if(icons.length)
+                li.icon="/wheels/?search="+encodeURIComponent(game.name).replace(/[!'()*]/g, escape)+"&fuzzySearch=1&imageIndex=0"
+            newItems.push(li);
+        }
+
+
+        results={
+            name: "",
+            type:"folder",
+            path:"",
+            items:newItems
+        };
+
     }
 
     res.json(results);
@@ -140,53 +301,8 @@ router.get('/', function (req, res) {
     var qry = query.search;
     var image = query.image;
     var json = query.json;
-    var imageIndex = query.imageIndex;
-    var perPage = query.perPage;
 
-    let wheelsDir = req.app.locals.libDirs+"/Wheels/";
-
-    if (image !== undefined && fs.existsSync(wheelsDir)) {
-        fs.readFile(wheelsDir + image, function (err, content) {
-            if (err) {
-                var size = (wheelsDir + image).length;
-                res.writeHead(400, { 'Content-type': 'text/html' });
-                console.log(err);
-                res.end("No such image");
-            } else {
-                //specify the content type in the response will be an image
-                res.writeHead(200, { 'Content-type': 'image/jpg' });
-                res.end(content);
-            }
-        });
-
-    } else {
-        var results = getWheelList(wheelsDir);
-    
-        if (qry !== undefined) {
-            let wheelListIndex=getSearchIndex(results);
-            results = wheelListIndex.search(qry);
-        }
-    
-        if (imageIndex !== undefined) {
-            image = results[imageIndex].file;
-        }
-    
-        if (perPage === undefined && isNaN(perPage)) {
-            perPage=100;
-        }
-        if (json !== undefined) {
-            res.json({
-                results: results
-            });
-        }
- 
-        var page = query.page;
-        if (page === undefined)
-            page = 0;
-        page = parseInt(page);
-        res.render('grid', { title: 'PinFE', items: results.slice(page * perPage, (page + 1) * perPage) });
-    }
-
+    res.render('grid', { title: 'PinFE' });
 });
 
 module.exports = router;

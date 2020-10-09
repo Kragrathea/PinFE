@@ -64,7 +64,51 @@ function superFuzzyCompare(a, b) {
         return true;
     return false;
 }
+var allGames=null
+function getAllGames()
+{
+    if(allGames)
+        return allGames;
+    let results = [];
+    let data = fs.readFileSync(masterDir + '/MasterTableList.tsv');
+    //let data = fs.readFileSync(masterDir + '/PinballX Database Sheet.tsv');
+    if(data) {
+        //if (err) throw err;
+        var lines = data.toString().split("\n");
 
+        //table headers are on line 0
+        var headers = lines[0].split("\t");
+
+        //Table Name (Manufacturer Year)	Feature(s) Description(s), comment(s) or extra information	Type 	VP Version	Table Author(s)	Table Version	Table Date	Needed ROM Name	Checkbox 	Comments or Notes 
+        //Table Name (Manufacturer Year)	Manufacturer	Year	Theme	Player(s)	IPDB Number	Description(s)	Type	VP Version	Table URL	Table Author(s)	Table Version	Table Date
+        //override headers to shorter javascript friendly.
+        headers = ["name", "feature", "desc","comment","type","vpver", "author", "vpver","date", "rom"];//, "rom"]; //,"check","notes"];
+
+        for (var i = 1; i < lines.length; i++) { //NOTE 1. Bypassheaders.
+            var obj = {id:i-1}; //NOTE -1
+            var currentline = lines[i].split("\t");
+            for (var j = 0; j < headers.length; j++) {
+                obj[headers[j]] = currentline[j];
+            }
+            if(obj.vpver!=="VPX")//only load vpx tables..
+                continue;
+            if(obj.name!=="")//get rid of blank rows.
+                results.push(obj);
+        }
+    }
+        
+    console.log("romToGame Length:" + results.length);
+    allGames=results;
+    return allGames;
+}
+function romToGames(romName)
+{
+    var masterDir = "./public/data";
+
+    let results = getAllGames();
+    results.filter(a => a.rom.toLowerCase()+".zip" === romName.toLowerCase());
+
+}
 function getMasterTableList() {
 
     var masterDir = "./public/data";

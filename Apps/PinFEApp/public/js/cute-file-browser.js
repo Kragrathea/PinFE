@@ -7,7 +7,7 @@ $(function(){
 	// Start by fetching the file data from scan.php with an AJAX request
 
 	//var data = {"name":"Home","type":"folder","path":"Home","items":[{"name":"Lorem Ipsum","type":"folder","path":"Home\/Lorem Ipsum","items":[{"name":"Another_Folder","type":"folder","path":"Home\/Lorem Ipsum\/Another_Folder","items":[]},{"name":"Lorem-Ipsum.pdf","type":"file","path":"Home\/Lorem Ipsum\/Lorem-Ipsum.pdf","size":77123}]},{"name":"Videos","type":"folder","path":"Home\/Videos","items":[{"name":"Waterfalls.mp4","type":"file","path":"Home\/Videos\/Waterfalls.mp4","size":11973085}]},{"name":"mahkeo-222765.jpg","type":"file","path":"Home\/mahkeo-222765.jpg","size":1093032},{"name":"montylov-252445.jpg","type":"file","path":"Home\/montylov-252445.jpg","size":6236288},{"name":"paul-itkin-261733.jpg","type":"file","path":"Home\/paul-itkin-261733.jpg","size":424875},{"name":"sylwia-bartyzel-114124.jpg","type":"file","path":"Home\/sylwia-bartyzel-114124.jpg","size":2358664}]}
-	$.get('/grid/scan', function(data) {
+	$.get('/grid/scan?type=games', function(data) {
 
 		var response = [data],
 			currentPath = '',
@@ -352,10 +352,15 @@ $(function(){
 						icon = '<span class="icon file"></span>';
 
 					fileType = fileType[fileType.length-1];
+										// if (fileType == "db") {
+					// 	return;
+					// }
+
+					if (f.icon) {
+						icon = '<div style="display:inline-block;margin:0px 0px 0px 0px;border-radius:8px;width:100%;height:100%;background-position: center center;background-size: contain; background-repeat:no-repeat;background-image: url(\''+f.icon + '\');"></div>';
+					}else
 					
-					if (fileType == "db") {
-						return;
-					}
+
 
 					if (fileType == "jpg") {
 						icon = '<div style="display:inline-block;margin:20px 30px 0px 25px;border-radius:8px;width:60px;height:70px;background-position: center center;background-size: cover; background-repeat:no-repeat;background-image: url(\'' + f.path + '\');"></div>';
@@ -368,7 +373,6 @@ $(function(){
 					} else {
 						icon = '<span class="icon file f-'+fileType+'">.'+fileType+'</span>';
 					} 
-					
 					
 					if (fileType == "jpg") {
 						var file = $('<li class="files"><a data-fancybox="images" href="'+ f.path+'" title="'+ f.path +'" target="_blank" class="files">'+icon+'<span class="name">'+ name +'</span> <span class="details">'+fileSize+'</span></a></li>');
@@ -383,7 +387,12 @@ $(function(){
 					} else if (fileType == "mp4") {
 						var file = $('<li class="files"><a data-fancybox data-type="iframe" data-src="'+ f.path+'" title="'+ f.path +'" href="javascript:;" class="files">'+icon+'<span class="name">'+ name +'</span> <span class="details">'+fileSize+'</span></a></li>');
 					} else {
-						var file = $('<li class="files"><a href="'+ f.path+'" title="'+ f.path +'" target="_blank" class="files">'+icon+'<span class="name">'+ name +'</span> <span class="details">'+fileSize+'</span></a></li>');
+
+						//HACK REMOVE. Treat blank type as GAME so link with game prefix. 
+						var file = $('<li class="files"><a data-fancybox data-type="iframe" data-src='+ f.path+' title="'+ f.path +'" href="javascript:;" class="files">'+icon+'<span class="name">'+ name +'</span> <span class="details">'+fileSize+'</span></a></li>');
+						//end HACK 
+
+						//var file = $('<li class="files"><a href="'+ f.path+'" title="'+ f.path +'" target="_blank" class="files">'+icon+'<span class="name">'+ name +'</span> <span class="details">'+fileSize+'</span></a></li>');
 					}
 					
 					file.appendTo(fileList);

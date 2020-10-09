@@ -20,7 +20,7 @@ function findInDir(baseDir,dir, filter, fileList = []) {
         const filePath = path.join(dir, file);
         const fileStat = fs.lstatSync(baseDir + filePath);
 
-        if (fileStat.isDirectory()) {
+        if (fileStat.isDirectory() || fileStat.isSymbolicLink()) {
             findInDir(baseDir,filePath, filter, fileList);
         } else if (filter.test(filePath)) {
             fileList.push(filePath);
@@ -38,7 +38,7 @@ function getBGList(bgDir) {
         files.forEach((file) => {
             results.push({
                 name: path.basename(file),
-                file: encodeURIComponent(file)
+                file: (file)
         });
         });
     }
@@ -64,7 +64,22 @@ function getSearchIndex(bgList) {
     let bgListIndex = new Fuse(bgList, options);
     return(bgListIndex);
 }
-
+function sendMissing(req,res)
+{
+    let bgDir = req.app.locals.FELibDirs+"/Backglasses/"; // ./public/data";
+    fs.readFile(bgDir + "/Missing_Backglass.png", function (err, content) {
+        if (err) {
+            res.writeHead(400, { 'Content-type': 'text/html' });
+            console.log(err);
+            res.end("No such image");
+        } else {
+            //specify the content type in the response will be an image
+            res.writeHead(200, { 'Content-type': 'image/jpg' });
+            res.end(content);
+        }
+    });   
+}
+var fuzzy=require('./fuzzycompare.js');
 router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
     var qry = query.search;
@@ -86,24 +101,52 @@ router.get('/', function (req, res) {
                 });
                 res.end(img);
             }else{
-                // error not backglass
-                //var size = (wheelsDir + image).length;
-                res.writeHead(400, { 'Content-type': 'text/html' });
-                console.log("No such image");
-                res.end("No such image");
+                sendMissing(req,res);
             }
         });
     } else {
         var results = getBGList(bgDir);
         if (qry !== undefined) {
-            let bgListIndex=getSearchIndex(results);
-            results = bgListIndex.search(qry);
+            if(query.fuzzySearch){
+                results=results.filter(a => fuzzy.superFuzzyCompare(a.name, qry) );
+            }else{
+                let bgListIndex=getSearchIndex(results);
+                results = bgListIndex.search(qry);
+            }
         }
+        if (query.imageIndex !== undefined) {
+            if(results.length<1 || query.imageIndex>results.length)
+            {
+                sendMissing(req,res); 
+                return;          
+            }
+            image = results[query.imageIndex].file;
+        }
+        if (image !== undefined){
+            fs.readFile(bgDir + image, "utf8", function (err, data) {
+                var line = data.split("<BackglassImage Value=\"")[1];
+                if(line){
+                    line = line.split("\n")[0];
+                    var imgData = line.replace(/&#xD;&#xA;/g, "");
+                    var img = Buffer.from(imgData, 'base64');
     
+                    res.writeHead(200, {
+                        'Content-Type': 'image/png',
+                        'Content-Length': img.length
+                    });
+                    res.end(img);
+                }else{
+                    // error not backglass
+                    sendMissing(req,res);
+                }
+            });
+            return;//all done
+        }    
         if (json !== undefined) {
             if (query.justNames)
                 results = results.map(x => x.name);
             res.json(results);
+            return;//all done
         }
 
         var page = query.page;
