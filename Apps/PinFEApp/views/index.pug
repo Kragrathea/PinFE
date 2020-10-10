@@ -40,7 +40,6 @@ block content
         img(src='https://wallpapermemory.com/uploads/652/pinball-wallpaper-hd-1280x854-469683.jpg')
         img(src='https://i.pinimg.com/originals/48/42/94/4842947688123d7606173ab02494c956.jpg')
         img(src='https://c4.wallpaperflare.com/wallpaper/441/505/132/pinball-wallpaper-preview.jpg')
-        img(src='https://cdn.hipwallpaper.com/i/26/52/iFgoV8.jpg')
         img(src='https://images2.alphacoders.com/679/thumb-1920-679000.jpg')
         img(src='https://images7.alphacoders.com/477/thumb-1920-477985.jpg')
         img(src='https://www.wallpaperup.com/uploads/wallpapers/2014/04/13/331425/7b6a848d6341223fd205e228c03b8cc2-700.jpg')
@@ -76,7 +75,7 @@ block content
 
     recognition.onstart = function () {
         recognizing = true;
-        console.log("start");
+        //console.log("start");
         $(".pulse-ring").show();
         //message.innerHTML = 'Speak now.';
         //talk_button.innerHTML = 'Listen';
@@ -134,7 +133,7 @@ block content
 
     recognition.onend = function () {
 
-        console.log("onend");
+        //console.log("onend");
         $(".pulse-ring").hide();
 
         recognizing = false;
@@ -193,7 +192,7 @@ block content
 
     function setFilter(filter){
         
-        console.log("Search:"+filter);
+        //console.log("Search:"+filter);
 
         if(filter=="")
             filteredTables = tables;
@@ -201,12 +200,12 @@ block content
         {
             filterString=filter.toLowerCase();
 
-            console.log("Searching:"+filterString);
+            //console.log("Searching:"+filterString);
             //filteredTables = tables.filter(x=>x.tableName.toLowerCase().indexOf(filterString)>-1);
             filteredTables = tables.filter(x=>x.table.toLowerCase().indexOf(filterString)>-1);
 
         }
-        console.log("Found:"+filteredTables.length);
+        //console.log("Found:"+filteredTables.length);
         //initTableList();
 
         //fill array with seq numbers. neat. 
@@ -550,9 +549,9 @@ block content
             init: function() {
                 this.on("addedfile", function(file) { /*alert("Added file."); */});
                 this.on("sending", function(file, xhr, data) {
-                    console.log(file.fullPath)
+                    console.log("Drop path:"+file.fullPath)
 
-                    console.log(file.name)          
+                    console.log("Drop name:"+file.name)          
                     // if file is actually a folder
                     if(file.fullPath){
                         data.append("fullPath", file.fullPath);
@@ -632,7 +631,7 @@ block content
               // this callback is executed every time the menu is to be shown
               // its results are destroyed every time the menu is hidden
               // e is the original contextmenu event, containing e.pageX and e.pageY (amongst other data)
-              console.log([$trigger,e])
+              //console.log([$trigger,e])
                 let tableFile = $($trigger).attr("data-table");
 
                 //just search for the file part.
@@ -640,9 +639,9 @@ block content
               return {
                   callback: function(key, options, rootMenu, originalEvent) {
 
-                    console.log("clicked: "); 
-                    console.log([key, options, rootMenu, originalEvent]);  
-                    console.log([options.$trigger.parent().attr("data-table")])
+                    //console.log("clicked: "); 
+                    //console.log([key, options, rootMenu, originalEvent]);  
+                    //console.log([options.$trigger.parent().attr("data-table")])
 
 
                     if(key=="edit")

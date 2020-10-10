@@ -5,7 +5,7 @@ block content
   h1= Master
 
   div
-    div.master-table
+    div.master-table(style="margin-top:140px")
 
   //div(style='width:100%;height:100%')
   //  div(style:'float:left')
@@ -20,7 +20,7 @@ block content
     var table = new Tabulator(".master-table", 
         {
         height:"1000px", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
-        layout:"fitDataStretch",
+        layout:"fitColumns",
         //pagination:"local",
         //paginationSize:100,
         //paginationSizeSelector:[30, 60, 80, 100],

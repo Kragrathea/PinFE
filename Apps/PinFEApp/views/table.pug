@@ -200,29 +200,29 @@ block content
 				//maxFilesize: 2, // MB
 
 				init: function() {
-					console.log("init dropzone")
+					//console.log("init dropzone")
 					var myDropzone = this;
 					this.on("completemultiple", function(files, response) {  // was queuecomplete
-						console.log("multiple Complete!");
+						//console.log("multiple Complete!");
 					
 						// Now reload page...
 						//location.reload(true);  // true => force server reload
 						//console.log("Reloaded?");
 					});
 					this.on("complete", function(files, response) {  // was queuecomplete
-					console.log("Complete!");
+					//console.log("Complete!");
 					
 						// Now reload page...
 						//location.reload(true);  // true => force server reload
 						console.log("Reloaded?");
 					});					
 					this.on("addedfile", function() { 
-					console.log("Added File! - show the upload button");
+					//console.log("Added File! - show the upload button");
 					$('#batch-upload').show();
 					});
 					
 					$('#batch-upload').click( function(e) {
-					console.log("Clicked on upload button"); // , e.target.href
+					//console.log("Clicked on upload button"); // , e.target.href
 					
 					e.preventDefault();
 					e.stopPropagation();

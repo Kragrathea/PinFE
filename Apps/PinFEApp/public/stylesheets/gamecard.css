@@ -123,11 +123,9 @@ body {
       
   }
   
-  .middle img {
+  .middle div {
     height: 300px;
     width: 300px;
-
-    margin: 7px;
     position:fixed;
     margin-top:-90%;
   }

@@ -1,10 +1,7 @@
 ﻿extends layout
 block content
 	//- .container
-	h1= Tables
-
-	div(style='')
-	div.tables-table
+	div.tables-table(style="margin-top:130px")
 
 	script.
 
@@ -132,14 +129,14 @@ block content
 		function loadTable(){
 		var table = new Tabulator(".tables-table", 
 			{
-			height:"100%", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+			height:"1000px", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
 			layout:"fitDataStretch",
 			selectable:true,
 			selectableRangeMode:"click",
 			//pagination:"local",
 			//paginationSize:30,
 			//paginationSizeSelector:[30, 60, 80, 100],
-			groupBy:"masterName",
+			//groupBy:"table",
 			//groupValues:[ [...new Set(masterNameList)] ],
 			columns:[ //Define Table Columns
 				{title:"Id", field:"id"},

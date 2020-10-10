@@ -17,7 +17,7 @@ function findInDir(baseDir,dir, filter, fileList = []) {
         const filePath = path.join(dir, file);
         const fileStat = fs.lstatSync(baseDir + filePath);
 
-        if (fileStat.isDirectory()) {
+        if (fileStat.isDirectory() || fileStat.isSymbolicLink()) {
             findInDir(baseDir,filePath, filter, fileList);
         } else if (filter.test(filePath)) {
             fileList.push(filePath);
