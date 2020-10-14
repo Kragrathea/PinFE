@@ -1,69 +1,16 @@
 ﻿'use strict';
 const express = require('express');
 const router = express.Router();
-const Fuse = require('fuse.js');
+const utils=require('./utils.js')
+const fuzz = require('fuzzball');
 
-
-
-const fs = require('fs'),
-    path = require('path'),
-    querystring = require('querystring');
+const fs = require('fs');
+const path = require('path');
+const querystring = require('querystring');
 const url = require('url');
+const fuzzy=require('./fuzzycompare.js');
 const AdmZip = require('adm-zip');
 
-
-function fuzzyCompare(a, b) {
-    //console.log([a, b]);
-
-    //if (a.startsWith("Char") && b.startsWith("Char"))
-    //    console.log([a, b]);
-    var ca = a.toLowerCase().replace(/ /g, "").replace(/-/g, "").replace(/\(/g, "").replace(/\)/g, "");
-    var cb = b.toLowerCase().replace(/ /g, "").replace(/-/g, "").replace(/\(/g, "").replace(/\)/g, "");
-
-    //if (ca.startsWith("char") && cb.startsWith("char"))
-    //    console.log([ca, cb]);
-    //if (ca.Contains("pharaoh") && cb.Contains("pharaoh"))
-    //    Console.WriteLine("here");
-
-    if (ca == cb)
-        return true;
-    return false;
-}
-function simplifyNameOld(tableName) {
-    if (tableName.indexOf(')') > 0)
-        tableName = tableName.substring(0, tableName.indexOf('('));
-    var ca = tableName.toLowerCase().replace(/ /g, "").replace(/\-/g, "").replace(/_/g, "").replace(/\'/g, "").replace(/\"/g, "").replace(/\&/g, "").replace(/\'/g, "").replace(/\(/g, "").replace(/\)/g, "").
-        replace(/\,/g, "").replace(/\./g, "").replace(/\!/g, "").replace(/the/g, "").replace(/and/g, "").replace(/do brasil/g, "").replace(/ /g, "");
-    return ca;
-}
-function simplifyName(tableName,replaceWith=" ") {
-    if (tableName.indexOf(')') > 0)
-        tableName = tableName.substring(0, tableName.indexOf('('));
-    var ca = tableName.toLowerCase().replace(/ /g, replaceWith).replace(/\-/g, replaceWith).replace(/_/g, replaceWith).
-        replace(/\'/g, replaceWith).replace(/\"/g, replaceWith).replace(/\&/g, replaceWith).replace(/\#/g, replaceWith).replace(/\;/g, replaceWith)
-        .replace(/\'/g, replaceWith).
-        replace(/\(/g, replaceWith).replace(/\)/g, replaceWith).replace(/\,/g, replaceWith).replace(/\./g, replaceWith).
-        replace(/\!/g, replaceWith)./*replace(/the/g, replaceWith).replace(/and/g, replaceWith).*/replace(/do brasil/g, replaceWith).
-        replace(/^[0-9]+/g, replaceWith).//NOTE replace leading numbers. 
-        //replace(/[0-9]/g, replaceWith).//NOTE replace ALL numbers. 
-        // replace(/jp s/g, replaceWith).
-        // replace(/jps/g, replaceWith).
-        // replace(/jp/g, replaceWith).
-        replace(/  /g, replaceWith);//double spaces
-    return ca;
-}
-function superFuzzyCompare(a, b) {
-    var ca = simplifyName(a);
-    var cb = simplifyName(b);
-
-    if (ca.startsWith("shadow") && cb.startsWith("shadow"))
-        console.log([ca, cb]);
-    //Console.WriteLine(ca);
-
-    if (ca == cb)
-        return true;
-    return false;
-}
 var allGames=null
 function getAllGames()
 {
@@ -152,11 +99,11 @@ function getMasterTableList() {
         // app.locals.masterTableQuickSearch = function (tableName) {
 
         //     console.log("quickSearch for:" + tableName);
-        //     var results = app.locals.masterTableList.filter(a => fuzzyCompare(a.name, tableName));
+        //     var results = app.locals.masterTableList.filter(a => fuzzy.fuzzyCompare(a.name, tableName));
         //     console.log("quickSearch found:" + results.length + " for:" + simplifyName(tableName));
 
         //     if (results.length < 1)
-        //         results = app.locals.masterTableList.filter(a => superFuzzyCompare(a.name, tableName));
+        //         results = app.locals.masterTableList.filter(a => fuzzy.superFuzzyCompare(a.name, tableName));
         //     console.log("quickSearch found:" + results.length + " for:" + simplifyName(tableName));
         //     return (results);
         // }
@@ -190,27 +137,9 @@ function getSearchIndex(masterList) {
 }
 
 
-function findInDir(baseDir,dir, filter, fileList = []) {
-    const files = fs.readdirSync(baseDir + dir);
-
-    files.forEach((file) => {
-        const filePath = path.join(dir, file);
-        const fileStat = fs.lstatSync(baseDir + filePath);
-
-        if (fileStat.isDirectory()) {
-            findInDir(baseDir,filePath, filter, fileList);
-        } else if (filter.test(filePath)) {
-            fileList.push(filePath);
-        }
-    });
-
-    return fileList;
-}
-
-
 function getZipList(dir) {
 
-    var allFiles = findInDir(dir,".", /\.zip$/);
+    var allFiles = utils.findInDir(dir,".", /\.zip$/);
     var results = [];
     allFiles.forEach((file) => {
         results.push(dir+file);
@@ -227,9 +156,9 @@ function suggestMasterName(filename)
         let masterList = getMasterTableList();
         
         let qryStr=path.basename(filename).toLowerCase().replace(".vpx","").replace(".zip","");
-        let simpleResults = masterList.filter(a => fuzzyCompare(a.name, qryStr));
+        let simpleResults = masterList.filter(a => fuzzy.fuzzyCompare(a.name, qryStr));
         if (simpleResults.length < 1)
-            simpleResults = masterList.filter(a => superFuzzyCompare(a.name, qryStr));
+            simpleResults = masterList.filter(a => fuzzy.superFuzzyCompare(a.name, qryStr));
 
         if(simpleResults.length)
         {
@@ -251,18 +180,18 @@ function suggestMasterName(filename)
         //let qryStr=path.basename(file).replace(".zip","");
         // if(true)
         // {
-        //     let simpleTableResults = masterList.filter(a => fuzzyCompare(a.name, tableQryStr));
+        //     let simpleTableResults = masterList.filter(a => fuzzy.fuzzyCompare(a.name, tableQryStr));
         //     if (simpleTableResults.length < 1)
-        //         simpleTableResults = masterList.filter(a => superFuzzyCompare(a.name, tableQryStr));
+        //         simpleTableResults = masterList.filter(a => fuzzy.superFuzzyCompare(a.name, tableQryStr));
             
         //     if(simpleTableResults.length){
         //         results.push("Simple suggested name:"+simpleTableResults[0].name);
         //         console.log("Simple suggested name:"+simpleTableResults[0].name);
         //     }
             
-        //     let simpleFileResults = masterList.filter(a => fuzzyCompare(a.name, qryStr));
+        //     let simpleFileResults = masterList.filter(a => fuzzy.fuzzyCompare(a.name, qryStr));
         //     if (simpleFileResults.length < 1)
-        //         simpleFileResults = masterList.filter(a => superFuzzyCompare(a.name, qryStr));    
+        //         simpleFileResults = masterList.filter(a => fuzzy.superFuzzyCompare(a.name, qryStr));    
 
         //     if(simpleFileResults.length){
         //         results.push("Simple suggested name:"+simpleFileResults[0].name);
@@ -317,11 +246,11 @@ function processZipFiles(zipFiles)
         //console.log("zip:"+file);
         //console.log("quickSearch for:" + query.query);
         // let qryStr=path.basename(file).replace(".zip","");
-        // let fileNameResults = masterList.filter(a => fuzzyCompare(a.name, qryStr));
+        // let fileNameResults = masterList.filter(a => fuzzy.fuzzyCompare(a.name, qryStr));
         //console.log("quickSearch found:" + fileNameResults.length + " for:" + simplifyName(qryStr));
     
         // if (fileNameResults.length < 1)
-        //     fileNameResults = masterList.filter(a => superFuzzyCompare(a.name, qryStr));
+        //     fileNameResults = masterList.filter(a => fuzzy.superFuzzyCompare(a.name, qryStr));
 
         // if (fileNameResults.length >0)
         //     goodName=fileNameResults[0].name;

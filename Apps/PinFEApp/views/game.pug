@@ -4,101 +4,151 @@ head
     script(src='/js/bootstrap.bundle.min.js')
     link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
     link(rel='stylesheet', href='/stylesheets/gamecard.css')
-
+        
 block content
-    .row.h-100(style="width:100%;")
-        iframe.paine(src='' style="width:100%;height:100%;")
-        //- .h-100.w-75.ml-5(style="background:green;font-size: 20px;")
-        //-     ul.nav.nav-tabs
-        //-         li.nav-item.active
-        //-             a(data-toggle="tab" href="#home") IPDB
-        //-         li.nav-item
-        //-             a(data-toggle="tab" href="#menu1") Table
-        //-         li.nav-item
-        //-             a(data-toggle="tab" href="#menu2") Wheel
-        //-         li.nav-item
-        //-             a(data-toggle="tab" href="#menu3") Backglass   
-        //-     .tab-content
-        //-         #home.tab-pane.active
-        //-             iframe(style="width:100%;height:90%" src='https://www.ipdb.org/machine.cgi?id='+game.ipdb)
- 
-        //-         #menu1.tab-pane.fade
-        //-             iframe(style="width:100%;height:90%" src='https://www.bing.com/search?q='+game.name+" vpx")
-        //-         #menu2.tab-pane.fade
-        //-             iframe(style="width:100%;height:90%" src='https://www.bing.com/search?q='+game.name+"&qft=+filterui:photo-transparent")
-        //-         #menu3.tab-pane.fade
-        //-             iframe(style="width:100%;height:90%" src='https://www.bing.com/search?q='+game.name+" directb2s")
-                        
+    .row.h-50.mx-auto.d-flex.justify-content-center(style="width:100%;")
+        .card
+            h-10.name.searchable
+                h3=game.name
+            .row.h-50.w-100
+                .col-md-4
+                    .card.h-100
+                        .decorative(style="")
 
-        .col-md-4.ml-auto
-            .card.mx-auto(data-tilt data-tilt-max="20" data-tilt-glare data-tilt-max-glare="1.0" data-tilt-scale="1.1" style="")
-                .decorative(style="")
-                    .top
-                        .name(style="transform: translateZ(15px);")
-                            h3=game.name
-                        .border(style="transform: translateZ(15px);height:250px;")
-                            div.border-img(style="transform: translateZ(15px);background-image:url('/backglasses?imageIndex=0&fuzzySearch=1&search="+game.name+')')
-                        .middle
-                            div(style='transform: translateZ(50px);background-position: center center;background-size: contain; background-repeat:no-repeat;background-image: url(\''+"/wheels/?search="  + encodeURIComponent(game.name).replace(/[!'()*]/g, escape)+"&fuzzySearch=1&imageIndex=0" + '\');')
+                            .bottom(style="")
+                                // Edit everything in white to customize
+                                //- p.bottom-name=game.name 
+                                //- p.description=game.comment 
+                                Span Info
+                                ul
+                                    li
+                                        span Manufacturer
+                                        | : 
+                                        =game.manufacturer
+                                    li
+                                        span Year
+                                        | : 
+                                        =game.year
+                                    li
+                                        span Type
+                                        | : 
+                                        =game.type
+                                    li
+                                        span Theme
+                                        | : 
+                                        =game.theme
+                                    li
+                                        span IPDB
+                                        | :  
+                                        a(href='#' onclick='setSearch("https://www.ipdb.org/machine.cgi?id='+game.ipdb+'")')=game.ipdb                                             
+                                    li
+                                        span Video
+                                        | : 
+                                        //- a(href='#' onclick='setSearch("https://www.youtube.com/embed/?listType=search&list='+game.name+' vpx")') YouTube
+                                        a(href='https://www.youtube.com/embed/?listType=search&list='+game.name+' vpx') YouTube 
+                                    //- li
+                                    //-     span Search
+                                    //-     | : 
+                                    //-     //- a.fas.fa-search(href='#' onClick="window.open('https://www.google.com/search?igu=1&q="+game.name+" vpx','_blank');") 
+                                    //-     a(href='#' onclick='setSearch("https://www.google.com/search?igu=1&q='+game.name+' vpx")') Table
+                                    //-     a(href='#' onclick='setSearch("https://www.google.com/search?igu=1&q='+game.name+' directb2s")') , Backglass
+                                    //- li
+                                    //-     span Search Wheel
+                                    //-     | : 
+                                    //-     a(href='#' onclick='setSearch("/wheels/?search='+game.name+'")') Local
+                                        
+                                    //-     a(href='#' onclick='setSearch("https://www.bing.com/images/search?qft=+filterui:photo-transparent&q='+game.name+'")') , Web
+                                .card
+                                    .name Variants
+                                    ul
+                                        //- li
+                                        //-     span Other
+                                        //-     | : 
+                                        //-     a(href='#' onclick='setSearch("https://3dwarehouse.sketchup.com/search/?searchTab=model&q='+game.name.split("(")[0]+' pinball")') Model
+                                            
+                                        li
+                                            span Author(s)
+                                            | : 
+                                            =game.author                      
+                                        li
+                                            span Comment
+                                            | : 
+                                            =game.comment                      
+
+                        //- form.dropzone(style="height:100px;width:100%;" id="my-awesome-dropzone" method='POST' enctype="multipart/form-data" action='/table/uploadbg?table='+encodeURIComponent(""))
+                        //-     input(style="width:100%;" type="text")                
+
+                                //- p.info
+                                //-     | Some more info
+
+                .col-md-4
+                    .card.h-100
+                        .name.searchable(style="transformx: translateZ(15px);")
+                            h3 Wheels
+                        .row.w-100
+                            img.w-100(src="/wheels/?search="+encodeURIComponent(game.name)+"&fuzzySearch=1&imageIndex=0")
+                            //- img(style="min-height:200px;background-image: url('/wheels/?search="+encodeURIComponent(game.name)+"&fuzzySearch=1&imageIndex=0');")
+                .col-md-4
+                    .card.h-100
+                        .name.searchable(style="transformx: translateZ(15px);")
+                            h3 Backglasses
+                        //- .border(style="transform: translateZ(15px);height:250px;")
+                        //-     div.border-img(style="transform: translateZ(15px);background-image:url('/backglasses?imageIndex=0&fuzzySearch=1&search="+game.name+')')
+                        .row.w-100
+                            .col
+                                img.w-100(style="" src="/backglasses/?search="+encodeURIComponent(game.name)+"&fuzzySearch=1&imageIndex=0")
+                            //- div(style="min-height:200px;background-image: url('/backglasses/?search="+encodeURIComponent(game.name)+"&fuzzySearch=1&imageIndex=0');")
+                            //- div(style='transformx: translateZ(50px);background-image: url(\''+"/backglasses?imageIndex=0&fuzzySearch=1&search="  + game.name+'\');')
                             //- img(src="/wheels/?search="+encodeURIComponent(game.name).replace(/[!'()*]/g, escape)+"&fuzzySearch=1&imageIndex=0" 
                             //-         style="transform: translateZ(50px);" alt=game.name)
-                    .bottom(style="transform: translateZ(15px);")
-                        // Edit everything in white to customize
-                        p.bottom-name=game.name 
-                        p.description=game.comment 
-                        ul
-                            li
-                                span Manufacturer
-                                | : 
-                                =game.manufacturer
-                            li
-                                span Year
-                                | : 
-                                =game.year
-                            //- li
-                            //-     span Type
-                            //-     | : 
-                            //-     =game.type
-                            //- li
-                            //-     span Theme
-                            //-     | : 
-                            //-     =game.theme
-                            //- li
-                            //-     span Author(s)
-                            //-     | : 
-                            //-     =game.author                      
-                            li
-                                span IPDB
-                                | :  
-                                a(href='#' onclick='setSearch("https://www.ipdb.org/machine.cgi?id='+game.ipdb+'")')=game.ipdb                                             
-                            li
-                                span Search
-                                | : 
-                                //- a.fas.fa-search(href='#' onClick="window.open('https://www.google.com/search?q="+game.name+" vpx','_blank');") 
-                                a(href='#' onclick='setSearch("https://www.bing.com/search?q='+game.name+' vpx")') Table
-                                a(href='#' onclick='setSearch("https://www.bing.com/search?q='+game.name+' directb2s")') , Backglass
-                            li
-                                span Search Wheel
-                                | : 
-                                a(href='#' onclick='setSearch("/wheels/?search='+game.name+'")') Local
-                                
-                                a(href='#' onclick='setSearch("https://www.bing.com/images/search?qft=+filterui:photo-transparent&q='+game.name+'")') , Web
-                            li
-                                span Other
-                                | : 
-                                a(href='#' onclick='setSearch("https://3dwarehouse.sketchup.com/search/?searchTab=model&q='+game.name.split("(")[0]+' pinball")') Model
-                                
-                            li
-                                span Video
-                                | : 
-                                //- a(href='#' onclick='setSearch("https://www.youtube.com/embed/?listType=search&list='+game.name+' vpx")') YouTube
-                                a(href='https://www.youtube.com/embed/?listType=search&list='+game.name+' vpx') YouTube 
-                form.dropzone(style="height:100px;width:100%;" id="my-awesome-dropzone" method='POST' enctype="multipart/form-data" action='/table/uploadbg?table='+encodeURIComponent(""))
-                    input(style="width:100%;" type="text")                
 
-                        //- p.info
-                        //-     | Some more info
-                            
+    .row.h-50.mx-auto.d-flex.justify-content-center(style="width:100%;")
+        .card
+            h-10.name.searchable()
+                h3 Tables
+
+            .row.h-100(style="width:100%;filter: drop-shadow(22px 22px 22px rgba(0,0,0,1.0));transform:perspective(1000px);transform-style: preserve-3d;")
+                .col-md-2.mx-auto.d-flex.justify-content-center(style='background:transparent;border:solid 1px red;')
+                    div(style="margin-top:10px;margin-bottom:10px;width:100%;background:transparent;transform:perspective(1000px);transform-style: preserve-3d;")
+                        div(style="margin-top:0px;height:40%;width:100%;background:transparent;")
+                            div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('/backglasses/?fuzzySearch=1&imageIndex=0&search="+encodeURIComponent(game.name)+"');")
+                        div(style="z-index:10;margin-top:-5%;height:10%;width:100%;background:transparent;transform:scale(1.5);")
+                            div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('/wheels/?fuzzySearch=1&imageIndex=0&search="+encodeURIComponent(game.name)+"');")
+                        div(style="margin-left:auto;margin-right:auto;margin-top:-5%;height:50%;width:60%;background:transparent;transform:scale(1.5) rotateX(45deg)")
+                            div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('tables/?image=MyLib%5CInbox%5CNew%5CClose%20Encounters%20of%20the%20Third%20Kind%20(VPX%2010.7%20version).vpx.fs-small.jpg');")
+                .col-md-2.mx-auto.d-flex.justify-content-center(style='background:transparent;border:solid 1px red;')
+                    div(style="margin-top:10px;margin-bottom:10px;width:100%;background:transparent;transform:perspective(1000px);transform-style: preserve-3d;")
+                        div(style="margin-top:0px;height:40%;width:100%;background:transparent;")
+                            div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('/backglasses/?fuzzySearch=1&imageIndex=0&search="+encodeURIComponent(game.name)+"');")
+                        div(style="z-index:10;margin-top:-5%;height:10%;width:100%;background:transparent;transform:scale(1.5);")
+                            div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('/wheels/?fuzzySearch=1&imageIndex=0&search="+encodeURIComponent(game.name)+"');")
+                        div(style="margin-left:auto;margin-right:auto;margin-top:-5%;height:50%;width:60%;background:transparent;transform:scale(1.5) rotateX(45deg)")
+                            div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('tables/?image=MyLib%5CInbox%5CNew%5CClose%20Encounters%20of%20the%20Third%20Kind%20(VPX%2010.7%20version).vpx.fs-small.jpg');")
+                .col-md-2.mx-auto.d-flex.justify-content-center(style='background:transparent;border:solid 1px red;')
+                    div(style="margin-top:10px;margin-bottom:10px;width:100%;background:transparent;transform:perspective(1000px);transform-style: preserve-3d;")
+                        div(style="margin-top:0px;height:40%;width:100%;background:transparent;")
+                            div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('/backglasses/?fuzzySearch=1&imageIndex=0&search="+encodeURIComponent(game.name)+"');")
+                        div(style="z-index:10;margin-top:-5%;height:10%;width:100%;background:transparent;transform:scale(1.5);")
+                            div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('/wheels/?fuzzySearch=1&imageIndex=0&search="+encodeURIComponent(game.name)+"');")
+                        div(style="margin-left:auto;margin-right:auto;margin-top:-5%;height:50%;width:60%;background:transparent;transform:scale(1.5) rotateX(45deg)")
+                            div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('tables/?image=MyLib%5CInbox%5CNew%5CClose%20Encounters%20of%20the%20Third%20Kind%20(VPX%2010.7%20version).vpx.fs-small.jpg');")
+                    //- .row.h-25()
+                    //-     .col
+                    //-         img.w-100(style="" src="/backglasses/?search="+encodeURIComponent(game.name)+"&fuzzySearch=1&imageIndex=0")
+                    //- .row.h-25()
+                    //-     .col
+                    //-         img.w-100(style="" src="/wheels/?search="+encodeURIComponent(game.name)+"&fuzzySearch=1&imageIndex=0")
+                    //- .row.h-25()
+                    //-     .col
+                    //-         img.w-100(style="" src="tables/?image=MyLib%5CInbox%5CNew%5CAl's%20Garage%20Band%20Goes%20On%20A%20World%20Tour%20(AlvinG%201992)%201.1.vpx.fs-small.jpg")
+                    //-     //div(style="min-height:200px;width:100%;background-position: center center;background-size: cover;background-repeat:no-repeat;transform: translateZ(15px);background-image:url('/backglasses?imageIndex=0&fuzzySearch=1&search="+game.name+')')
+                    //-     //img(style="width:100%;min-height:300px;min-width:200px;background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;" src="tables/?image=MyLib%5CInbox%5CNew%5CAl's%20Garage%20Band%20Goes%20On%20A%20World%20Tour%20(AlvinG%201992)%201.1.vpx.directb2s")
+                    //- .row.h-50.w-100
+                    //-     div(style='height:300px;width:100%;position:fixed;margin-top:-50%;background-position: center center;background-size: contain;background-repeat:no-repeat;transform: translateZ(50px);background-image: url(\''+"/wheels/?search="  + encodeURIComponent(game.name).replace(/[!'()*]/g, escape)+"&fuzzySearch=1&imageIndex=0" + '\');')
+                    //-     //img(src="tables/?image=MyLib%5CInbox%5CNew%5CAl's%20Garage%20Band%20Goes%20On%20A%20World%20Tour%20(AlvinG%201992)%201.1.vpx.wheel.png")
+                    //- .row.h-25.w-100
+                    //-     img(style="width:100%;margin-top:-45px;width:70%;min-height:400px;transform:rotateX(45deg);background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;" src="tables/?image=MyLib%5CInbox%5CNew%5CAl's%20Garage%20Band%20Goes%20On%20A%20World%20Tour%20(AlvinG%201992)%201.1.vpx.fs-small.jpg")
+                    //- <h2 name="Al's Garage Band Goes On A World Tour (AlvinG 1992) 1.1.vpx"></h2>                            
 
     script(src='/scripts/vanilla-tilt/dist/vanilla-tilt.js')
 

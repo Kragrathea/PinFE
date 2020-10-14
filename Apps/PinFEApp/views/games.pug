@@ -1,0 +1,89 @@
+extends layout
+
+block content
+    div
+        div.games-table(style="margin-top:140px;")
+
+    script.
+
+        var table = new Tabulator(".games-table", 
+        {
+            height:"700px", 
+            layout:"fitColumns",
+            //pagination:"local",
+            //paginationSize:100,
+            //paginationSizeSelector:[30, 60, 80, 100],
+            columns:[ //Define Table Columns
+                //{title:"Id", field:"id"},
+                {title:"Name", field:"name"},
+                {title:"Manufacturer", field:"manufacturer"},
+                {title:"Year", field:"year"},
+                {title:"Theme", field:"theme"},
+                {title:"Ipdb", field:"ipdb"},
+                //{title:"Comment", field:"comment", align:"left",width:"100"},
+                {title:"Type", field:"type"},
+                //{title:"vpver", field:"vpver"},
+                //{title:"ROM", field:"rom"},
+                //{title:"Date", field:"date", sorter:"date", align:"center"},
+                //{title:"Version", field:"version"},
+                //{title:"Author", field:"author"},
+            ],
+            rowFormatter:function(row){
+                //create and style holder elements
+                var holderEl = document.createElement("div");
+                var tableEl = document.createElement("div");
+                var tableEl2 = document.createElement("div");
+
+                holderEl.style.boxSizing = "border-box";
+                holderEl.style.padding = "10px 30px 10px 10px";
+                holderEl.style.borderTop = "1px solid #333";
+                holderEl.style.borderBotom = "1px solid #333";
+                holderEl.style.background = "#ddd";
+
+                tableEl.style.border = "1px solid #333";
+                tableEl2.style.border = "1px solid #333";
+
+                //- let iframe=$("<iframe src = 'http://localhost:3000/game' style='width:100%;height:400px;'>") 
+                //- $(holderEl).append(iframe);
+                //- $(row.getElement()).append(holderEl);
+                //- return;
+                tableEl2 = document.createElement("div");
+
+                holderEl.appendChild(tableEl);
+                holderEl.appendChild(tableEl2);
+
+                row.getElement().appendChild(holderEl);
+
+                var subData = row.getData().tables;
+                //console.log(subData)
+                if(subData.length){
+                    var subTable = new Tabulator(tableEl2, {
+                        layout:"fitColumns",
+                        data:subData,
+                        columns:[
+                        {title:"Tables", field:"table"},
+                        //- {title:"Date", field:"date", sorter:"date"},
+                        //- {title:"Comment", field:"comment"},
+                        //- {title:"Author(s)", field:"author"},
+                        ]
+                    })
+                }
+
+                var subData = row.getData().variant;
+                //console.log(subData)
+                if(subData.length){
+                    var subTable = new Tabulator(tableEl, {
+                        layout:"fitColumns",
+                        data:subData,
+                        columns:[
+                        {title:"Name", field:"name"},
+                        {title:"Date", field:"date", sorter:"date"},
+                        {title:"Comment", field:"comment"},
+                        {title:"Author(s)", field:"author"},
+                        ]
+                    })
+                }
+            }            
+        });
+
+        table.setData('/games/?json=1&includeTables=true');

@@ -1,14 +1,14 @@
 ﻿'use strict';
-var express = require('express');
-var router = express.Router();
-var Fuse = require('fuse.js');
+const express = require('express');
+const router = express.Router();
+const utils=require('./utils.js')
+const fuzz = require('fuzzball');
 
-var fs = require('fs'),
-    path = require('path'),
-    querystring = require('querystring');
-var url = require('url');
-var https = require('https');
-var http = require('http');
+const fs = require('fs');
+const path = require('path');
+const querystring = require('querystring');
+const url = require('url');
+const fuzzy=require('./fuzzycompare.js');
 
 var download = function(url, dest, cb) {
     var file = fs.createWriteStream(dest);
@@ -61,89 +61,203 @@ router.post('/downloadPng', function (req, res) {
 });
 
 
-/* GET users listing. */
-router.get('/', function (req, res) {
+router.get('/:id/wheel', function (req, res) {
+    let query = url.parse(req.url, true).query;
+    let pic = query.image;
+    //figure out backglass image name
+
+    let file = decodeURIComponent(req.params.id);
+    let tablesDir = req.app.locals.FETableDirs+"/";
+    let wheelPath=tablesDir + file + ".wheel.png"
+    if(fs.existsSync(wheelPath))
+    {
+        fs.readFile(wheelPath, function (err, content) {
+            if (err) {
+                utils.sendMissingIcon(req,res);
+            } else {
+                //specify the content type in the response will be an image
+                res.writeHead(200, { 'Content-type': 'image/png' });
+                res.end(content);
+            }
+        });
+        return;
+    }else{
+        utils.sendMissingIcon(req,res);
+        return;
+    }
+});
+router.get('/:id/fullscreen', function (req, res) {
+    let query = url.parse(req.url, true).query;
+
+    let file = decodeURIComponent(req.params.id);
+    let tablesDir = req.app.locals.FETableDirs+"/";
+    let path=tablesDir + file + ".fs-small.jpg"
+    if(fs.existsSync(path))
+    {
+        fs.readFile(path, function (err, content) {
+            if (err) {
+                utils.sendMissingIcon(req,res);
+            } else {
+                //specify the content type in the response will be an image
+                res.writeHead(200, { 'Content-type': 'image/jpg' });
+                res.end(content);
+            }
+        });
+        return;
+    }else{
+        utils.sendMissingIcon(req,res);
+        return;
+    }
+});
+router.get('/:id/desktop', function (req, res) {
+    let query = url.parse(req.url, true).query;
+
+    let file = decodeURIComponent(req.params.id);
+    let tablesDir = req.app.locals.FETableDirs+"/";
+    let path=tablesDir + file + ".dt-small.jpg"
+    if(fs.existsSync(path))
+    {
+        fs.readFile(path, function (err, content) {
+            if (err) {
+                utils.sendMissingIcon(req,res);
+            } else {
+                //specify the content type in the response will be an image
+                res.writeHead(200, { 'Content-type': 'image/jpg' });
+                res.end(content);
+            }
+        });
+        return;
+    }else{
+        utils.sendMissingIcon(req,res);
+        return;
+    }
+});
+router.get('/:id/backglass', function (req, res) {
+    let query = url.parse(req.url, true).query;
+
+    let file = decodeURIComponent(req.params.id);
+    let tablesDir = req.app.locals.FETableDirs+"/";
+    let tableFile=tablesDir + file;
+    let path=tableFile + ".bg.jpg"
+    if(fs.existsSync(path))
+    {
+        fs.readFile(path, function (err, content) {
+            if (err) {
+                utils.sendMissingIcon(req,res);
+            } else {
+                //specify the content type in the response will be an image
+                res.writeHead(200, { 'Content-type': 'image/jpg' });
+                res.end(content);
+            }
+        });
+        return;
+    }else{
+        var backglass =  tableFile.replace(".vpx", "") + ".directb2s"
+        if(!fs.existsSync(backglass))
+            backglass = tableFile + ".directb2s"
+        if(!fs.existsSync(backglass)){
+            utils.sendMissingBackglass(req,res);
+            return;
+        }
+        else {
+            fs.readFile(backglass, "utf8", function (err, data) {
+                var line = data.split("<BackglassImage Value=\"")[1];
+                if(line){
+                    line = line.split("\n")[0];
+                    var imgData = line.replace(/&#xD;&#xA;/g, "");
+                    var img = Buffer.from(imgData, 'base64');
+
+                    res.writeHead(200, {
+                        'Content-Type': 'image/png',
+                        'Content-Length': img.length
+                    });
+                    res.end(img);
+                }else{
+                    utils.sendMissingBackglass(req,res);
+                    return;
+                }
+            });
+            return;
+        }
+    }
+});
+
+router.get('/:id', function (req, res) {
+    var query = url.parse(req.url, true).query;
+
+    var file = req.params.id;
+
+    //var json = query.json;
+
+    let tablesDir = req.app.locals.FETableDirs+"/";
+    let tableFile=tablesDir + file;
+
+    if(!fs.existsSync(tableFile))
+    {
+        //if no table error
+        //err
+    }
+
+    //load table db info.
+    let dbase = utils.loadOrCreateTableDB(req,tableFile);
+
+    var backglass =  tableFile.replace(".vpx", "") + ".directb2s"
+    if(!fs.existsSync(backglass))
+        backglass = tableFile + ".directb2s"
+    if(!fs.existsSync(backglass))
+        backglass = null
+    
+    var tableInfo = {
+        name: path.basename(tableFile),
+        file: file,
+        gameName: dbase.gameName,
+        dbase: dbase,
+        backglass: backglass,
+    };
+
+    console.log(tableInfo);
+    res.json( tableInfo );
+    //res.render('table', { title: 'PinFE', tableInfo: tableInfo });
+});
+
+
+router.get('/:id/edit', function (req, res) {
     var query = url.parse(req.url, true).query;
     var qry = query.search;
-    var name = query.name;
 
-    var file = name;//todo fix this.
+    var file = req.params.id;
 
     var json = query.json;
 
     let tablesDir = req.app.locals.FETableDirs+"/";
-    var exists = fs.existsSync(tablesDir + name);
+    let tableFile=tablesDir + file;
 
 
-    var dbase = {
-        masterName: ""
+    if(!fs.existsSync(tableFile))
+    {
+        //if no table error
+        //err
     }
 
-    let suggestedMaster = "";
-    let master ="quick search";// res.app.locals.masterTableQuickSearch(path.basename(path.dirname(file)));
-    if (master && master.length > 0) {
-        suggestedMaster = master[0].name;
+    //load table db info.
+    let dbase = utils.loadOrCreateTableDB(req,tableFile);
 
-        //var dbName = tablesDir + file + ".dbase";
-        //dbase.masterName = suggestedMaster;
-        //fs.writeFileSync(dbName, JSON.stringify(dbase));
-    }
-
-    //load database file if any.
-    if (fs.existsSync(tablesDir + file + ".dbase")) {
-        //console.log(file)
-        let data = fs.readFileSync(tablesDir + file + ".dbase");
-        if (data)
-            dbase = JSON.parse(data);
-    } else {
-        // let master = res.app.locals.masterTableQuickSearch(path.basename(path.dirname(file)));
-        // if (master && master.length > 0) {
-        //     suggestedMaster = master[0].name;
-
-        //     //var dbName = tablesDir + file + ".dbase";
-        //     //dbase.masterName = suggestedMaster;
-        //     //fs.writeFileSync(dbName, JSON.stringify(dbase));
-        // } else {
-        //     //let master = res.app.locals.masterTableIndex.search(path.basename(path.dirname(file)));
-        //     //if (master && master.length > 0) {
-        //     //    suggestedMaster = master[0].name;
-        //     //}
-        // }
-    }
-
-    var bgFile=""
-    if(fs.existsSync(tablesDir + file.replace(".vpx", "") + ".directb2s"))
-        bgFile=encodeURIComponent(tablesDir + file.replace(".vpx", "") + ".directb2s");
-    else if (fs.existsSync(tablesDir + file + ".directb2s"))
-        bgFile=encodeURIComponent(file + ".directb2s");
-
-    var backglass =  file.replace(".vpx", "") + ".directb2s"
-    if(!fs.existsSync(tablesDir +backglass))
-        backglass = file + ".directb2s"
-    if(!fs.existsSync(tablesDir +backglass))
+    var backglass =  tableFile.replace(".vpx", "") + ".directb2s"
+    if(!fs.existsSync(backglass))
+        backglass = tableFile + ".directb2s"
+    if(!fs.existsSync(backglass))
         backglass = null
     
     var tableInfo = {
-        name: path.basename(file),
-        //tableFolder: path.basename(path.dirname(file)),
-        file: encodeURIComponent(file),
-        //master: '/master/quickSearch?query=' + encodeURIComponent(path.basename(path.dirname(file))) + "&json=1",
-        masterName: dbase.masterName,
-        suggestedMaster: suggestedMaster,
+        name: path.basename(tableFile),
+        file: file,
+        gameName: dbase.gameName,
         dbase: dbase,
-        backglass: encodeURIComponent(backglass),
-        fsPic: fs.existsSync(tablesDir + file + ".fs.jpg")?encodeURIComponent(file + ".fs.jpg"):"",
-        bgPic: fs.existsSync(tablesDir + file + ".bg.jpg")?encodeURIComponent(file + ".bg.jpg"):"",
-        dtPic: fs.existsSync(tablesDir + file + ".dt.jpg")?encodeURIComponent(file + ".dt.jpg"):"",
-        fsSmallPic: fs.existsSync(tablesDir + file + ".fs-small.jpg")?encodeURIComponent(file + ".fs-small.jpg"):"",
-        bgSmallPic: fs.existsSync(tablesDir + file + ".bg-small.jpg")?encodeURIComponent(file + ".bg-small.jpg"):"",
-        dtSmallPic: fs.existsSync(tablesDir + file + ".dt-small.jpg")?encodeURIComponent(file + ".dt-small.jpg"):"",
-        wheelPic: fs.existsSync(tablesDir + file + ".wheel.png")?(encodeURIComponent(file + ".wheel.png")):"",
-        wheelSmallPic: fs.existsSync(tablesDir + file + ".wheel-small.png")?encodeURIComponent(file + ".wheel-small.png"):""
+        backglass: backglass,
     };
 
-    console.log(tableInfo);
-    //res.json([name,exists]);
+    //console.log(tableInfo);
+    //res.json( tableInfo );
 
     res.render('table', { title: 'PinFE', tableInfo: tableInfo });
 });
@@ -202,3 +316,4 @@ router.post('/uploadbg', upload_files.single('file'), (req, res, next) => {
 
 
 module.exports = router;
+

@@ -1,39 +1,19 @@
 ﻿'use strict';
-var express = require('express');
-var router = express.Router();
-var child_process = require('child_process');
-var exec = require('child_process').exec;
+const express = require('express');
+const router = express.Router();
+const utils=require('./utils.js')
+const fuzz = require('fuzzball');
 
-var fs = require('fs'),
-    path = require('path'),
-    querystring = require('querystring');
-var url = require('url');
-//var imageDir = '/Games/VPTables/_index/FS/Gif/';
+const fs = require('fs');
+const path = require('path');
+const querystring = require('querystring');
+const url = require('url');
+const fuzzy=require('./fuzzycompare.js');
+const child_process = require('child_process');
+const exec = require('child_process').exec;
 
 
 var masterDir = "./public/Master";
-
-
-//tableDir = masterDir;
-
-function findInDir(dir, filter, fileList = []) {
-    const files = fs.readdirSync(dir);
-
-    files.forEach((file) => {
-        const filePath = path.join(dir, file);
-        const fileStat = fs.lstatSync(filePath);
-
-        if (fileStat.isDirectory() || fileStat.isSymbolicLink()) {
-            findInDir(filePath, filter, fileList);
-        } else if (filter.test(filePath)) {
-            fileList.push(filePath);
-        }
-    });
-
-    return fileList;
-}
-
-
 
 //get the list of jpg files in the image dir
 function getImages(imageDir, callback) {
@@ -51,33 +31,29 @@ function getImages(imageDir, callback) {
 function getTableInfo(dir, callback) {
 
     // Usage
-    var tableFiles = findInDir(dir, /\.vpx$/);
+    var tableFiles = utils.findInDir(dir,".", /\.vpx$/);
     var results = [];
     tableFiles.forEach((file) => {
 
         var bgFile=null
-        if(fs.existsSync(file.replace(".vpx", "") + ".directb2s"))
+        if(fs.existsSync(dir+file.replace(".vpx", "") + ".directb2s"))
             bgFile=(file.replace(".vpx", "") + ".directb2s");
-        else if (fs.existsSync(file + ".directb2s"))
+        else if (fs.existsSync(dir+file + ".directb2s"))
             bgFile=(file + ".directb2s");
 
-        if(bgFile)
-            bgFile=path.relative( dir, bgFile )
-    
-        let relFile = path.relative( dir, file )
         results.push({
-            tableName: path.basename(relFile),
-            tableFolder: path.basename(path.dirname(relFile)),
-            table: relFile,
+            tableName: path.basename(file),
+            tableFolder: path.basename(path.dirname(file)),
+            table: file,
             backglass:bgFile,
-            fsPic: fs.existsSync(file + ".fs.jpg"),
-            bgPic: fs.existsSync(file + ".bg.jpg"),
-            dtPic: fs.existsSync(file + ".dt.jpg"),
-            fsSmallPic: fs.existsSync(file + ".fs-small.jpg"),
-            bgSmallPic: fs.existsSync(file + ".bg-small.jpg"),
-            dtSmallPic: fs.existsSync(file + ".dt-small.jpg"),
-            wheelPic: fs.existsSync(file + ".wheel.png"),
-            wheelSmallPic: fs.existsSync(file + ".wheel-small.png")
+            fsPic: fs.existsSync(dir+file + ".fs.jpg"),
+            bgPic: fs.existsSync(dir+file + ".bg.jpg"),
+            dtPic: fs.existsSync(dir+file + ".dt.jpg"),
+            fsSmallPic: fs.existsSync(dir+file + ".fs-small.jpg"),
+            bgSmallPic: fs.existsSync(dir+file + ".bg-small.jpg"),
+            dtSmallPic: fs.existsSync(dir+file + ".dt-small.jpg"),
+            wheelPic: fs.existsSync(dir+file + ".wheel.png"),
+            wheelSmallPic: fs.existsSync(dir+file + ".wheel-small.png")
         });
     });
 

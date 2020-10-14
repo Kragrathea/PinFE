@@ -389,7 +389,8 @@ $(function(){
 					} else {
 
 						//HACK REMOVE. Treat blank type as GAME so link with game prefix. 
-						var file = $('<li class="files"><a data-fancybox data-type="iframe" data-src='+ f.path+' title="'+ f.path +'" href="javascript:;" class="files">'+icon+'<span class="name">'+ name +'</span> <span class="details">'+fileSize+'</span></a></li>');
+						//var file = $('<li class="files"><a data-fancyboxx data-type="iframe" data-src='+ f.path+' title="'+ f.path +'" href="javascript:;" class="files">'+icon+'<span class="name">'+ name +'</span> <span class="details">'+fileSize+'</span></a></li>');
+						var file = $('<li class="files"><a onclick=showCard("'+ f.path+'") title="'+ f.path +'" href="javascript:;" class="files">'+icon+'<span class="name">'+ name +'</span> <span class="details">'+fileSize+'</span></a></li>');
 						//end HACK 
 
 						//var file = $('<li class="files"><a href="'+ f.path+'" title="'+ f.path +'" target="_blank" class="files">'+icon+'<span class="name">'+ name +'</span> <span class="details">'+fileSize+'</span></a></li>');

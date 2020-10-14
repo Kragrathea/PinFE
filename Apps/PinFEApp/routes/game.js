@@ -1,14 +1,15 @@
 ﻿'use strict';
-var express = require('express');
-var router = express.Router();
-var Fuse = require('fuse.js');
+const express = require('express');
+const router = express.Router();
+const utils=require('./utils.js')
+const fuzz = require('fuzzball');
 
-var fs = require('fs'),
-    path = require('path'),
-    querystring = require('querystring');
-var url = require('url');
-var https = require('https');
-var http = require('http');
+const fs = require('fs');
+const path = require('path');
+const querystring = require('querystring');
+const url = require('url');
+const fuzzy=require('./fuzzycompare.js');
+
 var allGames=null;
 
 
@@ -61,21 +62,19 @@ function getMasterTableList() {
 router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
     var qry = query.search;
-    var name = query.name;
+    var name = decodeURIComponent(query.name);
 
-    var games = getMasterTableList();
+    var games = req.app.locals.globalGameList;
 
+    let results=games.filter(a=>a.name==name);
     var game=null 
-    if(games[name])
-        game= games[name][0];
+    if(results.length)
+        game= results[0];
 
     if(!game)
-        game=Object.values(games)[Math.floor(Object.values(games).length*Math.random())][0];
+        game=games[Math.floor(games.length*Math.random())];
 
     var json = query.json;
-
-    //console.log(game);
-    //res.json([name,exists]);
 
     res.render('game', { title: 'PinFE', game: game });
 });

@@ -5,7 +5,7 @@ block content
   h1= Tables
 
   button(onClick="updateTable()" style="z-index:12") click me
-  div(style='position:absolute;left:10px;right:10px;bottom:10px;top:50px')
+  div(style='margin-top:80px;position:absolute;left:10px;right:10px;bottom:10px;top:50px')
     div.tables-table
    
   script.
@@ -23,7 +23,7 @@ block content
         })
     }
 
-    $.getJSON( "/master/?json=1&justNames=1", function( data ) {
+    $.getJSON( "/games/names", function( data ) {
 
         masterNameList=data;
             
@@ -42,7 +42,7 @@ block content
         columns:[ //Define Table Columns
             {title:"Id", field:"id"},
             {title:"File Name", field:"tableName", headerFilter:true},
-            {title:"Master", field:"masterName",editor:"autocomplete", editorParams:{
+            {title:"Game Name", field:"gameName",editor:"autocomplete", editorParams:{
                     showListOnEmpty:true, //show all values when the list is empty,
                     freetext:false, //allow the user to set the value of the cell to a free text entry
                     allowEmpty:true, //allow empty string values
@@ -57,13 +57,13 @@ block content
                         });
                 },
             },
-            {title:"Suggested Master", field:"suggestedMaster",cellClick:function(e, cell){
-                console.log("Click: " + cell.getRow().getData()["table"] );
-                updateTable(cell.getRow().getData()["table"],{
-                    masterName:cell.getRow().getData()["suggestedMaster"]
-                    });
-                }
-            },
+            //- {title:"Suggested Master", field:"suggestedMaster",cellClick:function(e, cell){
+            //-     console.log("Click: " + cell.getRow().getData()["table"] );
+            //-     updateTable(cell.getRow().getData()["table"],{
+            //-         masterName:cell.getRow().getData()["suggestedMaster"]
+            //-         });
+            //-     }
+            //- },
             //{title:"Backglass", field:"backglass", align:"center", formatter:"tickCross", headerVertical:true},
             //{title:"FS Pic", field:"fsPic", align:"center", formatter:"tickCross",  headerVertical:true},
             //{title:"BG Pic", field:"fsPic", align:"center", formatter:"tickCross", headerVertical:true},

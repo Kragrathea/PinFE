@@ -1,40 +1,23 @@
 ﻿'use strict';
-var express = require('express');
-var router = express.Router();
-var Fuse = require('fuse.js');
+const express = require('express');
+const router = express.Router();
+const utils=require('./utils.js')
+const fuzz = require('fuzzball');
 
-var fs = require('fs'),
-    path = require('path'),
-    querystring = require('querystring');
-var url = require('url');
+const fs = require('fs');
+const path = require('path');
+const querystring = require('querystring');
+const url = require('url');
+const fuzzy=require('./fuzzycompare.js');
 
 var xml2js = require('xml2js');
 
-
-
-
-function findInDir(baseDir,dir, filter, fileList = []) {
-    const files = fs.readdirSync(baseDir + dir);
-
-    files.forEach((file) => {
-        const filePath = path.join(dir, file);
-        const fileStat = fs.lstatSync(baseDir + filePath);
-
-        if (fileStat.isDirectory() || fileStat.isSymbolicLink()) {
-            findInDir(baseDir,filePath, filter, fileList);
-        } else if (filter.test(filePath)) {
-            fileList.push(filePath);
-        }
-    });
-
-    return fileList;
-}
 
 function getBGList(bgDir) {
 
     var results = [];
     if(fs.existsSync(bgDir)){
-        var files = findInDir(bgDir,".", /\.directb2s/);
+        var files = utils.findInDir(bgDir,".", /\.directb2s/);
         files.forEach((file) => {
             results.push({
                 name: path.basename(file),
@@ -64,22 +47,8 @@ function getSearchIndex(bgList) {
     let bgListIndex = new Fuse(bgList, options);
     return(bgListIndex);
 }
-function sendMissing(req,res)
-{
-    let bgDir = req.app.locals.FELibDirs+"/Backglasses/"; // ./public/data";
-    fs.readFile(bgDir + "/Missing_Backglass.png", function (err, content) {
-        if (err) {
-            res.writeHead(400, { 'Content-type': 'text/html' });
-            console.log(err);
-            res.end("No such image");
-        } else {
-            //specify the content type in the response will be an image
-            res.writeHead(200, { 'Content-type': 'image/jpg' });
-            res.end(content);
-        }
-    });   
-}
-var fuzzy=require('./fuzzycompare.js');
+
+
 router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
     var qry = query.search;
@@ -101,7 +70,7 @@ router.get('/', function (req, res) {
                 });
                 res.end(img);
             }else{
-                sendMissing(req,res);
+                utils.sendMissingBackglass(req,res);
             }
         });
     } else {
@@ -117,7 +86,7 @@ router.get('/', function (req, res) {
         if (query.imageIndex !== undefined) {
             if(results.length<1 || query.imageIndex>results.length)
             {
-                sendMissing(req,res); 
+                utils.sendMissingBackglass(req,res); 
                 return;          
             }
             image = results[query.imageIndex].file;
@@ -137,7 +106,7 @@ router.get('/', function (req, res) {
                     res.end(img);
                 }else{
                     // error not backglass
-                    sendMissing(req,res);
+                    utils.sendMissingBackglass(req,res);
                 }
             });
             return;//all done

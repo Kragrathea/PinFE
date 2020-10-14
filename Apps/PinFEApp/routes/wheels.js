@@ -1,39 +1,21 @@
 ﻿'use strict';
-var express = require('express');
-var router = express.Router();
-var Fuse = require('fuse.js');
+const express = require('express');
+const router = express.Router();
+const utils=require('./utils.js')
+const fuzz = require('fuzzball');
 
-var fs = require('fs'),
-    path = require('path'),
-    querystring = require('querystring');
-var url = require('url');
-
-
-
-
-function findInDir(baseDir,dir, filter, fileList = []) {
-    const files = fs.readdirSync(baseDir + dir);
-
-    files.forEach((file) => {
-        const filePath = path.join(dir, file);
-        const fileStat = fs.lstatSync(baseDir + filePath);
-
-        if (fileStat.isDirectory() || fileStat.isSymbolicLink()) {
-            findInDir(baseDir,filePath, filter, fileList);
-        } else if (filter.test(filePath)) {
-            fileList.push(filePath);
-        }
-    });
-
-    return fileList;
-}
+const fs = require('fs');
+const path = require('path');
+const querystring = require('querystring');
+const url = require('url');
+const fuzzy=require('./fuzzycompare.js');
 
 
 function getWheelList(wheelsDir) {
 
     var results = [];
     if(fs.existsSync(wheelsDir)){
-        var wheelFiles = findInDir(wheelsDir,".", /\.png$/);
+        var wheelFiles = utils.findInDir(wheelsDir,".", /\.png$/);
         wheelFiles.forEach((file) => {
             results.push({
                 name: path.basename(file),
@@ -67,22 +49,7 @@ function getSearchIndex(wheelList) {
     let wheelListIndex = new Fuse(wheelList, options);
     return(wheelListIndex);
 }
-function sendMissingIcon(req,res)
-{
-    let wheelsDir = req.app.locals.FELibDirs+"/Wheels/";
-    fs.readFile(wheelsDir + "/Missing_Icon.png", function (err, content) {
-        if (err) {
-            res.writeHead(400, { 'Content-type': 'text/html' });
-            console.log(err);
-            res.end("No such image");
-        } else {
-            //specify the content type in the response will be an image
-            res.writeHead(200, { 'Content-type': 'image/jpg' });
-            res.end(content);
-        }
-    });   
-}
-var fuzzy=require('./fuzzycompare.js');
+
 
 router.get('/', function (req, res) {
     var query = url.parse(req.url, true).query;
@@ -100,7 +67,7 @@ router.get('/', function (req, res) {
     if (image !== undefined && fs.existsSync(wheelsDir)) {
         fs.readFile(wheelsDir + image, function (err, content) {
             if (err) {
-                sendMissingIcon(req,res);
+                utils.sendMissingIcon(req,res);
             } else {
                 //specify the content type in the response will be an image
                 res.writeHead(200, { 'Content-type': 'image/jpg' });
@@ -127,8 +94,22 @@ router.get('/', function (req, res) {
             if(query.fuzzySearch){
                 results=results.filter(a => fuzzy.superFuzzyCompare(a.name, qry) );
             }else{
-                let wheelListIndex=getSearchIndex(results);
-                results = wheelListIndex.search(qry);
+                let options = {
+                    //scorer: fuzz.token_sort_ratio,
+                    scorer: fuzz.partial_ratio, //seems to work best when strings start the same.
+                    processor: choice => choice.name,
+                    limit: 20, // Max number of top results to return, default: no limit / 0.
+                    //cutoff: 50, // Lowest score to return, default: 0
+                    returnObjects: true
+                };
+                //let fuzzResults = fuzz.extract(bestName.split(")")[0], gameNames, options);
+                let fuzzResults = fuzz.extract(qry, results, options);
+                let firstResults = fuzzResults.map(a=>a.choice);
+                //console.log("Fuzz result:"+[qry,firstResults])
+                results=firstResults;
+
+                // let wheelListIndex=getSearchIndex(results);
+                // results = wheelListIndex.search(qry);
             }
 
         }
@@ -136,7 +117,7 @@ router.get('/', function (req, res) {
         if (imageIndex !== undefined) {
             if(results.length<1 || imageIndex>results.length)
             {
-                sendMissingIcon(req,res); 
+                utils.sendMissingIcon(req,res); 
                 return;          
             }
             image = results[imageIndex].file;
@@ -144,7 +125,7 @@ router.get('/', function (req, res) {
         if (image !== undefined || imageIndex !== undefined){
             fs.readFile(wheelsDir + image, function (err, content) {
                 if (err) {
-                    sendMissingIcon(req,res);
+                    utils.sendMissingIcon(req,res);
                 } else {
                     //specify the content type in the response will be an image
                     res.writeHead(200, { 'Content-type': 'image/jpg' });

@@ -23,9 +23,71 @@ var process = require('process');
 var myArgs = process.argv.slice(2);
 //console.log('myArgs: ', myArgs);
 
-//todo. make configurable
+//todo(finish). make configurable
 app.locals.FELibDirs = defaultConfig.libDirs;//'/Games/PinFE';
 app.locals.FETableDirs = defaultConfig.tableDirs;//'/Games/PinFE';
+
+function preloadGames()
+{
+    let masterDir = "./public/data";
+
+    let games={};
+    let data = fs.readFileSync(masterDir + '/PinballX Database Sheet.tsv');
+    data =data+fs.readFileSync(masterDir + '/ExtraDatabaseSheet.tsv');
+    if(data) {
+        let lines = data.toString().replace("\r","").split("\n");
+
+        //table headers are on line 0
+        let headers = lines[0].split("\t");
+
+        //Table Name (Manufacturer Year)	Manufacturer	Year	Theme	Player(s)	IPDB Number	Description(s)	Type	VP Version	Table URL	Table Author(s)	Table Version	Table Date
+        //override headers to shorter javascript friendly.
+        headers = ["name", "manufacturer", "year","theme","players","ipdb", "comment", "type", "vpver","url", "author", "version", "date"];//, "rom"]; //,"check","notes"];
+
+        for (let i = 1; i < lines.length; i++) { //NOTE 1. Bypassheaders.
+            let obj = {id:i-1}; //NOTE -1
+
+            let currentline = lines[i].split("\t");
+            for (let j = 0; j < headers.length; j++) {
+                obj[headers[j]] = currentline[j];
+            }
+            if(obj.vpver!=="VPX")//only load vpx tables..
+                continue;
+            if(!games[obj.name])
+            {
+                let newGame={
+                    //id:obj.id, //Do we need an id or is name the field.
+                    name:obj.name,
+                    manufacturer:obj.manufacturer,
+                    year:obj.year,
+                    type:obj.type,
+                    ipdb:obj.ipdb,
+                    theme:obj.theme,
+                    variant:[],
+                    tables:[],
+                    //words:fuzzy.getFirstNWords(obj.name).join(" ")                    
+                }
+                games[obj.name]=newGame
+            }
+            let newVariant={
+                id:obj.id,
+                name:obj.name,
+                comment:obj.comment,
+                author:obj.author,
+                version:obj.version,
+                date:obj.date,
+                //tables:[]                    
+            }
+            games[obj.name].variant.push(newVariant);
+
+        }
+    }
+    
+    app.locals.globalGameList = Object.values(games).flat();
+    app.locals.globalGameNameList = app.locals.globalGameList.map(a=>a.name);
+    console.log("preloadGames() Length:" + app.locals.globalGameList.length);
+}
+preloadGames();
 
 //for debugging.
 //app.locals.FEDataDir = 'C:\\Games\\PinFE\\Apps\\PinFE';
@@ -45,6 +107,7 @@ var backglasses = require('./routes/backglasses');
 var tables = require('./routes/tables');
 var table = require('./routes/table');
 var grid = require('./routes/grid');
+var games = require('./routes/games');
 var game = require('./routes/game');
 
 var install = require('./routes/install');
@@ -72,6 +135,7 @@ app.use('/tables', tables);
 app.use('/table', table);
 app.use('/grid', grid);
 app.use('/game', game);
+app.use('/games', games);
 
 app.use('/install', install);
 

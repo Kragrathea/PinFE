@@ -47,7 +47,7 @@ block content
         
     // Modal
   #tableEditModal.modal.fade(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true")
-    .modal-dialog(role="document" style='max-width:50%')
+    .modal-dialog(role="document" style='max-width:80%')
       .modal-content
     //div.swiper-pagination
     
@@ -231,20 +231,21 @@ block content
         //item.attr("style",'');
         var img=$("<img/>");
         img.attr("style",'width:100%;min-height:200px;min-width:200px;background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;')
+        img.attr("src","table/"+encodeURIComponent(e.table).replace(/[!'()*]/g, escape)+"/backglass");
 
-        if(e.bgSmallPic){
-            img.attr("src","tables/?image="+ encodeURIComponent(e.table)+".bg-small.jpg");
-        }else{
-            //console.log("here:"+e.backglass)
-            if(e.backglass && e.backglass!=="")//fallback to actual backglass if any.
-            {
-                img.attr("src","tables/?image="+ encodeURIComponent(e.backglass));
-            }
-            else{
-                //img='<form><div class="dropzone" id="my-awesome-dropzone" method="POST" enctype="multipart/form-data" action="/install/upload?table=">Drop Here</div></form>'
-                //img.addClass("dropzone");
-            }
-        }
+        //- if(e.bgSmallPic){
+        //-     img.attr("src","tables/?image="+ encodeURIComponent(e.table)+".bg-small.jpg");
+        //- }else{
+        //-     //console.log("here:"+e.backglass)
+        //-     if(e.backglass && e.backglass!=="")//fallback to actual backglass if any.
+        //-     {
+        //-         img.attr("src","tables/?image="+ encodeURIComponent(e.backglass));
+        //-     }
+        //-     else{
+        //-         //img='<form><div class="dropzone" id="my-awesome-dropzone" method="POST" enctype="multipart/form-data" action="/install/upload?table=">Drop Here</div></form>'
+        //-         //img.addClass("dropzone");
+        //-     }
+        //- }
         item.append(img);
 
         var showDesktop=false;
@@ -255,7 +256,7 @@ block content
             img=$("<img/>");
             img.attr("style",'margin-top:25px;width:100%;min-height:180px;background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;')
             if(e.dtSmallPic && showDesktop){
-                img.attr("src","tables/?image="+encodeURIComponent(e.table)+".dt-small.jpg");
+                img.attr("src","table/"+encodeURIComponent(e.table).replace(/[!'()*]/g, escape)+"/desktop");
             }
             item.append(img);
         }
@@ -263,7 +264,7 @@ block content
             img=$("<img/>");
             img.attr("style",'margin-top:-45px;width:70%;min-height:400px;transform:rotateX(45deg);background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;')
             if(e.fsSmallPic && !showDesktop){
-                img.attr("src","tables/?image="+encodeURIComponent(e.table)+".fs-small.jpg");
+                img.attr("src","table/"+encodeURIComponent(e.table).replace(/[!'()*]/g, escape)+"/fullscreen");
             }
             item.append(img);
         }      
@@ -280,7 +281,7 @@ block content
             }else
             {
               var img=$("<img class='align-bottom'/>");
-              img.attr("src","tables/?image="+encodeURIComponent(e.table)+".wheel.png");
+              img.attr("src","table/"+encodeURIComponent(e.table).replace(/[!'()*]/g, escape)+"/wheel");
 
               img.attr("style",'')
               //max-height:120px;max-width:90%;
@@ -646,7 +647,7 @@ block content
 
                     if(key=="edit")
                     {
-                        $('#tableEditModal .modal-content').load("/table?name="+tableFile, function() {
+                        $('#tableEditModal .modal-content').load("/table/"+ tableFile+"/edit", function() {
                             
                             //$('#tableEditModal.modal-title').text("Edit "+decodeURIComponent(tableFile))
                             $('#tableEditModal').modal();

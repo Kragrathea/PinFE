@@ -26,8 +26,8 @@ block content
         span No files here.
     
       #cardModal.modal.fade(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true")
-        .modal-dialog(role="document" style='max-width:50%')
-          .modal-content
+        .modal-dialog(role="document" style='max-width:80%;height:90%;')
+          .modal-content(style='width:100%;height:100%;')
 
     div.background(id="slideshow")
         img(src='https://w.wallha.com/ws/10/npWx9agY.jpg')
@@ -41,12 +41,13 @@ block content
 
     script.
 
-        function showCard(gameName)
+        function showCard(url)
         {
-            $('#tableEditModal .modal-content').load("/game?name="+gameName, function() {
+            //alert("here"+url)
+            $('#cardModal .modal-content').load(url, function() {
 
-            //$('#tableEditModal.modal-title').text("Edit "+decodeURIComponent(tableFile))
-            $('#tableEditModal').modal();
+                //$('#tableEditModal.modal-title').text("Edit "+decodeURIComponent(tableFile))
+                $('#cardModal').modal();
             });
         }
         $(function(){

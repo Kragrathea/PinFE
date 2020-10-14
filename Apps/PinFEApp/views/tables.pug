@@ -5,29 +5,30 @@ block content
 
 	script.
 
-		function updateTable()
+		function updateTable(table,data)
 		{
 			$.ajax({
 				type: "POST",
 				url: "/tables/update",
 				dataType: "json",
-				data:JSON.stringify({name: "Dennis", address: {city: "Dub", country: "IE"}})
+				contentType: "application/json; charset=utf-8",
+				data:JSON.stringify({table: table, data: data})
 			}).done(function ( data ) {
 					console.log("ajax callback response:"+JSON.stringify(data));
 			})
 		}
-		var masterNameList=["a","b","c"];
-		function loadMasterNames()
+		var gameNameList=["a","b","c"];
+		function loadGameNames()
 		{
-			$.getJSON( "/master/?json=1&justNames=1", function( data ) {
+			$.getJSON( "/games/names", function( data ) {
 
-				masterNameList=data;
+				gameNameList=data;
 				
-				console.log(masterNameList)
+				console.log(gameNameList)
 				loadTable();
 			});
 		}
-		loadMasterNames();
+		loadGameNames();
 
 		function setupContext(table)
 		{
@@ -66,24 +67,24 @@ block content
 					return {
 						callback: function(key, options, rootMenu, originalEvent) {
 
-							console.log("clicked: "); 
-							console.log([key, options, rootMenu, originalEvent]);  
-							console.log([options.$trigger[0]])
+							//- console.log("clicked: "); 
+							//- console.log([key, options, rootMenu, originalEvent]);  
+							//- console.log([options.$trigger[0]])
 
-							console.log([table.getRow(options.$trigger[0])])
+							//- console.log([table.getRow(options.$trigger[0])])
 							
 							//var m = "clicked: " + e;
 							//console.log($trigger[0].parentNode); 
 
 							//let row = table.getRow(table.getRow(options.$trigger[0]));
 
-							console.log([row]); 
+							//console.log([row]); 
 
 							var tableFile= row.getData()["table"]
 							var tableName= row.getData()["tableName"]
-							var masterName= row.getData()["masterName"]
+							var gameName= row.getData()["gameName"]
 
-							console.log([tableFile,masterName]);
+							//console.log([tableFile,gameName]);
 							if(key=="edit")
 							{
 								document.location="/table?name="+tableFile
@@ -141,87 +142,44 @@ block content
 			columns:[ //Define Table Columns
 				{title:"Id", field:"id"},
 				{title:"Table Name", field:"tableName"/*, headerFilter:true*/},
-				//{title:"suggestedMaster", field:"suggestedMaster"/*, headerFilter:true*/},
-				//{title:"Master", field:"masterName",formatter:"select", headerFilter:true,editor:"select", editorParams:function(cell){
-				//        return {values:masterNameList};
-				//    }
-				//},
-				{title:"Master", field:"masterName",editor:"autocomplete", editorParams:{
+				{title:"Game Name", field:"gameName",editor:"autocomplete", editorParams:{
 						showListOnEmpty:true, //show all values when the list is empty,
 						freetext:false, //allow the user to set the value of the cell to a free text entry
-						allowEmpty:true, //allow empty string values
-						//searchFunc:function(term, values){ //search for exact matches
-						//    var matches = []
-						//
-						//    values.forEach(function(item){
-						//        if(item.value === term){
-						//            matches.push(item);
-						//        }
-						//    });
-						//
-						//    return matches;
-						//},
-						values:masterNameList,
-						//function(cell){
-						//
-						//    let map ={}
-						//    masterNameList.forEach(function(o){
-						//        map[o]=o;
-						//    });
-						//    //let list = masterNameList.map(x=>{x:x});
-						//    console.log(map);
-						//    return map;
-						//},
-						//function(cell){
-						//    return {values:masterNameList};
-						//    },
-						//sortValuesList:"asc", //if creating a list of values from values:true then choose how it should be sorted
-						//defaultValue:"Steve Johnson", //set the value that should be selected by default if the cells value is undefined
-						//elementAttributes:{
-						//    maxlength:"10", //set the maximum character length of the input element to 10 characters
-						//},
-						//verticalNavigation:"hybrid", //navigate to new row when at the top or bottom of the selection list
-					}
+						allowEmpty:true, 
+						values:gameNameList,
+
+					},
+					cellEdited:function(cell){
+						//console.log("Edit: " + cell.getRow().getData()["table"] );
+						//console.log("Edit: " + cell.getRow().getData()["gameName"] );
+						updateTable(cell.getRow().getData()["table"],{
+							gameName:cell.getRow().getData()["gameName"]
+							});
+					},
 				},
 				{title:"ROM", field:"wheelPic", align:"center", formatter:"tickCross", headerVertical:true},
 				{title:"Wheel", field:"wheelPic", align:"center", formatter:"tickCross", headerVertical:true,cellClick:function(e, cell){
 					console.log("Click: " + cell.getRow().getData()["table"] );
-					window.open('/wheels?search='+cell.getRow().getData()["masterName"] ,'_blank');
-					//window.open('https://www.google.com/search?q='+cell.getRow().getData()["masterName"] +' directb2s','_blank');
 					}
 				},
 				{title:"Backglass", field:"backglass", align:"center", formatter:"tickCross", headerVertical:true,cellClick:function(e, cell){
 					console.log("Click: " + cell.getRow().getData()["table"] );
-					window.open('/backglasses?search='+cell.getRow().getData()["masterName"] ,'_blank');
-					window.open('https://www.google.com/search?q='+cell.getRow().getData()["masterName"] +' directb2s','_blank');
 					}
 				},
 				{title:"FS Pic", field:"fsPic", align:"center", formatter:"tickCross",  headerVertical:true, cellClick:function(e, cell){
-					var playUrl = '/capture?view=fs'
-					$.ajax({
-						url: playUrl, 
-						type: 'POST', 
-						contentType: 'application/json', 
-						data: JSON.stringify({table:cell.getRow().getData()["table"]})
-					});
+					//var playUrl = '/capture?view=fs'
+					//$.ajax({
+					//	url: playUrl, 
+					//	type: 'POST', 
+					//	contentType: 'application/json', 
+					//	data: JSON.stringify({table:cell.getRow().getData()["table"]})
+					//});
 					}
 				},
 				{title:"BG Pic", field:"bgPic", align:"center", formatter:"tickCross", headerVertical:true},
 				{title:"DT Pic", field:"dtPic", align:"center", formatter:"tickCross", headerVertical:true, cellClick:function(e, cell){
-
-				return;
-					var playUrl = '/capture?view=dt'
-					$.ajax({
-						url: playUrl, 
-						type: 'POST', 
-						contentType: 'application/json', 
-						data: JSON.stringify({table:cell.getRow().getData()["table"]})
-					});
 					}
 				},
-
-
-				//{title:"Icon", field:"wheelSmallPic", align:"center", formatter:"tickCross", headerVertical:true},
 
 				//{title:"Folder Name", field:"tableFolder"},
 				{title:"Location", field:"table"/*, headerFilter:true*/},

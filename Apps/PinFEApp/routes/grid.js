@@ -1,31 +1,15 @@
 'use strict';
-var express = require('express');
-var router = express.Router();
-var Fuse = require('fuse.js');
+const express = require('express');
+const router = express.Router();
+const utils=require('./utils.js')
+const fuzz = require('fuzzball');
 
-var fuzzy=require('./fuzzycompare.js');
+const fs = require('fs');
+const path = require('path');
+const querystring = require('querystring');
+const url = require('url');
+const fuzzy=require('./fuzzycompare.js');
 
-var fs = require('fs'),
-    path = require('path'),
-    querystring = require('querystring');
-var url = require('url');
-
-function findInDir(baseDir,dir, filter, fileList = []) {
-    const files = fs.readdirSync(baseDir + dir);
-
-    files.forEach((file) => {
-        const filePath = path.join(dir, file);
-        const fileStat = fs.lstatSync(baseDir + filePath);
-
-        if (fileStat.isDirectory() || fileStat.isSymbolicLink()) {
-            findInDir(baseDir,filePath, filter, fileList);
-        } else if (filter.test(filePath)) {
-            fileList.push(filePath);
-        }
-    });
-
-    return fileList;
-}
 function scan(baseDir,dir, filter ) {
     const files = fs.readdirSync(baseDir + dir);
 
@@ -72,7 +56,7 @@ function getAllWheels(wheelsDir) {
 
     var results = [];
     if(fs.existsSync(wheelsDir)){
-        var wheelFiles = findInDir(wheelsDir,".", /\.png$/);
+        var wheelFiles = utils.findInDir(wheelsDir,".", /\.png$/);
         wheelFiles.forEach((file) => {
             results.push({
                 name: path.basename(file),

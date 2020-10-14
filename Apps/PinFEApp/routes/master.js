@@ -1,49 +1,16 @@
 ﻿'use strict';
-var express = require('express');
-var router = express.Router();
-var Fuse = require('fuse.js');
+const express = require('express');
+const router = express.Router();
+const utils=require('./utils.js')
+const fuzz = require('fuzzball');
 
-var fs = require('fs'),
-    path = require('path'),
-    querystring = require('querystring');
-var url = require('url');
+const fs = require('fs');
+const path = require('path');
+const querystring = require('querystring');
+const url = require('url');
+const fuzzy=require('./fuzzycompare.js');
 
-function fuzzyCompare(a, b) {
-    //console.log([a, b]);
 
-    //if (a.startsWith("Char") && b.startsWith("Char"))
-    //    console.log([a, b]);
-    var ca = a.toLowerCase().replace(/ /g, "").replace(/-/g, "").replace(/\(/g, "").replace(/\)/g, "");
-    var cb = b.toLowerCase().replace(/ /g, "").replace(/-/g, "").replace(/\(/g, "").replace(/\)/g, "");
-
-    //if (ca.startsWith("char") && cb.startsWith("char"))
-    //    console.log([ca, cb]);
-    //if (ca.Contains("pharaoh") && cb.Contains("pharaoh"))
-    //    Console.WriteLine("here");
-
-    if (ca == cb)
-        return true;
-    return false;
-}
-function simplifyName(tableName) {
-    if (tableName.indexOf(')') > 0)
-        tableName = tableName.substring(0, tableName.indexOf('('));
-    var ca = tableName.toLowerCase().replace(/ /g, "").replace(/\-/g, "").replace(/_/g, "").replace(/\'/g, "").replace(/\"/g, "").replace(/\&/g, "").replace(/\'/g, "").replace(/\(/g, "").replace(/\)/g, "").
-        replace(/\,/g, "").replace(/\./g, "").replace(/\!/g, "").replace(/the/g, "").replace(/and/g, "").replace(/do brasil/g, "").replace(/ /g, "");
-    return ca;
-}
-function superFuzzyCompare(a, b) {
-    var ca = simplifyName(a);
-    var cb = simplifyName(b);
-
-    if (ca.startsWith("char") && cb.startsWith("char"))
-        console.log([ca, cb]);
-    //Console.WriteLine(ca);
-
-    if (ca == cb)
-        return true;
-    return false;
-}
 
 function getMasterTableList() {
 
@@ -134,11 +101,11 @@ router.get('/quickSearch', function (req, res) {
     //let searchIndex = getSearchIndex(masterList)
 
     console.log("quickSearch for:" + query.query);
-    results = masterList.filter(a => fuzzyCompare(a.name, query.query));
+    results = masterList.filter(a => fuzzy.fuzzyCompare(a.name, query.query));
     console.log("quickSearch found:" + results.length + " for:" + simplifyName(query.query));
 
     if (results.length < 1)
-        results = masterList.filter(a => superFuzzyCompare(a.name, query.query));
+        results = masterList.filter(a => fuzzy.superFuzzyCompare(a.name, query.query));
     console.log("quickSearch found:" + results.length + " for:" + simplifyName(query.query));
  
     res.json(results);
