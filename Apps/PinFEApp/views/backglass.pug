@@ -1,66 +1,133 @@
-﻿extends layout
-
+﻿
 
 block content
   h1= Backglass
-   
 
-  div(style='width:100%;height:100%')
-    div(style:'float:left')
-        h2.status(style='color:green;position:absolute;top:15px;right:15px;z-index:11')
-        h2.tableName(style='display:inline-block;height:25px;margin:0px')
-    img.backglass(src=image style="position:absolute;left:0px;top:0px;width:100%;height:100%")
-    div.dmd(style="position:absolute;left:0px;top:0px;width:1024px;height:200px;z-index:12")
-        iframe(src='http://localhost:9090' style="width:100%;height:100%" )
-        div.cover(style="position:absolute;left:0px;top:0px;width:100%;height:100%")
+  textarea(cols=60 rows=6)
+  button Send
+  div(id="output")
+
+  //- div(style='width:100%;height:50%')
+  //-   div(style:'float:left')
+  //-   each item in items
+  //-     div(style='width:20%;height:400px;float:left;display:inline-block;filter: drop-shadow(22px 22px 22px rgba(0,0,0,1.0));')
+  //-       img(src="/backglasses/?image="+encodeURIComponent(item.file), alt=item.name style="display:block;width:100%;height:auto;")
+  //-   //img.backglass(src=image style="position:absolute;left:0px;top:0px;width:100%;height:100%")
     //div.swiper-pagination
   script.
+    window.searchBoxfilterFunction =function ()
+    {
+      let filter = $("#menu-search-box").val();
+      
+      window.history.pushState({id: 'homepage'},'Home | My App','?search='+filter);
+
+    }
+
+    /*var tables = !{JSON.stringify(tables)}*/
+     function onClickButton() {
+        var text = textarea.value;
+      
+        doSend("Test Me!!"+text);
+
+        textarea.value = "";
+        textarea.focus();
+        console.log("Sent")
+    }   
+    var button = document.querySelector("button"),
+        output = document.querySelector("#output"),
+        textarea = document.querySelector("textarea"),
+        //wsUri = "ws://echo.websocket.org/",
+        wsUri = "ws://localhost:80/",
+        websocket = new WebSocket(wsUri);
+
+    button.addEventListener("click", onClickButton);
+
+    websocket.onopen = function (e) {
+      //alert(1)
+        writeToScreen("CONNECTED");
+        doSend("WebSocket rocks");
+    };
+
+    websocket.onclose = function (e) {
+        writeToScreen("DISCONNECTED");
+    };
+
+    websocket.onmessage = function (e) {
+        writeToScreen("<span>RESPONSE: " + e.data + "</span>");
+    };
+
+    websocket.onerror = function (e) {
+        writeToScreen("<span class=error>ERROR:</span> " + e.data);
+    };
+
+    function doSend(message) {
+        writeToScreen("SENT: " + message);
+        websocket.send(message);
+    }
+
+    function writeToScreen(message) {
+        output.insertAdjacentHTML("afterbegin", "<p>" + message + "</p>");
+    }
+
+
+   
+
+  //- div(style='width:100%;height:100%')
+  //-   div(style:'float:left')
+  //-       h2.status(style='color:green;position:absolute;top:15px;right:15px;z-index:11')
+  //-       h2.tableName(style='display:inline-block;height:25px;margin:0px')
+  //-   img.backglass(src=image style="position:absolute;left:0px;top:0px;width:100%;height:100%")
+  //-   div.dmd(style="position:absolute;left:0px;top:0px;width:1024px;height:200px;z-index:12")
+  //-       iframe(src='http://localhost:9090' style="width:100%;height:100%" )
+  //-       div.cover(style="position:absolute;left:0px;top:0px;width:100%;height:100%")
+  //-   //div.swiper-pagination
+  //- script.
 
     /*var tables = !{JSON.stringify(tables)}*/
     
 
-    $(".dmd").draggable({
-        iframeFix: true
-        }).resizable();
+    //- $(".dmd").draggable({
+    //-     iframeFix: true
+    //-     }).resizable();
 
-      if (!!window.EventSource) {
-        var source = new EventSource('/status')
+    //-   if (!!window.EventSource) {
+    //-     var source = new EventSource('/status')
 
-        source.addEventListener('message', function(e) {
-            var status= JSON.parse(e.data);
-            if($(".status").val()!=status.state)
-                {
-                $(".status").text(status.state);
-                if(status.state.startsWith("Playing"))
-                    $(".dmd").show();
-                else
-                    $(".dmd").hide();
-                }
-            if($(".backglass").attr("src")!="tables?image="+encodeURIComponent(status.table)+".bg.jpg")
-                $(".backglass").attr("src","tables?image="+encodeURIComponent(status.table)+".bg.jpg");
-            //console.log("message:"+status.data);
-        }, false)
+    //-     source.addEventListener('message', function(e) {
+    //-         var status= JSON.parse(e.data);
+    //-         if($(".status").val()!=status.state)
+    //-             {
+    //-             $(".status").text(status.state);
+    //-             if(status.state.startsWith("Playing"))
+    //-                 $(".dmd").show();
+    //-             else
+    //-                 $(".dmd").hide();
+    //-             }
+    //-         if($(".backglass").attr("src")!="tables?image="+encodeURIComponent(status.table)+".bg.jpg")
+    //-             $(".backglass").attr("src","tables?image="+encodeURIComponent(status.table)+".bg.jpg");
+    //-         //console.log("message:"+status.data);
+    //-     }, false)
 
-        source.addEventListener('open', function(e) {
-            //console.log("Connected:"+e.data);
-            $(".status").text("Connected");
-        }, false)
+    //-     source.addEventListener('open', function(e) {
+    //-         //console.log("Connected:"+e.data);
+    //-         $(".status").text("Connected");
+    //-     }, false)
 
-        source.addEventListener('error', function(e) {
-          const id_state = document.getElementById('state')
-          if (e.eventPhase == EventSource.CLOSED)
-            source.close()
-          if (e.target.readyState == EventSource.CLOSED) {
-            //console.log("Disconnected:");
-            $(".status").text("Connected");
-            //id_state.innerHTML = "Disconnected"
-          }
-          else if (e.target.readyState == EventSource.CONNECTING) {
-            //console.log("Connecting...:");
-            $(".status").text("Connecting...");
-            //id_state.innerHTML = "Connecting..."
-          }
-        }, false)
-      } else {
-        console.log("Your browser doesn't support SSE")
-      }
+    //-     source.addEventListener('error', function(e) {
+    //-       const id_state = document.getElementById('state')
+    //-       if (e.eventPhase == EventSource.CLOSED)
+    //-         source.close()
+    //-       if (e.target.readyState == EventSource.CLOSED) {
+    //-         //console.log("Disconnected:");
+    //-         $(".status").text("Connected");
+    //-         //id_state.innerHTML = "Disconnected"
+    //-       }
+    //-       else if (e.target.readyState == EventSource.CONNECTING) {
+    //-         //console.log("Connecting...:");
+    //-         $(".status").text("Connecting...");
+    //-         //id_state.innerHTML = "Connecting..."
+    //-       }
+    //-     }, false)
+    //-   } else {
+    //-     console.log("Your browser doesn't support SSE")
+    //-   }

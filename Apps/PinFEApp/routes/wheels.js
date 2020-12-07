@@ -80,15 +80,8 @@ router.get('/', function (req, res) {
 
 
     if(true){
-        var results=[];
-            //cache wheel list for future use
-        if( req.app.locals.globalWheelList)
-            results=req.app.locals.globalWheelList
-        else
-            {
-                results = getWheelList(wheelsDir);
-                req.app.locals.globalWheelList=results;
-            }
+
+        let results=req.app.locals.globalWheelList
     
         if (qry !== undefined) {
             if(query.fuzzySearch){

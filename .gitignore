@@ -14,6 +14,7 @@
 Library/Wheels/MyLib
 [Ll]ibrary/[Bb]ackglasses/MyLib
 [Tt]ables/MyLib
+[Tt]ables/Inbox
 
 
 # User-specific files (MonoDevelop/Xamarin Studio)
@@ -268,3 +269,7 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+Apps/VisualPinball/AutoSave0.vpx
+Apps/VisualPinball/VPTemp0.ttf
+
+

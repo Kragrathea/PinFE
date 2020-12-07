@@ -57,6 +57,7 @@ function getTableInfo(dir, callback) {
         });
     });
 
+    //results=results.sort( (a,b)=>a.tableName>b.tableName?1:-1)
     callback("", results);
 
 }

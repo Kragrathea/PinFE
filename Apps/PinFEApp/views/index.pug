@@ -1,9 +1,6 @@
 ﻿extends layout
 
-
 block content
-
-
 
   div.row(style='text-align:center;position:fixed;left:0px;top:80px;width:100%;z-index:1')
     h5.filter(style='height:25px;width:100%;color:#dbde10;')
@@ -11,29 +8,10 @@ block content
 
   div.row.align-middle.swiper-container(id='table-list' style='')
     ul.swiper-wrapper.list  
-    //- div.message(id='message')
-    //- div.todo.final(id='final_span')
-    //- span.todo.interm(id='interm_span')
-
-    //- <i class="fas fa-spinner fa-spin fa-5x " style='position:absolute;top:50%;left:50%;z-index:11;color:white;display:none'></i>
-
-
-
-
-    //-webkit-box-reflect: below -100px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, transparent), to(rgba(255,255,255,0.2)));')
-    //- h5.status(style='color:green;position:absolute;top:15px;right:15px;z-index:11')
-
-    //- div(style:'z-index:10;float:left')
-    //-   //input.search(type="text")
-    //-   //ul.pagination
-
 
   div.row(style='text-align:center;position:fixed;bottom:0px;width:100%;')
     h5.masterName(style='height:25px;')
     h5.tableName(style='height:55px;width:100%;background:black;color:#dbde10;')
-
-
-            
 
     div.background(id="slideshow")
         img(src='https://w.wallha.com/ws/10/npWx9agY.jpg')
@@ -77,8 +55,6 @@ block content
         recognizing = true;
         //console.log("start");
         $(".pulse-ring").show();
-        //message.innerHTML = 'Speak now.';
-        //talk_button.innerHTML = 'Listen';
     };
 
     recognition.onresult = function (event) {
@@ -271,14 +247,14 @@ block content
          if(true ){
             var div =$("<div class='wheel align-bottom' style='margin-top:-60px;padding-bottom:60px;transform:rotateX(0deg)'></div>");
             
-            if(!e.wheelPic)
-            {
-                //img.attr("src","images/"+"3D Search.png");
-                let ntext =$("<h2></h2>");
-                //ntext.attr("name",e.tableName);
-                ntext.append(e.tableName);
-                div.append(ntext);
-            }else
+            //- if(!e.wheelPic)
+            //- {
+            //-     //img.attr("src","images/"+"3D Search.png");
+            //-     let ntext =$("<h2></h2>");
+            //-     //ntext.attr("name",e.tableName);
+            //-     ntext.append(e.tableName);
+            //-     div.append(ntext);
+            //- }else
             {
               var img=$("<img class='align-bottom'/>");
               img.attr("src","table/"+encodeURIComponent(e.table).replace(/[!'()*]/g, escape)+"/wheel");

@@ -10,6 +10,10 @@ const querystring = require('querystring');
 const url = require('url');
 const fuzzy=require('./fuzzycompare.js');
 
+const http = require('http');
+const https = require('https');
+
+
 var download = function(url, dest, cb) {
     var file = fs.createWriteStream(dest);
     var protocol=http;
@@ -82,6 +86,24 @@ router.get('/:id/wheel', function (req, res) {
         });
         return;
     }else{
+        let results=req.app.locals.globalWheelList
+        let bestName = fuzzy.tableGetBestName(file);
+        results=results.filter(a => fuzzy.superFuzzyCompare(a.name, bestName) );
+        if(results.length)
+        {
+            let wheelsDir = req.app.locals.FELibDirs+"/Wheels/";
+            fs.readFile(wheelsDir+results[0].file, function (err, content) {
+                if (err) {
+                    utils.sendMissingIcon(req,res);
+                } else {
+                    //specify the content type in the response will be an image
+                    res.writeHead(200, { 'Content-type': 'image/png' });
+                    res.end(content);
+                }
+            });
+            return;
+        }
+
         utils.sendMissingIcon(req,res);
         return;
     }
@@ -156,6 +178,38 @@ router.get('/:id/backglass', function (req, res) {
         if(!fs.existsSync(backglass))
             backglass = tableFile + ".directb2s"
         if(!fs.existsSync(backglass)){
+            
+            let results=req.app.locals.globalBGList
+            let bestName = fuzzy.tableGetBestName(file);
+            //console.log(bestName);
+            results=results.filter(a => fuzzy.superFuzzyCompare(a.name, bestName) );
+            if(results.length)
+            {
+                let bgDir = req.app.locals.FELibDirs+"/Backglasses/";
+                fs.readFile(bgDir+results[0].file,"utf8", function (err, content) {
+                    if (err) {
+                        utils.sendMissingBackglass(req,res);
+                    } else {
+                        var line = content.split("<BackglassImage Value=\"")[1];
+                        if(line){
+                            line = line.split("\n")[0];
+                            var imgData = line.replace(/&#xD;&#xA;/g, "");
+                            var img = Buffer.from(imgData, 'base64');
+            
+                            res.writeHead(200, {
+                                'Content-Type': 'image/png',
+                                'Content-Length': img.length
+                            });
+                            res.end(img);
+                        //specify the content type in the response will be an image
+                        }else{
+                            utils.sendMissingBackglass(req,res);
+                        }
+
+                    }
+                });
+                return;
+            }
             utils.sendMissingBackglass(req,res);
             return;
         }
@@ -250,7 +304,7 @@ router.get('/:id/edit', function (req, res) {
     
     var tableInfo = {
         name: path.basename(tableFile),
-        file: file,
+        file:encodeURIComponent(file).replace(/[!'()*]/g, escape),
         gameName: dbase.gameName,
         dbase: dbase,
         backglass: backglass,
@@ -271,10 +325,10 @@ router.post('/update', function (req, res) {
 
 var upload_files = require('multer')();
 
-router.post('/uploadbg', upload_files.single('file'), (req, res, next) => {
+router.post('/:id/upload', upload_files.single('file'), (req, res, next) => {
 
     var query = url.parse(req.url, true).query;
-    var tableFile = decodeURIComponent(query.table);
+    var tableFile = decodeURIComponent( req.params.id);
 
     let tablesDir = req.app.locals.FETableDirs+"/";
 

@@ -6,6 +6,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+const utils=require('./routes/utils.js')
 
 //var jQuery = require('jquery');
 //var flipster = require('jquery.flipster');
@@ -89,6 +90,40 @@ function preloadGames()
 }
 preloadGames();
 
+function preloadWheelsAndBG() {
+
+    let wheelsDir=app.locals.FELibDirs+"/Wheels/"
+
+    let results = [];
+    if(fs.existsSync(wheelsDir)){
+        var wheelFiles = utils.findInDir(wheelsDir,".", /\.png$/);
+        wheelFiles.forEach((file) => {
+            results.push({
+                name: path.basename(file),
+                file: file
+            });
+        });
+    }
+    //wheelList = results;
+    app.locals.globalWheelList=results;
+    console.log("Loaded wheelList. Length:" + results.length);
+
+    let bgDir = app.locals.FELibDirs+"/Backglasses/";
+    results = [];
+    if(fs.existsSync(bgDir)){
+        var files = utils.findInDir(bgDir,".", /\.directb2s/);
+        files.forEach((file) => {
+            results.push({
+                name: path.basename(file),
+                file: (file)
+        });
+        });
+    }
+    app.locals.globalBGList=results;
+    console.log("Loaded globalBGList. Length:" + results.length);
+    return(results);
+}
+preloadWheelsAndBG();
 //for debugging.
 //app.locals.FEDataDir = 'C:\\Games\\PinFE\\Apps\\PinFE';
 //app.locals.FEDataDir = '../../../';

@@ -7,35 +7,69 @@ block content
 	//- 	button.btn-sm.close(type="button" data-dismiss="modal" aria-label="Close")
 	//- 		span(aria-hidden="true") ×
 	.modal-body
-		.float-left.pl-5
-			.row.d-flex.justify-content-center
-				i.fas.fa-search(onclick="window.open('https://www.google.com/search?tbm=isch&tbs=ic:trans&q="+ encodeURIComponent(tableInfo.name).replace(/[!'()*]/g, escape)+"','_blank')") 
-				img(id="wheelImage" src="tables/?image="+tableInfo.wheelPic style="width:200px;height:auto;min-height:200px;background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;")
-			.row.d-flex.justify-content-center
-				i.fas.fa-search(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name).replace(/[!'()*]/g, escape)+" directb2s','_blank')")
-				img(id="bgImage" src="tables/?image="+tableInfo.backglass, style="width:200px;height:auto;min-height:200px;background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;")
-			.row.d-flex.justify-content-center
-				i.fas.fa-search(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name).replace(/[!'()*]/g, escape)+"','_blank')")
-				img(id="tableImage" src="tables/?image="+tableInfo.fsSmallPic,style="width:200px;height:auto;min-height:200px;background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;")
-		.float-left.pl-5
-			.row
+		.row(style="width:100%;text-align:center")
+			.col-md-10.mx-auto.d-flex.justify-content-center
 				legend=tableInfo.name
-			.row
-				.col-sm-2
-					label.col-form-label(for="exampleSelect1") Game Name
-				.col-sm-5
-					select#exampleSelect1.form-control
-						option Batman '66 (Original 2018)
-						option 2
-						option 3
-						option 4
-						option 5
-			.row.align-bottom
-				form.dropzone(id="my-awesome-dropzone" method='POST' enctype="multipart/form-data" action='/table/uploadbg?table='+encodeURIComponent(tableInfo.file))
-					//- | Drop PNG and Directb2s Here
+		.row.w-100
+			.col-md-5
+				.row.h-100(style="width:100%;filter: drop-shadow(22px 22px 22px rgba(0,0,0,1.0));transform:perspective(1000px);transform-style: preserve-3d;")
+					.col.w-100(style='background:transparent;border:solid 1px red;')
+						div.dropzone(style="height:700px;margin-bottom:20px;width:100%;background:transparent;transform:perspective(1000px);transform-style: preserve-3d;")
+							div(style="margin-top:0px;height:40%;width:100%;background:transparent;")
+								i.fas.fa-search(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name).replace(/[!'()*]/g, escape)+" directb2s','_blank')")
+								div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('/backglasses/?fuzzySearch=1&imageIndex=0&search="+encodeURIComponent(tableInfo.file)+"');")
+							div(style="z-index:10;margin-top:-5%;height:10%;width:100%;background:transparent;transform:scale(1.5);")
+								div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('"+"table/"+encodeURIComponent(tableInfo.file).replace(/[!'()*]/g, escape)+"/wheel"+"');")
+								i.fas.fa-search(onclick="window.open('https://www.google.com/search?tbm=isch&tbs=ic:trans&q="+ encodeURIComponent(tableInfo.name).replace(/[!'()*]/g, escape)+"','_blank')") 
+							div(style="margin-left:auto;margin-right:auto;margin-top:-5%;height:50%;width:60%;background:transparent;transform:scale(1.5) rotateX(45deg)")
+								div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('"+"table/"+encodeURIComponent(tableInfo.file).replace(/[!'()*]/g, escape)+"/fullscreen"+"');")
+								//div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('tables/?image=MyLib%5CInbox%5CNew%5CClose%20Encounters%20of%20the%20Third%20Kind%20(VPX%2010.7%20version).vpx.fs-small.jpg');")
+
+
+				//img(id="wheelImage" src="table/"+encodeURIComponent(tableInfo.file).replace(/[!'()*]/g, escape)+"/wheel" style="width:200px;height:auto;min-height:200px;background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;")
+				//i.fas.fa-search(onclick="window.open('https://www.google.com/search?tbm=isch&tbs=ic:trans&q="+ encodeURIComponent(tableInfo.name).replace(/[!'()*]/g, escape)+"','_blank')") 
+			.col-md-7
+				.row
+					.col-3
+						label.col-form-label(for="exampleSelect1") Game Name
+					.col-8
+						select#exampleSelect1.form-control
+							option Batman '66 (Original 2018)
+							option 2
+							option 3
+							option 4
+							option 5
+
+		//- 	.row.d-flex.justify-content-center
+		//- 		i.fas.fa-search(onclick="window.open('https://www.google.com/search?tbm=isch&tbs=ic:trans&q="+ encodeURIComponent(tableInfo.name).replace(/[!'()*]/g, escape)+"','_blank')") 
+		//- 		//img(id="wheelImage" src="tables/?image="+tableInfo.wheelPic style="width:200px;height:auto;min-height:200px;background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;")
+		//- 		img(id="wheelImage" src="table/"+encodeURIComponent(tableInfo.file).replace(/[!'()*]/g, escape)+"/wheel" style="width:200px;height:auto;min-height:200px;background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;")
+		//- 	.row.d-flex.justify-content-center
+		//- 		i.fas.fa-search(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name).replace(/[!'()*]/g, escape)+" directb2s','_blank')")
+		//- 		img(id="bgImage" src="table/"+encodeURIComponent(tableInfo.file).replace(/[!'()*]/g, escape)+"/backglass" style="width:200px;height:auto;min-height:200px;background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;")
+		//- 	.row.d-flex.justify-content-center
+		//- 		i.fas.fa-search(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name).replace(/[!'()*]/g, escape)+"','_blank')")
+		//- 		//img(id="tableImage" src="tables/?image="+tableInfo.fsSmallPic style="width:200px;height:auto;min-height:200px;background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;")
+		//- 		img(id="tableImage" src="table/"+encodeURIComponent(tableInfo.file).replace(/[!'()*]/g, escape)+"/fullscreen" style="width:200px;height:auto;min-height:200px;background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;")
+		//- .float-left
+		//- 	.row
+		//- 		legend=tableInfo.name
+		//- 	.row
+		//- 		.col-sm-2
+		//- 			label.col-form-label(for="exampleSelect1") Game Name
+		//- 		.col-sm-5
+		//- 			select#exampleSelect1.form-control
+		//- 				option Batman '66 (Original 2018)
+		//- 				option 2
+		//- 				option 3
+		//- 				option 4
+		//- 				option 5
+		//- 	.row.align-bottom
+		//- 		form.dropzone(id="my-awesome-dropzone" method='POST' enctype="multipart/form-data" action='/table/uploadbg?table='+encodeURIComponent(tableInfo.file))
+		//- 			//- | Drop PNG and Directb2s Here
 	.modal-footer
 		//- button.btn.btn-secondary(type="button" data-dismiss="modal") Close
-		button.btn.btn-primary(type="button") Apply					
+		button.btn.btn-primary(type="button") Done					
 
 
 				//- Table Author(s)	
@@ -173,7 +207,10 @@ block content
 				evt.stopPropagation();
 				evt.preventDefault(); 
 				//console.log([evt,'!{tableInfo.file}'])
-				var imageUrl = evt.dataTransfer.getData('Text');
+				let imageUrl = evt.dataTransfer.getData('Text');
+
+				let encodedFile = "!{tableInfo.file}"
+				//alert(encodedFile);
 				if(imageUrl && imageUrl!="")
 				{
 					$.ajax({
@@ -189,9 +226,9 @@ block content
 
 		}
 		//$(document).ready(function() {
-		
+		var encodedFile = "!{tableInfo.file}"
 		$(".dropzone").dropzone({
-				//url:'/uploadbg',
+				url:"table/"+encodeURIComponent( encodedFile ).replace(/[!'()*]/g, escape)+"/upload",
 				//autoProcessQueue: true,
 				//paramName:'source_file', // Name used to transfer the file(s) (will have '[i=0,1,2,3,4...]' appended)
 				//paramName: function(n) { return 'source_file[]';},  // Don't enumerate the transfers
