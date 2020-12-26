@@ -1,0 +1,35 @@
+{
+    "version":1.0,
+    "dirs": {
+        "appDir":"../../Apps",
+        "libDirs":"../../Library",
+        "tableDirs":"../../Tables"
+    },
+    "displays": {
+        "playfield":{
+            "width":1920,
+            "height":1080,
+            "offsetX":0,
+            "offsetY":0,
+            "display":0,
+            "fullscreen":1
+        },
+        "backglass":{
+            "width":1920,
+            "height":1080,
+            "offsetX":1920,
+            "offsetY":0,
+            "display":0,
+            "fullscreen":1
+        },
+        "dmd":{
+            "width":1024,
+            "height":768,
+            "offsetX":0,
+            "offsetY":0,
+            "display":0,
+            "fullscreen":1
+        }
+    }
+
+}

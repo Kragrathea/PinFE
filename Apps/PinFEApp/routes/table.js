@@ -110,10 +110,18 @@ router.get('/:id/wheel', function (req, res) {
 });
 router.get('/:id/fullscreen', function (req, res) {
     let query = url.parse(req.url, true).query;
+    let size = query.size;
 
     let file = decodeURIComponent(req.params.id);
     let tablesDir = req.app.locals.FETableDirs+"/";
-    let path=tablesDir + file + ".fs-small.jpg"
+    let path=tablesDir + file;
+    if(size=="large")
+        path=path+".fs.jpg"
+    else if(size=="mp4")
+        path=path+".fs.mp4"
+    else
+        path=path+".fs-small.jpg";//default to small
+
     if(fs.existsSync(path))
     {
         fs.readFile(path, function (err, content) {
@@ -121,7 +129,10 @@ router.get('/:id/fullscreen', function (req, res) {
                 utils.sendMissingIcon(req,res);
             } else {
                 //specify the content type in the response will be an image
-                res.writeHead(200, { 'Content-type': 'image/jpg' });
+                if(size=="mp4")
+                    res.writeHead(200, { 'Content-type': 'video/mp4' });
+                else
+                    res.writeHead(200, { 'Content-type': 'image/jpg' });
                 res.end(content);
             }
         });
@@ -133,18 +144,28 @@ router.get('/:id/fullscreen', function (req, res) {
 });
 router.get('/:id/desktop', function (req, res) {
     let query = url.parse(req.url, true).query;
+    let size = query.size;
 
     let file = decodeURIComponent(req.params.id);
     let tablesDir = req.app.locals.FETableDirs+"/";
-    let path=tablesDir + file + ".dt-small.jpg"
+    let path=tablesDir + file;
+    if(size=="large")
+        path=path+".dt.jpg"
+    else if(size=="mp4")
+        path=path+".dt.mp4"
+    else
+        path=path+".dt-small.jpg";//default to small    
+
     if(fs.existsSync(path))
     {
         fs.readFile(path, function (err, content) {
             if (err) {
                 utils.sendMissingIcon(req,res);
             } else {
-                //specify the content type in the response will be an image
-                res.writeHead(200, { 'Content-type': 'image/jpg' });
+                if(size=="mp4")
+                    res.writeHead(200, { 'Content-type': 'video/mp4' });
+                else//specify the content type in the response will be an image
+                    res.writeHead(200, { 'Content-type': 'image/jpg' });
                 res.end(content);
             }
         });

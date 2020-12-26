@@ -713,14 +713,24 @@ block content
                             data: JSON.stringify({table:decodeURIComponent(tableFile)})}
                         )
 
-                    }                      
+                    }
+                    if(key=="folder")
+                    {
+                        $.ajax({
+                            url: "openFolder", 
+                            type: 'POST', 
+                            contentType: 'application/json', 
+                            data: JSON.stringify({table:decodeURIComponent(tableFile)})}
+                        )
+
+                    }                                           
                   },
                   items: {
                       "edit": {name: "Edit", icon: "edit"},
                       "play": {name: "Play", icon: "play"},
                       "test": {name: "Test", icon: "test"},
-                      "folder": {name: "Open Folder", icon: "folder"},
                       "load": {name: "Load in VP", icon: "load"},
+                      "folder": {name: "Open Folder", icon: "folder"},
 
                     //-   "searchWheel": {name: "Search for Wheel", icon: "search"},
                     //-   "searchBG": {name: "Search for Backglass", icon: "search"},

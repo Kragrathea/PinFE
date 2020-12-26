@@ -143,7 +143,22 @@ router.post('/select', function (req, res) {
 
     res.end();
 });
+router.post('/openFolder', function (req, res) {
+    var query = url.parse(req.url, true).query;
 
+    console.log("POST openFolder:" + req.body.table);
+    //var cmd = '"f:/Games/Visual Pinball/VPinballX_cab.exe" /play ' + '"c:\\' + tableDir + req.body.table + '"';
+
+    let tableDir=req.app.locals.FETableDirs+"/";
+    let tableFile= tableDir + path.dirname(req.body.table);
+    tableFile= path.resolve(tableFile)
+
+    //todo:Add sanity checks.
+    child_process.exec('start "" "'+tableFile+'"');
+    //captureVideo('../../VisualPinball/VisualPinballCab.exe', ["/play", tableDir + req.body.table, arg, "-minimized"], tableDir + req.body.table+".bg.mp4");
+
+    res.end();
+});
 function prepareTable(tableFile) {
     console.log("prepareTable:"+tableFile);
     let tableRomsDir = path.dirname(tableFile) + "\\Roms\\";

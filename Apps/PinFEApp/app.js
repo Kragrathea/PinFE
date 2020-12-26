@@ -25,8 +25,26 @@ var myArgs = process.argv.slice(2);
 //console.log('myArgs: ', myArgs);
 
 //todo(finish). make configurable
-app.locals.FELibDirs = defaultConfig.libDirs;//'/Games/PinFE';
-app.locals.FETableDirs = defaultConfig.tableDirs;//'/Games/PinFE';
+app.locals.PinFEDefaultConfig = require('./PinFE.config.default.json');
+app.locals.PinFEConfig={
+    ...app.locals.PinFEDefaultConfig
+}
+if(fs.existsSync('./PinFE.config.json')){
+    let feConfig = require('./PinFE.config.json');
+    app.locals.PinFEConfig ={
+        ...app.locals.PinFEDefaultConfig,
+        ...feConfig,
+    }
+    console.log("PinFEConfig loaded:"+JSON.stringify(app.locals.PinFEConfig))
+}else{
+    console.log("PinFE DEFAULT Config loaded:"+JSON.stringify(app.locals.PinFEConfig))
+    let data = JSON.stringify(app.locals.PinFEDefaultConfig);
+    fs.writeFileSync('./PinFE.config.json', data);
+    //console.log("PinFE DEFAULT Config saved")
+}
+
+app.locals.FELibDirs = app.locals.PinFEConfig.dirs.libDirs;//'/Games/PinFE';
+app.locals.FETableDirs = app.locals.PinFEConfig.dirs.tableDirs;//'/Games/PinFE';
 
 function preloadGames()
 {

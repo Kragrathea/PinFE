@@ -6,7 +6,7 @@ block content
     div(style:'float:left')
         h2.status(style='color:green;position:absolute;top:15px;right:15px;z-index:11')
         h2.tableName(style='display:inline-block;height:25px;margin:0px')
-    img.backglass(src=image style="width:auto;height:100%")
+    img.wheel(src=image style="width:auto;height:100%")
     //div.swiper-pagination
   script.
 
@@ -21,8 +21,9 @@ block content
             if($(".status").val()!=status.state)
                 $(".status").text(status.state);
 
-            if($(".backglass").attr("src")!="tables?image="+encodeURIComponent(status.table)+".wheel.png")
-                $(".backglass").attr("src","tables?image="+encodeURIComponent(status.table)+".wheel.png");
+            let imgPath="table/"+encodeURIComponent(status.table).replace(/[!'()*]/g, escape)+"/wheel"
+            if($(".wheel").attr("src")!=imgPath)
+                $(".wheel").attr("src",imgPath);    
             //console.log("message:"+status.data);
         }, false)
 

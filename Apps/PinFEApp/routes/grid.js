@@ -90,29 +90,6 @@ function getSearchIndex(wheelList) {
     let wheelListIndex = new Fuse(wheelList, options);
     return(wheelListIndex);
 }
-var Registry = require('winreg')
-var romPath=null;//todo make this sync
-function loadRomPath()
-{
-    let   regKey = new Registry({                                       // new operator is optional
-        hive: Registry.HKCU,                                        // open registry hive HKEY_CURRENT_USER
-        key:  '\\Software\\Freeware\\Visual PinMame\\globals' // key containing autostart programs
-        })
-
-    regKey.values(function (err, items /* array of RegistryItem */) {
-    if (err)
-        console.log('ERROR: '+err);
-    else
-        for (var i=0; i<items.length; i++){
-            //console.log('ITEM: '+items[i].name+'\t'+items[i].type+'\t'+items[i].value);
-            if(items[i].name==="rompath"){
-                romPath=items[i].value+"\\";
-                console.log("Setting romPath:"+romPath);
-            }
-        }
-    });
-}
-loadRomPath();//todo make this sync
 
 var allGames=null;
 function getAllGames()
