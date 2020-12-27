@@ -17,7 +17,7 @@ block content
 						div.dropzone(style="height:700px;margin-bottom:20px;width:100%;background:transparent;transform:perspective(1000px);transform-style: preserve-3d;")
 							div(style="margin-top:0px;height:40%;width:100%;background:transparent;")
 								i.fas.fa-search(onclick="window.open('https://www.google.com/search?q="+ encodeURIComponent(tableInfo.name).replace(/[!'()*]/g, escape)+" directb2s','_blank')")
-								div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('/backglasses/?fuzzySearch=1&imageIndex=0&search="+encodeURIComponent(tableInfo.file)+"');")
+								div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('/table/"+encodeURIComponent(tableInfo.file).replace(/[!'()*]/g, escape)+"/backglass"+"');")
 							div(style="z-index:10;margin-top:-5%;height:10%;width:100%;background:transparent;transform:scale(1.5);")
 								div(style="width:100%;height:100%;background-position: center center;background-size: contain;background-repeat:no-repeat;background-image: url('"+"table/"+encodeURIComponent(tableInfo.file).replace(/[!'()*]/g, escape)+"/wheel"+"');")
 								i.fas.fa-search(onclick="window.open('https://www.google.com/search?tbm=isch&tbs=ic:trans&q="+ encodeURIComponent(tableInfo.name).replace(/[!'()*]/g, escape)+"','_blank')") 
@@ -33,7 +33,7 @@ block content
 					.col-3
 						label.col-form-label(for="exampleSelect1") Game Name
 					.col-8
-						select#exampleSelect1.form-control
+						select#game-name.form-control
 							option Batman '66 (Original 2018)
 							option 2
 							option 3

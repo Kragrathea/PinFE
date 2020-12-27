@@ -126,7 +126,9 @@ router.post('/capture', function (req, res) {
         {
             //copy over roms.
             prepareTable(tableFile);
-            captureVideo('../VisualPinball/VisualPinballCab.exe', ["/play", tableFile, arg, "-minimized"], outName);
+            let bounds= req.app.locals.PinFEConfig.displays.playfield;
+
+            captureVideo('../VisualPinball/VisualPinballCab.exe', ["/play", tableFile, arg, "-minimized"], outName,bounds.offsetX,bounds.offsetY,bounds.width,bounds.height);
         }
     }
 
@@ -209,7 +211,7 @@ router.get('/status', function (req, res) {
 });
 
 var captureActive = false;
-function captureVideo(command, args, outName) {
+function captureVideo(command, args, outName,offX,offY,width,height) {
     console.log("Starting capture:"+args);
     if (playerActive)
         return;
@@ -229,8 +231,8 @@ function captureVideo(command, args, outName) {
 
         if (data.toString().indexOf("VPTableStart")>-1) {
 
-            var ffargs = ["-loglevel", "error", "-stats", "-f", "gdigrab", "-framerate", "30", "-offset_x", "-1920", "-offset_y", "0",
-                "-video_size", "1920x1080", "-ss", "6", "-t", "00:00:2", "-i", "desktop", "-c:v", "h264_nvenc", "-an", "-preset", "lossless", "-y", "-f", "mp4",
+            var ffargs = ["-loglevel", "error", "-stats", "-f", "gdigrab", "-framerate", "30", "-offset_x", offX, "-offset_y", offY,
+                "-video_size", width.toString()+"x"+height, "-ss", "6", "-t", "00:00:2", "-i", "desktop", "-c:v", "h264_nvenc", "-an", "-preset", "lossless", "-y", "-f", "mp4",
                 outName+"_"];
 
             var ffmpeg = child_process.spawn("../Ffmpeg/ffmpeg.exe", ffargs);
