@@ -7,7 +7,7 @@ $(function(){
 	// Start by fetching the file data from scan.php with an AJAX request
 
 	//var data = {"name":"Home","type":"folder","path":"Home","items":[{"name":"Lorem Ipsum","type":"folder","path":"Home\/Lorem Ipsum","items":[{"name":"Another_Folder","type":"folder","path":"Home\/Lorem Ipsum\/Another_Folder","items":[]},{"name":"Lorem-Ipsum.pdf","type":"file","path":"Home\/Lorem Ipsum\/Lorem-Ipsum.pdf","size":77123}]},{"name":"Videos","type":"folder","path":"Home\/Videos","items":[{"name":"Waterfalls.mp4","type":"file","path":"Home\/Videos\/Waterfalls.mp4","size":11973085}]},{"name":"mahkeo-222765.jpg","type":"file","path":"Home\/mahkeo-222765.jpg","size":1093032},{"name":"montylov-252445.jpg","type":"file","path":"Home\/montylov-252445.jpg","size":6236288},{"name":"paul-itkin-261733.jpg","type":"file","path":"Home\/paul-itkin-261733.jpg","size":424875},{"name":"sylwia-bartyzel-114124.jpg","type":"file","path":"Home\/sylwia-bartyzel-114124.jpg","size":2358664}]}
-	$.get('/grid/scan?type=games', function(data) {
+	$.get('/grid/scan?type=inbox', function(data) {
 
 		var response = [data],
 			currentPath = '',

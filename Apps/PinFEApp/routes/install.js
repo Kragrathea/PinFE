@@ -455,6 +455,23 @@ router.post('/upload', upload_files.single('file'), (req, res, next) => {
         });
         return res.status(200).send(req.file);
       }
+      if (req.file.mimetype.startsWith('application/x-zip-compressed') ) {
+        var destName = tablesDir+ "/Inbox/"+req.file.originalname;
+        // if(fs.existsSync(destName))
+        // {
+        //     return res.status(422).json({
+        //         error :'File exists.'
+        //       });
+        // }
+        console.log("Writing:"+destName);
+        fs.writeFile(destName, req.file.buffer, function (err) {
+            //todo:handle err
+            //res.redirect("back");
+            let results = processZipFiles([destName]);
+
+        });
+        return res.status(200).send(req.file);
+      }      
     if (req.file.mimetype.startsWith('application/') && req.file.originalname.toLowerCase().endsWith(".directb2s")) {
         // var destName = tablesDir+ tableFile+".directb2s";
         // if(fs.existsSync(destName))

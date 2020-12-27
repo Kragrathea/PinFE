@@ -176,6 +176,16 @@ router.get('/scan', function (req, res) {
             //items:scan(wheelsDir,"/", /\.(png|directb2s)\b/)
             items:scan(dir,"/", /\.vpx$/)
         };
+    }else if(type==="inbox"){
+        let dir = req.app.locals.FETableDirs+"/Inbox/";
+
+        results={
+            name: "",
+            type:"folder",
+            path:"",
+            //items:scan(wheelsDir,"/", /\.(png|directb2s)\b/)
+            items:scan(dir,"/", /\./)
+        };
     }else if(type==="wheel"){
         let dir = req.app.locals.FELibDirs+"/Wheels/";
 

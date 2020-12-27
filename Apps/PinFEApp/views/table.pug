@@ -31,15 +31,24 @@ block content
 			.col-md-7
 				.row
 					.col-3
-						label.col-form-label(for="exampleSelect1") Game Name
+						label.col-form-label(for="game-name") Game Name
 					.col-8
 						select#game-name.form-control
-							option Batman '66 (Original 2018)
+							option=tableInfo.dbase.gameName
 							option 2
 							option 3
 							option 4
 							option 5
-
+				.row
+					.col-3
+						label.col-form-label(for="game-tags") Tags
+					.col-8
+						div#game-tags.form-control=JSON.stringify(tableInfo.tags)
+				.row
+					.col-3
+						label.col-form-label(for="game-dbase") dbase
+					.col-8
+						div#game-dbase.form-control=JSON.stringify(tableInfo.dbase)						
 		//- 	.row.d-flex.justify-content-center
 		//- 		i.fas.fa-search(onclick="window.open('https://www.google.com/search?tbm=isch&tbs=ic:trans&q="+ encodeURIComponent(tableInfo.name).replace(/[!'()*]/g, escape)+"','_blank')") 
 		//- 		//img(id="wheelImage" src="tables/?image="+tableInfo.wheelPic style="width:200px;height:auto;min-height:200px;background:radial-gradient(#9d9e9e,rgb(2, 2, 2)) no-repeat;")
