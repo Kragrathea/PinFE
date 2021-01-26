@@ -29,12 +29,12 @@ var download = function(url, dest, cb) {
             });
         }else{
             //not png error
-            fs.unlink(dest); // Delete the file async. (But we don't check the result)
+            fs.unlinkSync(dest); // Delete the file async. (But we don't check the result)
             console.log("Download error:not png/jpg");
             if (cb) cb("Download error:not png/jpg");
         }
     }).on('error', function(err) { // Handle errors
-      fs.unlink(dest); // Delete the file async. (But we don't check the result)
+      fs.unlinkSync(dest); // Delete the file async. (But we don't check the result)
       console.log("Download error:"+err.message);
       if (cb) cb(err.message);
     });

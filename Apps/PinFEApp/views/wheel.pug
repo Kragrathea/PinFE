@@ -2,16 +2,20 @@
 
 
 block content
-  div(style='width:100%;height:100%')
+  div.wheel2(style='position:absolute;width:100%;height:100%;background-position: center center;background-size: contain; background-repeat:no-repeat;')
     div(style:'float:left')
         h2.status(style='color:green;position:absolute;top:15px;right:15px;z-index:11')
         h2.tableName(style='display:inline-block;height:25px;margin:0px')
-    img.wheel(src=image style="width:auto;height:100%")
-    //div.swiper-pagination
+    div(style="display:inline-block;margin:0px 0px 0px 0px;width:100%;height:100%;background-position: center center;background-size: contain; background-repeat:no-repeat;background-image: url(\'/"+image+"\');")
+
+    //- img.wheel(src=image style="width:auto;height:100%")
+    //- div.swiper-pagination
   script.
 
-    /*var tables = !{JSON.stringify(tables)}*/
-    
+    /*Remove nav and fs toggle on wheel screen.*/
+    $("nav").hide();    
+    $("#fstoggle").hide();    
+    $(".status").hide();    
 
       if (!!window.EventSource) {
         var source = new EventSource('/status')
@@ -22,6 +26,9 @@ block content
                 $(".status").text(status.state);
 
             let imgPath="table/"+encodeURIComponent(status.table).replace(/[!'()*]/g, escape)+"/wheel"
+
+            if($(".wheel2").css("background-image")!="url('"+imgPath+"')")
+                $(".wheel2").css("background-image","url('"+imgPath+"')");    
             if($(".wheel").attr("src")!=imgPath)
                 $(".wheel").attr("src",imgPath);    
             //console.log("message:"+status.data);
