@@ -107,7 +107,10 @@ router.post('/capture', function (req, res) {
     if (view) {
         var arg = "";
         var outName;
-        var xOffset = -1920;    //TODO:Make config!!!
+        //var xOffset = -1920;    //TODO:Make config!!!
+
+        let bounds= req.app.locals.PinFEConfig.displays.playfield;
+        
         if (view && view.toLowerCase() === "dt") {
             arg = "-ForceDT";
             outName = tableDir + req.body.table + ".dt.mp4"
@@ -117,7 +120,7 @@ router.post('/capture', function (req, res) {
         } else if (view && view.toLowerCase() === "bg") {
             arg = "-ForceFS";
             outName = tableDir + req.body.table + ".bg.mp4"
-            xOffset=0;
+            bounds= req.app.locals.PinFEConfig.displays.backglass;
         } else if (view && view.toLowerCase() === "fs") {
             arg = "-ForceFS";
             outName = tableDir + req.body.table + ".fs.mp4"
@@ -126,7 +129,6 @@ router.post('/capture', function (req, res) {
         {
             //copy over roms.
             prepareTable(tableFile);
-            let bounds= req.app.locals.PinFEConfig.displays.playfield;
 
             captureVideo('../VisualPinball/VisualPinballCab.exe', ["/play", tableFile, arg, "-minimized"], outName,bounds.offsetX,bounds.offsetY,bounds.width,bounds.height);
         }
@@ -334,6 +336,9 @@ function captureVideo(command, args, outName,offX,offY,width,height) {
                 //    console.log('ffmpeg stderr: ' + data);
                 //});
 
+                //and any pup crap running. 
+                child_process.spawn("taskkill", ["/IM", "PinUpDisplay.exe", "/F"]);
+                child_process.spawn("taskkill", ["/IM", "PinUpPlayer.exe", "/F"]);
 
                 captureActive = false;
             });

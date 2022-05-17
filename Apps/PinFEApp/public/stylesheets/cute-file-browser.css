@@ -207,16 +207,37 @@ body {
 	border-radius: 15px;
 	transition: all .2s ease-in-out;
 }
+.filemanager .data li.large  {
+	width: 320px;
+	height: 200px;
+}
+.filemanager .data li.large .name {
+	white-space:pre-wrap;
+	height:40px;
+	bottom:0px;
+}
+
+.filemanager .data li.large:hover {
+	background-color:#6b696970;
+	transform: scale(1.0);
+}
+
+.filemanager li.selected {
+    color: red !important;
+    border: 2px solid rgb(30, 255, 0) !important;  
+    transform: scale(1.0);
+	background-color:#6b696970;
+}
 
 li:focus-within {
     color: red !important;
     border: 1px solid red !important;  
-    transform: scale(1.1);
+    transform: scale(1.0);
 	background-color:#6b696970;
 }
 .filemanager .data li:hover {
 	background-color:#6b696970;
-	transform: scale(1.1);
+	transform: scale(1.0);
 }
 
 .filemanager .data li a {

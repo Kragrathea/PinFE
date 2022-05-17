@@ -275,3 +275,12 @@ Apps/VisualPinball/VPTemp0.ttf
 
 Apps/PinFEApp/PinFE.config.json
 Apps/MultiMonitorTool.cfg
+Apps/PinUPPlayer/PUPVideos/*
+Apps/VisualPinball/User/VPReg.stg
+Apps/VPinMAME/cfg/*
+Apps/VPinMAME/nvram/*
+Apps/BackglassServer/B2STableSettings.xml
+Apps/BackglassServer/ScreenRes.txt
+Apps/VisualPinball/User/VPReg.stg
+Apps/VPinMAME/nvram/cueball.nv
+Apps/BackglassServer/B2STableSettings.xml

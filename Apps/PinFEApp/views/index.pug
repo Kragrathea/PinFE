@@ -692,6 +692,16 @@ block content
                         )
 
                     }
+                    if(key=="testbg")
+                    {
+                        let playUrl = '/capture?view=bg';
+                        $.ajax({
+                            url: playUrl, 
+                            type: 'POST', 
+                            contentType: 'application/json', 
+                            data: JSON.stringify({table:decodeURIComponent(tableFile)})}
+                        )
+                    }                    
                     if(key=="load")
                     {
                         /*var playUrl = '/capture?view=fs'
@@ -729,6 +739,7 @@ block content
                       "edit": {name: "Edit", icon: "edit"},
                       "play": {name: "Play", icon: "play"},
                       "test": {name: "Test", icon: "test"},
+                      "testbg": {name: "Testbg", icon: "testbg"},
                       "load": {name: "Load in VP", icon: "load"},
                       "folder": {name: "Open Folder", icon: "folder"},
 

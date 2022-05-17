@@ -4,7 +4,7 @@
         "config_id": "development",
         "libDirs":"../../Library",
         "tableDirs":"../../Tables",
-        "node_port": 3000
+        "node_port": 4000
     },
     "production": {
         "config_id": "production",
