@@ -375,6 +375,18 @@ block content
             case 40:
                 // down arrow
                 break;
+            case 16:
+            console.log(e.location)
+                if (e.location === KeyboardEvent.DOM_KEY_LOCATION_LEFT){
+                    // left arrow
+                    buildingFilter=false;
+                    swiper.slidePrev();
+                } else if (e.location === KeyboardEvent.DOM_KEY_LOCATION_RIGHT){
+                    // right arrow
+                    buildingFilter=false;
+                    swiper.slideNext();
+                }
+                break;
             case 37:
                 // left arrow
                 buildingFilter=false;
@@ -738,8 +750,8 @@ block content
                   items: {
                       "edit": {name: "Edit", icon: "edit"},
                       "play": {name: "Play", icon: "play"},
-                      "test": {name: "Test", icon: "test"},
-                      "testbg": {name: "Testbg", icon: "testbg"},
+                    //  "test": {name: "Test", icon: "test"},
+                    //  "testbg": {name: "Testbg", icon: "testbg"},
                       "load": {name: "Load in VP", icon: "load"},
                       "folder": {name: "Open Folder", icon: "folder"},
 
