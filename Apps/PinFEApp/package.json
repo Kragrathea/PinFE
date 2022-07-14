@@ -30,7 +30,7 @@
     "node-stream-zip": "^1.15.0",
     "pug": "^2.0.0-beta6",
     "serve-favicon": "^2.3.0",
-    "swiper": "^5.4.5",
+    "swiper": "^6.5.1",
     "tabulator-tables": "^4.9.3",
     "vanilla-tilt": "^1.7.2",
     "winreg": "^1.2.4",
