@@ -363,7 +363,7 @@ block content
     document.onkeydown = checkKey;
     function checkKey(e) {
         e = e || window.event;
-        //console.log(e.keyCode);      
+        console.log(e.keyCode);      
         if (e.ctrlKey)
             return;
 
@@ -375,10 +375,8 @@ block content
             case 40:
                 // down arrow
                 break;
-            case 49://"1" on keyboard. For cabs
-            case 53://"5" on keyboard. For cabs
             case 16:
-            console.log(e.location)
+            //console.log(e.location)
                 if (e.location === KeyboardEvent.DOM_KEY_LOCATION_LEFT){
                     // left arrow
                     buildingFilter=false;
@@ -399,6 +397,8 @@ block content
                 buildingFilter=false;
                 swiper.slideNext();
                 break;
+            case 49://"1" on keyboard. For cabs
+            case 53://"5" on keyboard. For cabs
             case 13:
                 var curIndex = parseInt(swiper.virtual.slides[swiper.activeIndex]);
                 var table = filteredTables[curIndex].table;
@@ -418,16 +418,17 @@ block content
                 setFilter(curFilter);
                 break;
             default:
-                if (e.key.length==1 /*&& e.key.match(/^[0-9a-z]+$/)*/)
-                {
-                    if(!buildingFilter){
-                        curFilter=""
-                        buildingFilter=true;
-                        }
-                    curFilter=curFilter+e.key;
-                    setFilter(curFilter);
-                    //console.log(curFilter);
-                }
+                //handle keyboard search
+                //- if (e.key.length==1 /*&& e.key.match(/^[0-9a-z]+$/)*/)
+                //- {
+                //-     if(!buildingFilter){
+                //-         curFilter=""
+                //-         buildingFilter=true;
+                //-         }
+                //-     curFilter=curFilter+e.key;
+                //-     setFilter(curFilter);
+                //-     //console.log(curFilter);
+                //- }
                 break;
         }
         $(".filter").text(curFilter);
