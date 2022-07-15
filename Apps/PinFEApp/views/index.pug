@@ -352,6 +352,12 @@ block content
         });
     }
 
+    var launchSoundsIndex=0;
+    var launchSounds =[new Audio('/sounds/play.wav'),new Audio('/sounds/play.wav')];
+    function playLaunch()
+    {
+        launchSounds[(launchSoundsIndex++)%launchSounds.length].play()
+    }        
           
 
     //swiper.on("reachBeginning",updateSlides);
@@ -406,6 +412,9 @@ block content
                 if(e.shiftKey || (window.location.href.toLowerCase().indexOf("view=dt") > -1))
                     playUrl='/play?view=dt';
 
+                playLaunch();
+                $(".spinner").show();
+
                 $.ajax({
                     url: playUrl, 
                     type: 'POST', 
@@ -448,9 +457,9 @@ block content
 
                 //loading spinner
                 if(status.state.startsWith("Playing"))
-                    $(".fa-spinner").show();
+                    $(".spinner").show();
                 else
-                    $(".fa-spinner").hide();
+                    $(".spinner").hide();
                 
             }
 
